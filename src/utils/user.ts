@@ -1,5 +1,15 @@
 import { IUser, IUserDocument } from "@/models/User";
 
+/**
+ * Sanitizes a user object by selecting specific fields based on the user's role.
+ *
+ * @param user - The user document to be sanitized.
+ * @param role - The role of the user, which determines the fields to be included.
+ * @returns A sanitized user object containing common fields for all users.
+ *          If the role is 'admin' or 'super-admin', additional fields such as
+ *          email, blocked status, deleted status, and otp are included.
+ */
+
 export function sanitizeUser(user: IUserDocument, role: IUser['role'] = 'user') {
     const baseUser = {
         _id: user._id,
