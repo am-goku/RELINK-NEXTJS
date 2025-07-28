@@ -26,8 +26,8 @@ export interface IUser {
     messageFrom?: 'everyone' | 'followers' | 'none';
     onlineStatus?: boolean;
 
-    createdAt?: Date;
-    updatedAt?: Date;
+    created_at?: Date;
+    updated_at?: Date;
 }
 
 export type IUserDocument = Document & IUser;

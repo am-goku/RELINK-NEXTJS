@@ -2,58 +2,29 @@ import User, { IUser, IUserDocument } from "@/models/User";
 import { connectDB } from "../mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
 import { FilterQuery } from "mongoose";
+import { sanitizeUser } from "@/utils/user";
 
 export async function getUserById(
     userId: string,
     role: IUser['role'] = 'user'
 ) {
 
-    if (!userId) throw new NotFoundError('Username not found')
+    if (!userId) throw new NotFoundError('User ID not found')
 
     await connectDB()
 
-    const query: FilterQuery<IUserDocument> = {
-        _id: userId,
-        blocked: role === 'user' ? { $ne: true } : undefined,
-        deleted: role === 'user' ? { $ne: true } : undefined,
-        role: { $in: ['user', null] },
+    const query: FilterQuery<IUserDocument> = { _id: userId };
+
+    if (role === 'user') {
+        query.blocked = { $ne: true };
+        query.deleted = { $ne: true };
+        query.role = 'user';
     }
 
     const user: IUserDocument | null = await User.findOne(query);
+    if (!user) throw new NotFoundError('User not found');
 
-    if (!user) throw new NotFoundError('User not found')
-
-    const baseUser = {
-        _id: user._id,
-        username: user.username,
-        role: user.role,
-        name: user.name,
-        bio: user.bio,
-        gender: user.gender,
-        image: user.image,
-        cover: user.cover,
-        links: user.links,
-        accountType: user.accountType,
-        messageFrom: user.messageFrom,
-        onlineStatus: user.onlineStatus,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        followersCount: user.followers?.length || 0,
-        followingCount: user.following?.length || 0,
-    }
-
-    if (role === 'admin' || role === 'super-admin') {
-        return {
-            ...baseUser,
-            email: user.email,
-            blocked: user.blocked,
-            deleted: user.deleted,
-            otp: user.otp,
-        }
-    }
-
-    // If role is 'user', hide sensitive fields
-    return baseUser
+    return sanitizeUser(user, role);
 }
 
 
@@ -61,52 +32,23 @@ export async function getUserByUsername(
     username: string,
     role: IUser['role'] = 'user'
 ) {
-    if (!username) throw new NotFoundError('Username not found')
+    if (!username) throw new NotFoundError('Username is required')
 
     await connectDB()
 
-    const query: FilterQuery<IUserDocument> = {
-        username: username,
-        blocked: role === 'user' ? { $ne: true } : undefined,
-        deleted: role === 'user' ? { $ne: true } : undefined,
-        role: { $in: ['user', null] },
+    // Build query conditionally (avoid undefined keys)
+    const query: FilterQuery<IUserDocument> = { username };
+
+    if (role === 'user') {
+        query.blocked = { $ne: true };
+        query.deleted = { $ne: true };
+        query.role = 'user';
     }
 
     const user: IUserDocument | null = await User.findOne(query);
-
     if (!user) throw new NotFoundError('User not found')
 
-    const baseUser = {
-        _id: user._id,
-        username: user.username,
-        role: user.role,
-        name: user.name,
-        bio: user.bio,
-        gender: user.gender,
-        image: user.image,
-        cover: user.cover,
-        links: user.links,
-        accountType: user.accountType,
-        messageFrom: user.messageFrom,
-        onlineStatus: user.onlineStatus,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        followersCount: user.followers?.length || 0,
-        followingCount: user.following?.length || 0,
-    }
-
-    if (role === 'admin' || role === 'super-admin') {
-        return {
-            ...baseUser,
-            email: user.email,
-            blocked: user.blocked,
-            deleted: user.deleted,
-            otp: user.otp,
-        }
-    }
-
-    // If role is 'user', hide sensitive fields
-    return baseUser
+    return sanitizeUser(user, role)
 }
 
 
@@ -125,20 +67,22 @@ export async function updateUserProfile({ email, data }: UpdateProfileInput): Pr
 
     const updates: Record<string, unknown> = {};
 
-    // Enforce whitelist
-    for (const field of allowedFields) {
-        if (Object.prototype.hasOwnProperty.call(data, field)) {
-            updates[field] = data[field];
+    // Only allow specific fields, collect disallowed ones
+    const disallowedFields: string[] = [];
+    for (const key of Object.keys(data)) {
+        if (allowedFields.includes(key)) {
+            updates[key] = data[key];
+        } else {
+            disallowedFields.push(key);
         }
     }
 
-    // Check for disallowed fields
-    const disallowedFields = Object.keys(data).filter(field => !allowedFields.includes(field));
+    // Explicitly reject any disallowed fields
     if (disallowedFields.length > 0) {
         throw new Error(`Attempt to update disallowed fields: ${disallowedFields.join(", ")}`);
     }
 
-    // Unique username check
+    // Check for unique username manually (before update)
     if (updates.username) {
         const existing = await User.findOne({ username: updates.username });
         if (existing && existing.email !== email) {
@@ -146,14 +90,13 @@ export async function updateUserProfile({ email, data }: UpdateProfileInput): Pr
         }
     }
 
-    // Update and return safe user
     const updatedUser = await User.findOneAndUpdate(
         { email },
         updates,
         { new: true }
-    ).select("-password -otp");
+    );
 
     if (!updatedUser) throw new NotFoundError("User not found");
 
-    return updatedUser.toObject();
+    return sanitizeUser(updatedUser, 'user')
 }
