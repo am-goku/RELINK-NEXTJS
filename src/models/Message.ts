@@ -39,6 +39,9 @@ const MessageSchema = new Schema<IMessageDocument>(
     }
 )
 
+// Index for faster chat queries
+MessageSchema.index({ sender: 1, receiver: 1, created_at: 1 });
+
 const Message = mongoose.models.Message || mongoose.model<IMessageDocument>("Message", MessageSchema);
 
 export default Message;

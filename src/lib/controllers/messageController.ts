@@ -11,8 +11,8 @@ export async function createMessage(c_user: string, receiver: string, message: s
     }
 
     // No need to fetch full user docs, just check existence
-    const usersExist = await User.exists({ _id: { $in: [c_user, receiver] } });
-    if (!usersExist) throw new NotFoundError('Users not found');
+    const users = await User.find({ _id: { $in: [c_user, receiver] } });
+    if (users.length !== 2) throw new NotFoundError('One or both users not found');
 
     const newMessage = await Message.create({
         sender: c_user,
@@ -23,18 +23,21 @@ export async function createMessage(c_user: string, receiver: string, message: s
     return newMessage;
 }
 
-export async function getMessages(c_user: string, receiver: string) {
+export async function getMessages(c_user: string, receiver: string, skip?: number) {
     await connectDB();
 
-    const usersExist = await User.exists({ _id: { $in: [c_user, receiver] } });
-    if (!usersExist) throw new NotFoundError('Users not found');
+    const users = await User.find({ _id: { $in: [c_user, receiver] } });
+    if (users.length !== 2) throw new NotFoundError('One or both users not found');
 
     const rawMessages = await Message.find({
         $or: [
             { sender: c_user, receiver },
             { sender: receiver, receiver: c_user }
         ]
-    }).sort({ createdAt: 1 });
+    }).sort({ created_at: -1 })
+        .limit(20)   // latest 20 messages
+        .skip(skip || 0)  // for pagination
+        .lean();
 
     // Mask deleted messages with placeholder
     const messages = rawMessages.map(msg => ({
@@ -42,9 +45,9 @@ export async function getMessages(c_user: string, receiver: string) {
         sender: msg.sender,
         receiver: msg.receiver,
         message: msg.deleted ? "This message was deleted." : msg.message,
-        deleted: msg.deleted || false,
-        createdAt: msg.createdAt,
-        updatedAt: msg.updatedAt
+        deleted: msg.deleted ?? false,
+        created_at: msg.created_at,
+        updated_at: msg.updated_at
     }));
 
     return messages;
@@ -54,14 +57,15 @@ export async function getMessages(c_user: string, receiver: string) {
 export async function deleteMessage(messageId: string) {
     await connectDB();
 
-    const result = await Message.updateOne(
-        { _id: messageId },
-        { $set: { deleted: true } }
+    const deletedMessage = await Message.findOneAndUpdate(
+        { _id: messageId, deleted: { $ne: true } },
+        { $set: { deleted: true } },
+        { new: true } // returns updated doc
     );
 
-    if (result.matchedCount === 0) {
-        throw new NotFoundError('Message not found');
+    if (!deletedMessage) {
+        throw new NotFoundError('Message not found or already deleted');
     }
 
-    return result;
+    return deletedMessage;
 }
