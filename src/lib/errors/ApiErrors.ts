@@ -57,3 +57,57 @@ export class InternalServerError extends ApiError {
         super(message, 500);
     }
 }
+
+export class TooManyRequestsError extends ApiError {
+    constructor(message = 'Too Many Requests') {
+        super(message, 429);
+    }
+}
+
+export class ServiceUnavailableError extends ApiError {
+    constructor(message = 'Service Unavailable') {
+        super(message, 503);
+    }
+}
+
+export class GatewayTimeoutError extends ApiError {
+    constructor(message = 'Gateway Timeout') {
+        super(message, 504);
+    }
+}
+
+export class MethodNotAllowedError extends ApiError {
+    constructor(message = 'Method Not Allowed') {
+        super(message, 405);
+    }
+}
+
+export class RequestTimeoutError extends ApiError {
+    constructor(message = 'Request Timeout') {
+        super(message, 408);
+    }
+}
+
+export class UnsupportedMediaTypeError extends ApiError {
+    constructor(message = 'Unsupported Media Type') {
+        super(message, 415);
+    }
+}
+
+export class PayloadTooLargeError extends ApiError {
+    constructor(message = 'Payload Too Large') {
+        super(message, 413);
+    }
+}
+
+export class NetworkError extends ApiError {
+    constructor(message = 'Network Error') {
+        super(message, 503);
+    }
+}
+
+export class NetworkTimeoutError extends ApiError {
+    constructor(message = 'Network Timeout') {
+        super(message, 504);
+    }
+}
