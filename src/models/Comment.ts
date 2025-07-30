@@ -4,8 +4,9 @@ export interface IComment {
     _id: Types.ObjectId;
     post: Types.ObjectId;
     user: Types.ObjectId;
-    text: string;
+    comment: string;
     created_at?: Date;
+    updated_at?: Date;
 }
 
 export type ICommentDocument = IComment & Document;
@@ -21,7 +22,7 @@ const CommentSchema = new Schema<ICommentDocument>(
             ref: "User",
             required: true
         },
-        text: {
+        comment: {
             type: String,
             required: true
         },
