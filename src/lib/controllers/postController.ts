@@ -5,7 +5,7 @@ import { connectDB } from "../mongoose";
 import cloudinary from "../cloudinary";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { SessionUser } from "@/types/instance";
-import { sanitizePost } from "@/utils/post";
+import { sanitizePost } from "@/utils/sanitizer/post";
 
 
 export async function createPost(formData: FormData, user: SessionUser) {

@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/mongoose";
 import Comment from "@/models/Comment";
 import { BadRequestError } from "../errors/ApiErrors";
-import { sanitizeComment } from "@/utils/comment";
+import { sanitizeComment } from "@/utils/sanitizer/comment";
 
 const PAGE_SIZE = 20;
 

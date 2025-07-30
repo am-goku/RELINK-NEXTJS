@@ -2,7 +2,7 @@ import User, { IUser, IUserDocument } from "@/models/User";
 import { connectDB } from "../mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
 import { FilterQuery } from "mongoose";
-import { sanitizeUser } from "@/utils/user";
+import { sanitizeUser } from "@/utils/sanitizer/user";
 
 
 /**
