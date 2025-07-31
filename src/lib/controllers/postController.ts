@@ -101,3 +101,21 @@ export async function getPostsByUsername(username: string, page = 1) {
 
     return posts.map(post => sanitizePost(post));
 }
+
+export async function getPostsByUserId(userId: string, page = 1) {
+    await connectDB()
+
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find({
+        user: userId,
+        is_archived: false,
+        is_blocked: false,
+    }).sort({ created_at: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate("user", "name username image");
+
+    return posts.map(post => sanitizePost(post));
+}

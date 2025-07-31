@@ -3,9 +3,9 @@ import { getUserByUsername } from "@/lib/controllers/userController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextResponse } from "next/server";
 
-export async function GET(req: NextResponse, { params }: { params: Promise<{ username: string }> }) {
+export async function GET(req: NextResponse, { params }: { params: { username: string } }) {
     try {
-        const { username } = await params;
+        const { username } = params;
 
         await userAuth();
 
