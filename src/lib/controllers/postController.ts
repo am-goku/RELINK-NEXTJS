@@ -8,6 +8,21 @@ import { SessionUser } from "@/types/instance";
 import { sanitizePost } from "@/utils/sanitizer/post";
 
 
+/**
+ * Creates a new post for a given user.
+ *
+ * Connects to the database and retrieves the user object based on the provided user id.
+ * It then creates a new post document and saves it to the database.
+ * The post can have an image, content, and hashtags.
+ * If the image is provided, it is uploaded to Cloudinary.
+ * The post is then sanitized and returned.
+ *
+ * @param formData - The form data containing the content, image, and hashtags of the post.
+ * @param user - The user object that owns the post.
+ * @returns The newly created post object, sanitized for public consumption.
+ * @throws {BadRequestError} If the either content or image is not provided.
+ * @throws {NetworkError} If there is a network error while uploading the image to Cloudinary.
+ */
 export async function createPost(formData: FormData, user: SessionUser) {
 
     await connectDB();
@@ -63,6 +78,16 @@ export async function createPost(formData: FormData, user: SessionUser) {
     return sanitizePost(post);
 }
 
+/**
+ * Retrieves a paginated list of posts.
+ * 
+ * Connects to the database and fetches posts that are not archived or blocked.
+ * Results are sorted by creation date in descending order and paginated based on the provided page number.
+ * Each post is populated with user information and sanitized before being returned.
+ * 
+ * @param page - The page number for pagination, defaulting to 1.
+ * @returns An array of sanitized post objects.
+ */
 export async function getPosts(page = 1) {
     await connectDB();
 
@@ -81,6 +106,19 @@ export async function getPosts(page = 1) {
     return posts.map(post => sanitizePost(post));
 }
 
+/**
+ * Retrieves a paginated list of posts by a specific username.
+ * 
+ * Connects to the database and fetches posts associated with the given username,
+ * excluding posts that are archived or blocked. Results are sorted by creation date
+ * in descending order and paginated based on the provided page number.
+ * Each post is populated with user information and sanitized before being returned.
+ * 
+ * @param username - The username of the user whose posts are to be fetched.
+ * @param page - The page number for pagination, defaulting to 1.
+ * @returns An array of sanitized post objects.
+ * @throws {NotFoundError} If the user is not found.
+ */
 export async function getPostsByUsername(username: string, page = 1) {
     await connectDB()
 
@@ -102,6 +140,19 @@ export async function getPostsByUsername(username: string, page = 1) {
     return posts.map(post => sanitizePost(post));
 }
 
+/**
+ * Retrieves a paginated list of posts by a specific user ID.
+ * 
+ * Connects to the database and fetches posts associated with the given user ID,
+ * excluding posts that are archived or blocked. Results are sorted by creation date
+ * in descending order and paginated based on the provided page number.
+ * Each post is populated with user information and sanitized before being returned.
+ * 
+ * @param userId - The unique identifier of the user whose posts are to be fetched.
+ * @param page - The page number for pagination, defaulting to 1.
+ * @returns An array of sanitized post objects.
+ * @throws {NotFoundError} If the user is not found.
+ */
 export async function getPostsByUserId(userId: string, page = 1) {
     await connectDB()
 

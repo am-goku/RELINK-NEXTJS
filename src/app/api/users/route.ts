@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { updateUserProfile } from "@/lib/controllers/userController";
+import { NotFoundError, UnauthorizedError } from "@/lib/errors/ApiErrors";
 
 export async function GET() {
     try {
@@ -12,13 +13,13 @@ export async function GET() {
         const session = await getServerSession(authOptions);
 
         if (!session?.user?.email) {
-            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+            throw new UnauthorizedError('Unauthorized');
         }
 
         const user = await User.findOne({ email: session.user.email }).select("-password -otp");
 
         if (!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
+            throw new NotFoundError('User not found');
         }
 
         return NextResponse.json(user);

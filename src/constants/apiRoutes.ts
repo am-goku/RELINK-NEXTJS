@@ -57,4 +57,11 @@ export const API_ROUTES = {
         GET: '/api/notifications',
         MARK_AS_READ: '/api/notifications/mark-read',
     },
+
+    // Chat Messages
+    CHAT: {
+        CREATE: (receiverId: string) => `/api/chat/${receiverId}`,
+        GET: (receiverId: string, skip: number = 0) => `/api/chat/${receiverId}?skip=${skip}`,
+        DELETE: (id: string) => `/api/chat/${id}`,
+    }
 }

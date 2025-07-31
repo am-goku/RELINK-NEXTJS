@@ -91,11 +91,11 @@ export async function getMessages(c_user: string, receiver: string, skip?: numbe
  * @returns The updated message document with the deleted flag set to true.
  * @throws {NotFoundError} If the message is not found or already deleted
  */
-export async function deleteMessage(messageId: string) {
+export async function deleteMessage(userId: string, messageId: string) {
     await connectDB();
 
     const deletedMessage = await Message.findOneAndUpdate(
-        { _id: messageId, deleted: { $ne: true } },
+        { _id: messageId, sender: userId, deleted: { $ne: true } },
         { $set: { deleted: true } },
         { new: true } // returns updated doc
     );
