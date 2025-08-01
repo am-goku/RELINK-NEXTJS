@@ -1,8 +1,9 @@
 import User, { IUser, IUserDocument } from "@/models/User";
 import { connectDB } from "../mongoose";
-import { NotFoundError } from "../errors/ApiErrors";
+import { BadRequestError, NotFoundError } from "../errors/ApiErrors";
 import { FilterQuery } from "mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
+import { hashPassword } from "../hash";
 
 
 /**
@@ -135,4 +136,31 @@ export async function updateUserProfile({ email, data }: {
     if (!updatedUser) throw new NotFoundError("User not found");
 
     return sanitizeUser(updatedUser, 'user')
+}
+
+
+/**
+ * Updates a user's password with the provided value.
+ * 
+ * Connects to the database and finds the user by ID.
+ * Hashes the provided password and updates the user document with the new value.
+ * 
+ * @param password - The new password to be set for the user.
+ * @param userId - The unique identifier of the user whose password is to be updated.
+ * @returns A sanitized version of the user object, containing only the fields permitted by the user's role.
+ * @throws {BadRequestError} If the user ID is not provided or the user is not found.
+ */
+export async function updatePassword(password: string, userId: string) {
+    await connectDB();
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = await User.findOneAndUpdate(
+        { _id: userId },
+        { password: hashedPassword },
+    );
+
+    if (!user) throw new BadRequestError("User not found");
+
+    return sanitizeUser(user, 'user');
 }

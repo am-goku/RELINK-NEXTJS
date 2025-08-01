@@ -5,15 +5,18 @@ export const API_ROUTES = {
         LOGIN: '/api/auth/login',
         REFRESH: '/api/auth/refresh',
         LOGOUT: '/api/auth/logout',
-        VERIFY_EMAIL: '/api/auth/verify-email',
-        CONFIRM_EMAIL: '/api/auth/confirm-email',
-        FORGOT_PASSWORD: '/api/auth/forgot-password',
-        RESET_PASSWORD: '/api/auth/reset-password',
+
+        // Reset Password
+        REQUEST_RESET: '/api/auth/request-reset', //POST
+        RESET_PASSWORD: '/api/auth/reset-password', //PATCH
+
+        // OTP
+        SEND_OTP: '/api/auth/otp/send', //POST
+        VERIFY_OTP: '/api/auth/otp/verify', //POST
 
         GET_AUTHENTICATE_USER: '/api/auth/user',
     },
 
-    // 👤 User
     USER: {
         ROOT: '/api/users',
         byId: (userId: string) => `/api/users/${userId}`,
@@ -25,7 +28,6 @@ export const API_ROUTES = {
         FOLLOWING: (username: string) => `/api/users/${username}/following`,
     },
 
-    // 🖼️ Posts
     POSTS: {
         CREATE: '/api/posts',
         FEED: '/api/posts',
@@ -35,7 +37,6 @@ export const API_ROUTES = {
         UPDATE: (postId: string) => `/api/posts/${postId}`,
     },
 
-    // 💬 Likes & Comments
     INTERACTION: {
         LIKE: (postId: string) => `/api/posts/${postId}/like`,
         UNLIKE: (postId: string) => `/api/posts/${postId}/unlike`,
@@ -46,19 +47,16 @@ export const API_ROUTES = {
             `/api/posts/${postId}/comments/${commentId}`,
     },
 
-    // 🔍 Search
     SEARCH: {
         USERS: (query: string, page = 1) => `/api/search/users?q=${query}&page=${page}`,
         POSTS: (tags: string, page = 1) => `/api/search/posts?tags=${tags}&page=${page}`,
     },
 
-    // 🔔 Notifications
     NOTIFICATIONS: {
         GET: '/api/notifications',
         MARK_AS_READ: '/api/notifications/mark-read',
     },
 
-    // Chat Messages
     CHAT: {
         CREATE: (receiverId: string) => `/api/chat/${receiverId}`,
         GET: (receiverId: string, skip: number = 0) => `/api/chat/${receiverId}?skip=${skip}`,

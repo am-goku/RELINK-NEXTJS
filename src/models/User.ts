@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { model, models, Schema, Types } from "mongoose";
 
 export interface IUser {
@@ -20,7 +21,9 @@ export interface IUser {
 
     blocked?: boolean;
     deleted?: boolean;
+
     otp?: string;
+    otp_expiry?: Date;
 
     accountType?: 'public' | 'private';
     messageFrom?: 'everyone' | 'followers' | 'none';
@@ -28,6 +31,9 @@ export interface IUser {
 
     created_at?: Date;
     updated_at?: Date;
+
+    // Methods
+    compareOTP(enteredOtp: string): Promise<boolean>;
 }
 
 export type IUserDocument = Document & IUser;
@@ -98,8 +104,13 @@ const UserSchema = new Schema<IUserDocument>(
             type: String,
             default: 'user'
         },
+
+        //OTP
         otp: {
             type: String
+        },
+        otp_expiry: {
+            type: Date
         },
 
         //Follow and Following
@@ -124,6 +135,10 @@ const UserSchema = new Schema<IUserDocument>(
         },
     }
 );
+
+UserSchema.methods.compareOTP = async function (enteredOtp: string): Promise<boolean> {
+  return bcrypt.compare(enteredOtp, this.otp);
+};
 
 const User = models.User || model<IUserDocument>("User", UserSchema);
 export default User;
