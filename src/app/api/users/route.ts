@@ -1,11 +1,12 @@
 import User from "@/models/User";
-import { authOptions, userAuth } from "@/lib/auth";
+import { userAuth } from "@/lib/auth";
 import { connectDB } from "@/lib/mongoose";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { updateUserProfile } from "@/lib/controllers/userController";
 import { NotFoundError, UnauthorizedError } from "@/lib/errors/ApiErrors";
+import { authOptions } from "@/lib/auth/authOptions";
 
 export async function GET() {
     try {

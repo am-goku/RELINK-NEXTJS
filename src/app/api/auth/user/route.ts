@@ -1,4 +1,4 @@
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/lib/auth/authOptions";
 import { NotFoundError, UnauthorizedError } from "@/lib/errors/ApiErrors";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { connectDB } from "@/lib/mongoose";
