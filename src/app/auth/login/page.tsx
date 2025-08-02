@@ -1,7 +1,7 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
@@ -9,27 +9,56 @@ import Button from '@/components/Button';
 import Link from 'next/link';
 
 export default function LoginPage() {
+    const { status } = useSession();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (status === 'authenticated') {
+            router.push('/');
+        }
+    }, [status, router]);
+
+    if (status === 'loading' || status === 'authenticated') return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+        try {
+            e.preventDefault();
+            setError('');
+            setLoading(true);
 
-        const result = await signIn('credentials', {
-            redirect: false,
-            email,
-            password,
-        });
+            if (!email || !password) {
+                throw new Error("Please enter both email and password.")
+            }
 
-        if (result?.error) {
-            setError(result.error);
-        } else {
-            // Redirect to dashboard or home on successful login
-            router.push('/');
+            const result = await signIn('credentials', {
+                redirect: false,
+                email,
+                password,
+            });
+
+            console.log(result)
+
+            if (result?.error) {
+                throw new Error(result.error);
+            }
+
+            if (result?.ok && !result.error) {
+                router.push("/");
+            }
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message || "An error occurred. Please try again.");
+            } else {
+                setError("An error occurred. Please try again.");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -57,6 +86,7 @@ export default function LoginPage() {
 
                         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
+                        <label htmlFor="email" className="sr-only">Email</label>
                         <input
                             type="email"
                             name="email"
@@ -74,17 +104,19 @@ export default function LoginPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full border border-gray-300 p-2 rounded pr-10"
                             />
-                            <span
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-sm text-gray-500"
+                            <button
+                                type="button"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
                                 onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
                             >
                                 {showPassword ? "🙈" : "👁️"}
-                            </span>
+                            </button>
                         </div>
-                        <Button label='Sign In' type='submit' />
+                        <Button label='Sign In' type='submit' disabled={loading} />
                         <section className='flex flex-col gap-2'>
-                            <span>New here? <Link href="/auth/signup" className='text-indigo-700'>Signup.</Link></span>
-                            <a href='#' className='text-indigo-700'>Forgot password?</a>
+                            <span>New here? <Link href="/auth/signup" className='text-indigo-700'>Signup</Link></span>
+                            <Link href="/forgot-password" className="text-indigo-700">Forgot password?</Link>
                         </section>
                     </form>
                 </div>
