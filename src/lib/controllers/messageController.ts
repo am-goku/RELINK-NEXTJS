@@ -7,7 +7,18 @@ import { Types } from "mongoose";
 import { sanitizeMessage } from "@/utils/sanitizer/message";
 
 
-
+/**
+ * Creates a new message between two users.
+ * Ensures that both users exist, and a conversation between them exists.
+ * If the conversation does not exist, it will be created.
+ * The last_message field in the conversation will be updated, if the conversation exists.
+ * @param c_user - The current user's ID
+ * @param receiver - The user to receive the message's ID
+ * @param message - The text content of the message
+ * @returns The newly created message document, sanitized according to the current user's role
+ * @throws {NotFoundError} If one or both users are not found
+ * @throws {Error} If the message content is empty
+ */
 export async function createMessage(c_user: string, receiver: string, message: string) {
     await connectDB();
 
@@ -29,7 +40,7 @@ export async function createMessage(c_user: string, receiver: string, message: s
     });
 
     // Create conversation if not exists
-    if(!conversation) {
+    if (!conversation) {
         conversation = await Conversation.create({
             participants,
             is_group: false,
@@ -56,6 +67,20 @@ export async function createMessage(c_user: string, receiver: string, message: s
 
 
 
+/**
+ * Retrieves a list of messages between two users.
+ * 
+ * Connects to the database and fetches messages associated with the conversation
+ * between the current user and the receiver. Messages are sorted by creation date
+ * in descending order and paginated based on the provided skip value.
+ * Deleted messages are masked with a placeholder text.
+ * 
+ * @param c_user - The current user's ID.
+ * @param receiver - The receiver user's ID.
+ * @param skip - The number of messages to skip for pagination, defaults to 0.
+ * @returns An array of sanitized message objects.
+ * @throws {NotFoundError} If one or both users are not found.
+ */
 export async function getMessages(c_user: string, receiver: string, skip?: number) {
     await connectDB();
 
@@ -72,7 +97,7 @@ export async function getMessages(c_user: string, receiver: string, skip?: numbe
         is_group: false
     });
 
-    if(!conversation) {
+    if (!conversation) {
         return []; // No message if conversation does't exist
     }
 
@@ -93,6 +118,17 @@ export async function getMessages(c_user: string, receiver: string, skip?: numbe
 
 
 
+/**
+ * Deletes a message by updating its `deleted` field to `true`.
+ * 
+ * Connects to the database and finds the message by ID.
+ * If the message is found and is not already deleted, the `deleted` field is updated to `true`.
+ * 
+ * @param userId - The unique identifier of the user that sent the message to be deleted.
+ * @param messageId - The unique identifier of the message to be deleted.
+ * @returns A sanitized version of the deleted message object.
+ * @throws {NotFoundError} If the message is not found or is already deleted.
+ */
 export async function deleteMessage(userId: string, messageId: string) {
     await connectDB();
 
