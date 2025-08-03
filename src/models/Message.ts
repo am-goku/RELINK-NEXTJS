@@ -2,17 +2,26 @@ import mongoose, { Schema, Types } from "mongoose";
 
 export interface IMessage {
     _id: Types.ObjectId;
-    message: string;
+    conversation_id: Types.ObjectId;
     sender: Types.ObjectId;
-    receiver: Types.ObjectId;
-    deleted: boolean
+    text: string;
+    message_type: 'text' | 'image' | 'video' | 'file';
+    ready_by: Types.ObjectId[];
+    deleted: boolean;
+    created_at: Date;
+    updated_at: Date;
 }
 
 export type IMessageDocument = IMessage & Document;
 
 const MessageSchema = new Schema<IMessageDocument>(
     {
-        message: {
+        conversation_id: {
+            type: Schema.Types.ObjectId,
+            ref: "Conversation",
+            required: true
+        },
+        text: {
             type: String,
             required: true
         },
@@ -21,10 +30,15 @@ const MessageSchema = new Schema<IMessageDocument>(
             ref: "User",
             required: true
         },
-        receiver: {
-            type: Schema.Types.ObjectId,
+        message_type: {
+            type: String,
+            enum: ['text', 'image', 'video', 'file'],
+            default: 'text'
+        },
+        ready_by: {
+            type: [Schema.Types.ObjectId],
             ref: "User",
-            required: true
+            default: []
         },
         deleted: {
             type: Boolean,

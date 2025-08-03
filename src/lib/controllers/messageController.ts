@@ -2,20 +2,11 @@ import User from "@/models/User";
 import { connectDB } from "../mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
 import Message from "@/models/Message";
+import Conversation from "@/models/Conversation";
+import { Types } from "mongoose";
+import { sanitizeMessage } from "@/utils/sanitizer/message";
 
-/**
- * Create a new message between two users.
- * This function connects to the database and checks if both the sender and receiver exist.
- * It then creates and stores a new message document in the database.
- * Throws an error if the message content is empty or if one or both users are not found.
- *
- * @param c_user - The current user's ID (sender)
- * @param receiver - The receiver user's ID
- * @param message - The content of the message to be sent
- * @returns The newly created message document
- * @throws {Error} If the message content is empty
- * @throws {NotFoundError} If one or both users are not found
- */
+
 
 export async function createMessage(c_user: string, receiver: string, message: string) {
     await connectDB();
@@ -28,69 +19,80 @@ export async function createMessage(c_user: string, receiver: string, message: s
     const users = await User.find({ _id: { $in: [c_user, receiver] } });
     if (users.length !== 2) throw new NotFoundError('One or both users not found');
 
-    const newMessage = await Message.create({
-        sender: c_user,
-        receiver,
-        message
+    //Sort participant IDs to ensure consistent lookup
+    const participants = [c_user, receiver].sort();
+
+    //Check for existing 1-to-1 conversation
+    let conversation = await Conversation.findOne({
+        participants,
+        is_group: false
     });
 
-    return newMessage;
+    // Create conversation if not exists
+    if(!conversation) {
+        conversation = await Conversation.create({
+            participants,
+            is_group: false,
+        });
+    }
+
+    // Create new message linked to the conversation
+    const newMessage = await Message.create({
+        conversation_id: conversation?._id,
+        sender: c_user,
+        text: message,
+    }, { new: true });
+
+    // Optionally update last_message field in Conversation
+    conversation.last_message = {
+        text: message,
+        sender_id: new Types.ObjectId(c_user),
+        created_at: new Date()
+    }
+    await conversation.save();
+
+    return sanitizeMessage(newMessage);
 }
 
-/**
- * Retrieve a list of messages exchanged between two users.
- * This function connects to the database to fetch the latest messages between the 
- * current user and the specified receiver, ensuring both users exist before proceeding.
- * It returns messages in descending order of creation and supports pagination.
- * Deleted messages are replaced with a placeholder text.
- *
- * @param c_user - The current user's ID (sender or receiver)
- * @param receiver - The other participant's ID in the conversation
- * @param skip - Optional number of messages to skip for pagination
- * @returns An array of message objects with properties: _id, sender, receiver, 
- *          message (with placeholder if deleted), deleted status, created_at, and updated_at.
- * @throws {NotFoundError} If one or both users are not found
- */
+
 
 export async function getMessages(c_user: string, receiver: string, skip?: number) {
     await connectDB();
 
+    // Confirm both users exist
     const users = await User.find({ _id: { $in: [c_user, receiver] } });
     if (users.length !== 2) throw new NotFoundError('One or both users not found');
 
+    // Sort participant IDs for consistent query
+    const participants = [c_user, receiver].sort();
+
+    // Find the existing conversation
+    const conversation = await Conversation.findOne({
+        participants,
+        is_group: false
+    });
+
+    if(!conversation) {
+        return []; // No message if conversation does't exist
+    }
+
+    // Fetch messages by conversation_id
     const rawMessages = await Message.find({
-        $or: [
-            { sender: c_user, receiver },
-            { sender: receiver, receiver: c_user }
-        ]
-    }).sort({ created_at: -1 })
+        conversation_id: conversation._id
+    })
+        .sort({ created_at: -1 })
         .limit(20)   // latest 20 messages
         .skip(skip || 0)  // for pagination
         .lean();
 
-    // Mask deleted messages with placeholder
-    const messages = rawMessages.map(msg => ({
-        _id: msg._id,
-        sender: msg.sender,
-        receiver: msg.receiver,
-        message: msg.deleted ? "This message was deleted." : msg.message,
-        deleted: msg.deleted ?? false,
-        created_at: msg.created_at,
-        updated_at: msg.updated_at
-    }));
+    // Format/Mask deleted messages with placeholder
+    const messages = rawMessages.map(sanitizeMessage);
 
     return messages;
 }
 
 
-/**
- * Soft delete a message by setting the deleted flag to true.
- * This function will not delete the message document from the database.
- * This function will throw a NotFoundError if the message is not found or already deleted.
- * @param messageId - The ID of the message to be deleted
- * @returns The updated message document with the deleted flag set to true.
- * @throws {NotFoundError} If the message is not found or already deleted
- */
+
 export async function deleteMessage(userId: string, messageId: string) {
     await connectDB();
 
