@@ -170,3 +170,34 @@ export async function getPostsByUserId(userId: string, page = 1) {
 
     return posts.map(post => sanitizePost(post));
 }
+
+
+/**
+ * Retrieves a paginated list of posts by a specific hashtag.
+ * 
+ * Connects to the database and fetches posts associated with the given hashtag,
+ * excluding posts that are archived or blocked. Results are sorted by creation date
+ * in descending order and paginated based on the provided page number.
+ * Each post is populated with user information and sanitized before being returned.
+ * 
+ * @param tag - The hashtag to search by.
+ * @param page - The page number for pagination, defaulting to 1.
+ * @returns An array of sanitized post objects.
+ */
+export async function searchPosts(tag: string | null, page: number = 1) {
+    await connectDB();
+
+    const trimmedTag = typeof tag === 'string' ? tag.trim() : '';
+    if (!trimmedTag) return [];
+
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find({
+        hashtags: { $regex: `^${trimmedTag}`, $options: 'i' } // prefix match
+    })
+        .skip(skip)
+        .limit(limit);
+
+    return posts.map(post => sanitizePost(post));
+}

@@ -48,8 +48,8 @@ export const API_ROUTES = {
     },
 
     SEARCH: {
-        USERS: (query: string, page = 1) => `/api/search/users?q=${query}&page=${page}`,
-        POSTS: (tags: string, page = 1) => `/api/search/posts?tags=${tags}&page=${page}`,
+        USERS: (key: string, page: number = 1) => `/api/users/search?searchKey=${key}&page=${page}`,
+        POSTS: (tag: string, page: number = 1) => `/api/posts/search?tag=${tag}&page=${page}`,
     },
 
     NOTIFICATIONS: {

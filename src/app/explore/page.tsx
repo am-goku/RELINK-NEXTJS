@@ -20,7 +20,6 @@ export default function ExplorePage() {
         <div className="flex flex-col min-h-screen">
             <Navbar type='explore' />
             <div className="px-4 py-6 max-w-6xl mx-auto text-[#2D3436]">
-                {/* <h1 className="text-2xl font-semibold mb-6">Explore</h1> */}
 
                 {/* Search bar */}
                 <div className="mb-6 relative">

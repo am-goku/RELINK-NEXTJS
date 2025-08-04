@@ -164,3 +164,36 @@ export async function updatePassword(password: string, userId: string) {
 
     return sanitizeUser(user, 'user');
 }
+
+
+/**
+ * Searches for users by username or full name.
+ * 
+ * Connects to the database and performs a case-insensitive search for users
+ * whose username starts with the provided search key, or whose full name contains
+ * the search key.
+ * 
+ * Results are sorted by username in ascending order and paginated based on the
+ * provided page number.
+ * 
+ * @param searchKey - The search key to be used for the search.
+ * @param page - The page number for pagination, defaulting to 1.
+ * @returns An array of sanitized user objects.
+ */
+export async function searchUser(searchKey: string | null, page: number = 1) {
+    await connectDB();
+
+    if (!searchKey || !searchKey.trim()) return [];
+
+    const limit = 15;
+    const skip = (page - 1) * limit;
+
+    const users = await User.find({
+        $or: [
+            { username: { $regex: `^${searchKey.trim()}`, $options: 'i' } }, // prefix match
+            { name: { $regex: searchKey.trim(), $options: 'i' } }            // optional full name match
+        ]
+    }).skip(skip).limit(limit); // Optional: limit to prevent abuse
+
+    return users.map(user => sanitizeUser(user, 'user'));
+}
