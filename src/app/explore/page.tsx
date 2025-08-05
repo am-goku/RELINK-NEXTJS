@@ -1,21 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, UserPlus } from 'lucide-react';
 import Navbar from '../../components/Navbar';
+import SearchResult from '@/components/search/SearchResult';
 
 const suggestedUsers = [
     { id: 1, name: 'Ava Johnson', username: 'avaj', avatar: '/images/default-profile.png' },
     { id: 2, name: 'Liam Brown', username: 'liamb', avatar: '/images/default-profile.png' },
     { id: 3, name: 'Noah Smith', username: 'noahsmith', avatar: '/images/default-profile.png' },
 ];
-
 const mockPosts = Array.from({ length: 12 }, (_, i) => ({
     id: i + 1,
-    imageUrl: `/images/bannerImg.jpg`,
+    imageUrl: '/images/bannerImg.jpg',
 }));
 
+
+
 export default function ExplorePage() {
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    
+
+
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar type='explore' />
@@ -25,11 +33,18 @@ export default function ExplorePage() {
                 <div className="mb-6 relative">
                     <input
                         type="text"
-                        placeholder="Search users, posts..."
+                        placeholder="Search users, posts, tags..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#F0F2F5] text-sm focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] placeholder-[#636E72]"
                     />
                     <Search className="absolute top-3 left-3 text-[#636E72]" size={20} />
+
+                    {searchQuery.trim() !== '' && (
+                        <SearchResult searchKey={searchQuery} />
+                    )}
                 </div>
+
 
                 {/* Suggested Users */}
                 <div className="mb-8">
