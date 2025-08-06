@@ -48,7 +48,7 @@ export const API_ROUTES = {
     },
 
     SEARCH: {
-        USERS: (key: string, page: number = 1) => `/api/users/search?searchKey=${key}&page=${page}`,
+        USERS: (key: string, page: number = 1, prev: boolean = false) => `/api/users/search?searchKey=${key}&page=${page}&prev=${prev}`,
         POSTS: (tag: string, page: number = 1) => `/api/posts/search?tag=${tag}&page=${page}`,
     },
 

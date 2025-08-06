@@ -21,9 +21,6 @@ export default function ExplorePage() {
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    
-
-
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar type='explore' />
@@ -36,6 +33,14 @@ export default function ExplorePage() {
                         placeholder="Search users, posts, tags..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                const query = searchQuery.trim();
+                                if (query) {
+                                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+                                }
+                            }
+                        }}
                         className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#F0F2F5] text-sm focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] placeholder-[#636E72]"
                     />
                     <Search className="absolute top-3 left-3 text-[#636E72]" size={20} />

@@ -7,11 +7,12 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url);
         
         const searchKey = searchParams.get("searchKey");
+        const prev = searchParams.get("prev") || 'false';
         const pageParam = searchParams.get("page");
 
         const page = Math.max(parseInt(pageParam || "1", 10), 1);
 
-        const users = await searchUser(searchKey, page);
+        const users = await searchUser(searchKey, page, prev as 'false' | 'true');
 
         return NextResponse.json({ users });
     } catch (error) {

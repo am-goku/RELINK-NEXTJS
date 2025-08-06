@@ -180,12 +180,12 @@ export async function updatePassword(password: string, userId: string) {
  * @param page - The page number for pagination, defaulting to 1.
  * @returns An array of sanitized user objects.
  */
-export async function searchUser(searchKey: string | null, page: number = 1) {
+export async function searchUser(searchKey: string | null, page: number = 1, prev: 'true' | 'false' = 'false') {
     await connectDB();
 
     if (!searchKey || !searchKey.trim()) return [];
 
-    const limit = 15;
+    const limit = prev == 'true' ? 4 : 15;
     const skip = (page - 1) * limit;
 
     const users = await User.find({
