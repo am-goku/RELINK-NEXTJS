@@ -1,31 +1,27 @@
+import { IUser } from '@/models/User';
+import { searchService } from '@/services/apiServices';
 import Image from 'next/image';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 type Props = {
     searchKey: string
 }
 
-const allUsers = [
-    { id: 1, name: 'Ava Johnson', username: 'avaj', avatar: '/images/default-profile.png' },
-    { id: 2, name: 'Liam Brown', username: 'liamb', avatar: '/images/default-profile.png' },
-    { id: 3, name: 'Noah Smith', username: 'noahsmith', avatar: '/images/default-profile.png' },
-    { id: 4, name: 'Emma Davis', username: 'emmad', avatar: '/images/default-profile.png' },
-    { id: 5, name: 'Oliver Wilson', username: 'oliverw', avatar: '/images/default-profile.png' },
-];
-
 const allTags = ['fitness', 'travel', 'coding', 'design', 'food'];
 
 function SearchResult({ searchKey }: Props) {
 
-    const filteredUsers = allUsers.filter(
-        (user) =>
-            user.name.toLowerCase().includes(searchKey.toLowerCase()) ||
-            user.username.toLowerCase().includes(searchKey.toLowerCase())
-    );
+    const [users, setUsers] = useState<IUser[]>([]);
 
     const filteredTags = allTags.filter((tag) =>
         tag.toLowerCase().includes(searchKey.toLowerCase())
     );
+
+    useEffect(() => {
+        searchService.searchUsers(searchKey, 1, true).then((res) => {
+            setUsers(res.data.users);
+        }).catch((err) => console.log(err))
+    }, [searchKey])
 
 
     return (
@@ -33,17 +29,17 @@ function SearchResult({ searchKey }: Props) {
             <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-md z-10 max-h-[400px] overflow-y-auto p-4 space-y-4 text-sm">
 
                 {/* Users */}
-                {filteredUsers.length > 0 && (
+                {users.length > 0 && (
                     <div>
                         <p className="font-semibold text-[#2D3436] mb-2">Users</p>
-                        {filteredUsers.slice(0, 3).map((user) => (
+                        {users.slice(0, 3).map((user) => (
                             <div
-                                key={user.id}
+                                key={user._id.toString()}
                                 className="flex items-center gap-3 py-2 px-2 hover:bg-gray-100 rounded-md cursor-pointer"
                             >
                                 <Image
-                                    src={user.avatar}
-                                    alt={user.name}
+                                    src={user.image || '/images/default-profile.png'}
+                                    alt={user.name || user.username}
                                     width={32}
                                     height={32}
                                     className="rounded-full object-cover"
@@ -54,7 +50,7 @@ function SearchResult({ searchKey }: Props) {
                                 </div>
                             </div>
                         ))}
-                        {filteredUsers.length > 3 && (
+                        {users.length > 3 && (
                             <div className="text-[#6C5CE7] hover:underline cursor-pointer mt-1 px-2">
                                 See more users...
                             </div>
@@ -80,7 +76,7 @@ function SearchResult({ searchKey }: Props) {
                 )}
 
                 {/* No results */}
-                {filteredUsers.length === 0 &&
+                {users.length === 0 &&
                     filteredTags.length === 0 && (
                         <div className="text-center text-gray-500 py-4">
                             No results found.

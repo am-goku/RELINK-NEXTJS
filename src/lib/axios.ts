@@ -12,9 +12,16 @@ const apiInstance = axios.create({
 apiInstance.interceptors.response.use(
   response => response,
   error => {
-    // Handle common errors globally (e.g., 401, 500)
-    return Promise.reject(error)
+    const status = error.response?.status;
+
+    // Example: Auto-logout on unauthorized
+    if (status === 401) {
+      // Optionally: clear cookies / token or redirect
+      // window.location.href = '/login';
+    }
+
+    return Promise.reject(error);
   }
-)
+);
 
 export default apiInstance

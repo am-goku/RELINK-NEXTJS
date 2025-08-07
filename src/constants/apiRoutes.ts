@@ -1,4 +1,4 @@
-export const API_ROUTES = {
+const API_ROUTES = {
     // 🧑 User Auth & Verification
     AUTH: {
         REGISTER: '/api/auth/register',
@@ -7,19 +7,19 @@ export const API_ROUTES = {
         LOGOUT: '/api/auth/logout',
 
         // Reset Password
-        REQUEST_RESET: '/api/auth/request-reset', //POST
-        RESET_PASSWORD: '/api/auth/reset-password', //PATCH
+        REQUEST_RESET: '/api/auth/request-reset', // POST
+        RESET_PASSWORD: '/api/auth/reset-password', // PATCH
 
         // OTP
-        SEND_OTP: '/api/auth/otp/send', //POST
-        VERIFY_OTP: '/api/auth/otp/verify', //POST
+        SEND_OTP: '/api/auth/otp/send', // POST
+        VERIFY_OTP: '/api/auth/otp/verify', // POST
 
         GET_AUTHENTICATE_USER: '/api/auth/user',
     },
 
     USER: {
         ROOT: '/api/users',
-        byId: (userId: string) => `/api/users/${userId}`,
+        BY_ID: (userId: string) => `/api/users/${userId}`,
         GET_PROFILE: (username: string) => `/api/users/${username}`,
         GET_POSTS: (username: string) => `/api/users/${username}/posts`,
         FOLLOW: (username: string) => `/api/users/${username}/follow`,
@@ -34,7 +34,7 @@ export const API_ROUTES = {
         EXPLORE: '/api/posts/explore',
         GET: (postId: string) => `/api/posts/${postId}`,
         DELETE: (postId: string) => `/api/posts/${postId}`,
-        UPDATE: (postId: string) => `/api/posts/${postId}`,
+        UPDATE: (postId: string) => `/api/posts/${postId}`, // PUT
     },
 
     INTERACTION: {
@@ -48,8 +48,10 @@ export const API_ROUTES = {
     },
 
     SEARCH: {
-        USERS: (key: string, page: number = 1, prev: boolean = false) => `/api/users/search?searchKey=${key}&page=${page}&prev=${prev}`,
-        POSTS: (tag: string, page: number = 1) => `/api/posts/search?tag=${tag}&page=${page}`,
+        USERS: (key: string, page: number = 1, prev: boolean = false) =>
+            `/api/users/search?searchKey=${key}&page=${page}&prev=${prev}`,
+        POSTS: (tag: string, page: number = 1) =>
+            `/api/posts/search?tag=${tag}&page=${page}`,
     },
 
     NOTIFICATIONS: {
@@ -58,8 +60,11 @@ export const API_ROUTES = {
     },
 
     CHAT: {
-        CREATE: (receiverId: string) => `/api/chat/${receiverId}`,
-        GET: (receiverId: string, skip: number = 0) => `/api/chat/${receiverId}?skip=${skip}`,
+        CREATE: (receiverId: string) => `/api/chat/${receiverId}`, // POST message
+        GET: (receiverId: string, skip: number = 0) =>
+            `/api/chat/${receiverId}?skip=${skip}`, // GET messages
         DELETE: (id: string) => `/api/chat/${id}`,
-    }
-}
+    },
+};
+
+export default API_ROUTES;

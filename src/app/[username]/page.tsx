@@ -11,9 +11,8 @@ import { IPublicPost } from "../../models/Post";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/stores/userStore";
 import SkeletonPostCard from "@/components/skeletons/SkeletonPostCard";
-import { API_ROUTES } from "@/constants/apiRoutes";
-import apiInstance from "@/lib/axios";
 import { useParams } from "next/navigation";
+import { userService } from "@/services/apiServices";
 
 
 function Page() {
@@ -30,13 +29,14 @@ function Page() {
     useEffect(() => {
         if (user) {
             setLoadingPosts(true)
-            apiInstance.get(API_ROUTES.USER.GET_POSTS(params.username as string)).then((res) => {
-                setPosts(res.data.posts)
-            }).catch((error) => {
-                console.log(error)
-            }).finally(() => {
-                setLoadingPosts(false)
-            })
+            userService.getPosts(params.username as string)
+                .then((res) => {
+                    setPosts(res.data.posts)
+                }).catch((error) => {
+                    console.log(error)
+                }).finally(() => {
+                    setLoadingPosts(false)
+                })
         }
     }, [user, params])
 

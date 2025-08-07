@@ -11,8 +11,7 @@ import { IPublicPost } from "../../models/Post";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/stores/userStore";
 import SkeletonPostCard from "@/components/skeletons/SkeletonPostCard";
-import apiInstance from "@/lib/axios";
-import { API_ROUTES } from "@/constants/apiRoutes";
+import { userService } from "@/services/apiServices";
 
 
 export default function ProfilePage() {
@@ -27,13 +26,14 @@ export default function ProfilePage() {
   useEffect(() => {
     if (user) {
       setLoadingPosts(true)
-      apiInstance.get(API_ROUTES.USER.GET_POSTS(user.username as string)).then((res) => {
-        setPosts(res.data.posts)
-      }).catch((error) => {
-        console.log(error)
-      }).finally(() => {
-        setLoadingPosts(false)
-      })
+      userService.getPosts(user.username as string)
+        .then((res) => {
+          setPosts(res.data.posts)
+        }).catch((error) => {
+          console.log(error)
+        }).finally(() => {
+          setLoadingPosts(false)
+        })
     }
   }, [user])
 

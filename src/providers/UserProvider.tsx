@@ -3,8 +3,7 @@
 import { useCallback, useEffect } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { useUserStore } from '@/stores/userStore';
-import { API_ROUTES } from '@/constants/apiRoutes';
-import apiInstance from '@/lib/axios';
+import { authService } from '@/services/apiServices';
 
 export default function UserProvider({ children }: { children: React.ReactNode }) {
     const { status } = useSession();
@@ -12,9 +11,12 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     const clearUser = useUserStore((state) => state.clearUser);
 
     const fetchUser = useCallback(async () => {
-        const res = await apiInstance.get(API_ROUTES.AUTH.GET_AUTHENTICATE_USER);
-        console.log(res)
-        setUser(res.data.user);
+        try {
+            const res = (await authService.getAuthenticatedUser()).data;
+            setUser(res?.user);
+        } catch (error) {
+            console.log(error);
+        }
     }, [setUser]);
 
     useEffect(() => {

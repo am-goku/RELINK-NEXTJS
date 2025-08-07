@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Search, UserPlus } from 'lucide-react';
+import React from 'react';
+import { UserPlus } from 'lucide-react';
 import Navbar from '../../components/Navbar';
-import SearchResult from '@/components/search/SearchResult';
+import SearchBar from '@/components/search/SearchBar';
 
 const suggestedUsers = [
     { id: 1, name: 'Ava Johnson', username: 'avaj', avatar: '/images/default-profile.png' },
@@ -19,7 +19,6 @@ const mockPosts = Array.from({ length: 12 }, (_, i) => ({
 
 export default function ExplorePage() {
 
-    const [searchQuery, setSearchQuery] = useState('');
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -27,28 +26,7 @@ export default function ExplorePage() {
             <div className="px-4 py-6 max-w-6xl mx-auto text-[#2D3436]">
 
                 {/* Search bar */}
-                <div className="mb-6 relative">
-                    <input
-                        type="text"
-                        placeholder="Search users, posts, tags..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                const query = searchQuery.trim();
-                                if (query) {
-                                    window.location.href = `/search?q=${encodeURIComponent(query)}`;
-                                }
-                            }
-                        }}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#F0F2F5] text-sm focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] placeholder-[#636E72]"
-                    />
-                    <Search className="absolute top-3 left-3 text-[#636E72]" size={20} />
-
-                    {searchQuery.trim() !== '' && (
-                        <SearchResult searchKey={searchQuery} />
-                    )}
-                </div>
+                <SearchBar />
 
 
                 {/* Suggested Users */}
