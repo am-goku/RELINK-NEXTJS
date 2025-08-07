@@ -18,10 +18,19 @@ function SearchResult({ searchKey }: Props) {
     );
 
     useEffect(() => {
-        searchService.searchUsers(searchKey, 1, true).then((res) => {
-            setUsers(res.data.users);
-        }).catch((err) => console.log(err))
-    }, [searchKey])
+        const delayDebounce = setTimeout(() => {
+            if (searchKey.trim()) {
+                searchService
+                    .searchUsers(searchKey, 1, true)
+                    .then((res) => setUsers(res.data.users))
+                    .catch((err) => console.log(err));
+            } else {
+                setUsers([]);
+            }
+        }, 300); // debounce delay in ms
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchKey]);
 
 
     return (
