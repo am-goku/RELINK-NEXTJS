@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { signOut, useSession } from 'next-auth/react'
-import RelinkLogo from './icons/RelinkLogo'
+import RelinkLogo from '../icons/RelinkLogo'
 import Image from 'next/image'
 import { useUserStore } from '@/stores/userStore'
 import { Session } from 'next-auth'

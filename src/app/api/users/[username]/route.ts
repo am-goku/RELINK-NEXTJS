@@ -3,15 +3,21 @@ import { getUserByUsername } from "@/lib/controllers/userController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextResponse } from "next/server";
 
-export async function GET(req: NextResponse, { params }: { params: { username: string } }) {
+export async function GET(req: NextResponse, context: { params: Promise<{ username: string }> }) {
     try {
-        const { username } = params;
+        const { username } = await context.params;
 
-        await userAuth();
+        const currUser = await userAuth();
 
         const user = await getUserByUsername(username);
 
-        return NextResponse.json({ message: 'User fetch successfull', user })
+        let isOwner = false;
+
+        if (currUser.id === user._id.toString()) {
+            isOwner = true;
+        }
+
+        return NextResponse.json({ message: 'User fetch successfull', user, isOwner })
 
     } catch (error) {
         return handleApiError(error)

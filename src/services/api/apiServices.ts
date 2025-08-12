@@ -1,10 +1,9 @@
 import API_ROUTES from '@/constants/apiRoutes';
 import apiInstance from '@/lib/axios';
 
-// 🧑 Auth APIs
 export const authService = {
-    register: (data: any) => apiInstance.post(API_ROUTES.AUTH.REGISTER, data),
-    login: (data: any) => apiInstance.post(API_ROUTES.AUTH.LOGIN, data),
+    register: (data: { email: string; username: string; password: string }) => apiInstance.post(API_ROUTES.AUTH.REGISTER, data),
+    login: (data: { email: string; password: string }) => apiInstance.post(API_ROUTES.AUTH.LOGIN, data),
     refresh: () => apiInstance.get(API_ROUTES.AUTH.REFRESH),
     logout: () => apiInstance.post(API_ROUTES.AUTH.LOGOUT),
 
@@ -12,13 +11,12 @@ export const authService = {
     resetPassword: (token: string, newPassword: string) =>
         apiInstance.patch(API_ROUTES.AUTH.RESET_PASSWORD, { token, newPassword }),
 
-    sendOtp: (data: any) => apiInstance.post(API_ROUTES.AUTH.SEND_OTP, data),
-    verifyOtp: (data: any) => apiInstance.post(API_ROUTES.AUTH.VERIFY_OTP, data),
+    sendOtp: (data: { email: string }) => apiInstance.post(API_ROUTES.AUTH.SEND_OTP, data),
+    verifyOtp: (data: { email: string; otp: string }) => apiInstance.post(API_ROUTES.AUTH.VERIFY_OTP, data),
 
     getAuthenticatedUser: () => apiInstance.get(API_ROUTES.AUTH.GET_AUTHENTICATE_USER),
 };
 
-// 👤 User APIs
 export const userService = {
     getAll: () => apiInstance.get(API_ROUTES.USER.ROOT),
     getById: (id: string) => apiInstance.get(API_ROUTES.USER.BY_ID(id)),
@@ -30,17 +28,15 @@ export const userService = {
     following: (username: string) => apiInstance.get(API_ROUTES.USER.FOLLOWING(username)),
 };
 
-// 📝 Post APIs
 export const postService = {
-    create: (data: any) => apiInstance.post(API_ROUTES.POSTS.CREATE, data),
+    create: (data: { caption: string; image: string }) => apiInstance.post(API_ROUTES.POSTS.CREATE, data),
     getFeed: () => apiInstance.get(API_ROUTES.POSTS.FEED),
     explore: () => apiInstance.get(API_ROUTES.POSTS.EXPLORE),
     getById: (id: string) => apiInstance.get(API_ROUTES.POSTS.GET(id)),
     delete: (id: string) => apiInstance.delete(API_ROUTES.POSTS.DELETE(id)),
-    update: (id: string, data: any) => apiInstance.put(API_ROUTES.POSTS.UPDATE(id), data),
+    update: (id: string, data: { caption: string; image: string }) => apiInstance.put(API_ROUTES.POSTS.UPDATE(id), data),
 };
 
-// ❤️ Interaction APIs
 export const interactionService = {
     like: (postId: string) => apiInstance.post(API_ROUTES.INTERACTION.LIKE(postId)),
     unlike: (postId: string) => apiInstance.post(API_ROUTES.INTERACTION.UNLIKE(postId)),
@@ -53,7 +49,6 @@ export const interactionService = {
         apiInstance.delete(API_ROUTES.INTERACTION.DELETE_COMMENT(postId, commentId)),
 };
 
-// 🔍 Search APIs
 export const searchService = {
     searchUsers: (key: string, page = 1, prev = false) =>
         apiInstance.get(API_ROUTES.SEARCH.USERS(key, page, prev)),
@@ -61,13 +56,11 @@ export const searchService = {
         apiInstance.get(API_ROUTES.SEARCH.POSTS(tag, page)),
 };
 
-// 🔔 Notification APIs
 export const notificationService = {
     getAll: () => apiInstance.get(API_ROUTES.NOTIFICATIONS.GET),
     markAsRead: () => apiInstance.patch(API_ROUTES.NOTIFICATIONS.MARK_AS_READ),
 };
 
-// 💬 Chat APIs
 export const chatService = {
     sendMessage: (receiverId: string, message: string) =>
         apiInstance.post(API_ROUTES.CHAT.CREATE(receiverId), { message }),

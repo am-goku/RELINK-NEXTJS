@@ -1,5 +1,5 @@
 import { userAuth } from "@/lib/auth";
-import { connectDB } from "@/lib/mongoose";
+import { connectDB } from "@/lib/db/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 import { getPostsByUserId } from "@/lib/controllers/postController";
 import { handleApiError } from "@/lib/errors/errorResponse";

@@ -1,5 +1,5 @@
 import User from "@/models/User";
-import { connectDB } from "../mongoose";
+import { connectDB } from "../db/mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
 import Message from "@/models/Message";
 import Conversation from "@/models/Conversation";

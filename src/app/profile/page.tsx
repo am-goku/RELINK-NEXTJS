@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CoverImage from "../../components/CoverImage";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/ui/Navbar";
 import PostCard from "../../components/PostCard";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileStats from "../../components/ProfileStats";
@@ -11,7 +11,7 @@ import { IPublicPost } from "../../models/Post";
 import { useSession } from "next-auth/react";
 import { useUserStore } from "@/stores/userStore";
 import SkeletonPostCard from "@/components/skeletons/SkeletonPostCard";
-import { userService } from "@/services/apiServices";
+import { userService } from "@/services/api/apiServices";
 
 
 export default function ProfilePage() {

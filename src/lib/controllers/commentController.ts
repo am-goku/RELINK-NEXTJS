@@ -1,4 +1,4 @@
-import { connectDB } from "@/lib/mongoose";
+import { connectDB } from "@/lib/db/mongoose";
 import Comment from "@/models/Comment";
 import { BadRequestError } from "../errors/ApiErrors";
 import { sanitizeComment } from "@/utils/sanitizer/comment";

@@ -6,7 +6,7 @@ import { PlusIcon } from '@heroicons/react/24/solid';
 import axios from 'axios';
 import { IPublicPost } from '../models/Post';
 import LoaderScreen from '../components/loaders/LoaderScreen';
-import Navbar from '../components/Navbar';
+import Navbar from '../components/ui/Navbar';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/modal/CreatePostModal';
 import SkeletonPostCard from '@/components/skeletons/SkeletonPostCard';

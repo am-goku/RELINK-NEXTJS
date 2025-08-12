@@ -1,7 +1,7 @@
 import { authOptions } from "@/lib/auth/authOptions";
 import { NotFoundError, UnauthorizedError } from "@/lib/errors/ApiErrors";
 import { handleApiError } from "@/lib/errors/errorResponse";
-import { connectDB } from "@/lib/mongoose";
+import { connectDB } from "@/lib/db/mongoose";
 import User from "@/models/User";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";

@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { UserPlus } from 'lucide-react';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/ui/Navbar';
 import SearchBar from '@/components/search/SearchBar';
+import { useRouter } from 'next/navigation';
 
 const suggestedUsers = [
     { id: 1, name: 'Ava Johnson', username: 'avaj', avatar: '/images/default-profile.png' },
@@ -19,6 +20,7 @@ const mockPosts = Array.from({ length: 12 }, (_, i) => ({
 
 export default function ExplorePage() {
 
+    const router = useRouter();
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -36,7 +38,8 @@ export default function ExplorePage() {
                         {suggestedUsers.map((user) => (
                             <div
                                 key={user.id}
-                                className="flex-shrink-0 bg-[#F0F2F5] rounded-xl p-4 w-60 flex items-center gap-4 shadow-sm"
+                                onClick={()=> router.push(`/${user.username}`)}
+                                className="flex-shrink-0 bg-[#F0F2F5] cursor-pointer rounded-xl p-4 w-60 flex items-center gap-4 shadow-sm"
                             >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img

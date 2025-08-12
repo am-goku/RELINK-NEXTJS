@@ -21,3 +21,23 @@ export function handleApiError(error: unknown) {
         { status: 500 }
     );
 }
+
+export function getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+        // Standard JS Error object
+        return error.message;
+    }
+
+    if (typeof error === "string") {
+        // Directly a string error
+        return error;
+    }
+
+    try {
+        // In case it's an object with a 'message' property
+        return JSON.stringify(error);
+    } catch {
+        // Fallback if JSON.stringify fails
+        return "Unknown error occurred";
+    }
+}

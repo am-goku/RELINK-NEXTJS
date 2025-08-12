@@ -1,6 +1,7 @@
 import { IUser } from '@/models/User';
-import { searchService } from '@/services/apiServices';
+import { searchService } from '@/services/api/apiServices';
 import { UserPlus } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 function UserResults({ query }: Props) {
 
     const [users, setUsers] = useState<IUser[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
         searchService.searchUsers(query, 1, false).then((res) => {
@@ -38,7 +40,8 @@ function UserResults({ query }: Props) {
                                 {users.map((user) => (
                                     <div
                                         key={user._id.toString()}
-                                        className="w-full bg-[#F0F2F5] rounded-xl p-4 flex items-center gap-4 shadow-sm"
+                                        onClick={()=> router.push(`/${user.username}`)}
+                                        className="w-full bg-[#F0F2F5] cursor-pointer rounded-xl p-4 flex items-center gap-4 shadow-sm"
                                     >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img

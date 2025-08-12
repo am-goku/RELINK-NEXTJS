@@ -1,6 +1,6 @@
 import Post from "@/models/Post";
 import { userAuth } from "@/lib/auth";
-import { connectDB } from "@/lib/mongoose";
+import { connectDB } from "@/lib/db/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 

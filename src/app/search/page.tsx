@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/components/ui/Navbar';
 import SearchBar from '@/components/search/SearchBar';
 import UserResults from '@/components/search/UserResults';
 import PostResults from '@/components/search/PostResults';

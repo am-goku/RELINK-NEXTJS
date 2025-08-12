@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/mongoose';
+import { connectDB } from '@/lib/db/mongoose';
 import { userAuth } from '@/lib/auth';
 import { handleApiError } from '@/lib/errors/errorResponse';
 import { createPost, getPosts } from '@/lib/controllers/postController';

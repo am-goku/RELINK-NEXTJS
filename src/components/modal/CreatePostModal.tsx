@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { XMarkIcon, PhotoIcon, TrashIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import '../../styles/cropper.css'
-import { getCroppedImg } from '@/utils/cropImage';
+import { getCroppedImg } from '@/utils/cropper/cropImage';
 import CropComponent from './CropComponent';
 import LoadingModal from '../loaders/LoadingModal';
 

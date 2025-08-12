@@ -3,7 +3,7 @@
 import { useCallback, useEffect } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 import { useUserStore } from '@/stores/userStore';
-import { authService } from '@/services/apiServices';
+import { authService } from '@/services/api/apiServices';
 
 export default function UserProvider({ children }: { children: React.ReactNode }) {
     const { status } = useSession();

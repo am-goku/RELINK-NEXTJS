@@ -1,9 +1,9 @@
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { NotFoundError } from "../errors/ApiErrors";
-import { connectDB } from "../mongoose";
+import { connectDB } from "../db/mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
-import { sendEmail } from "@/utils/mail/mailer";
+import { sendEmail } from "@/services/mail/mailer";
 
 type IOtpFor = 'password' | 'email' | 'login' | 'verification';
 

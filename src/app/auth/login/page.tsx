@@ -4,8 +4,8 @@ import { signIn, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Navbar from '@/components/Navbar';
-import Button from '@/components/Button';
+import Navbar from '@/components/ui/Navbar';
+import Button from '@/components/ui/Button';
 import Link from 'next/link';
 
 export default function LoginPage() {

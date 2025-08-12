@@ -1,5 +1,5 @@
 import { IUser } from '@/models/User';
-import { searchService } from '@/services/apiServices';
+import { searchService } from '@/services/api/apiServices';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react'
 

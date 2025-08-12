@@ -1,8 +1,9 @@
 "use client"
 
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
 import LoaderScreen from "@/components/loaders/LoaderScreen";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/ui/Navbar";
+import { authService } from "@/services/api/apiServices";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -53,11 +54,7 @@ export default function SignupPage() {
         }
 
         try {
-            await axios.post("/api/auth/signup", {
-                email,
-                username,
-                password,
-            });
+            await authService.register({ email, username, password });
             router.push("/auth/login"); // redirect to login
         } catch (err) {
             if (axios.isAxiosError(err)) {
@@ -138,6 +135,7 @@ export default function SignupPage() {
 
                         <Button label="Sign Up" type="submit" />
                         <section className='flex flex-col'>
+                            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                             <span>Have an account? <a href="/auth/login" className='text-indigo-700'>Login.</a></span>
                         </section>
                     </form>

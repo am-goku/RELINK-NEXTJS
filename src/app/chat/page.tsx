@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { MessageCircle, Send } from 'lucide-react';
 import clsx from 'clsx';
-import Navbar from '../../components/Navbar';
+import Navbar from '../../components/ui/Navbar';
 
 const conversations = [
     { id: 1, name: 'Emily White', lastMessage: 'Hey, how are you?', avatar: '/avatars/emily.png' },

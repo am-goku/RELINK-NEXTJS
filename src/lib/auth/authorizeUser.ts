@@ -1,5 +1,5 @@
 import User, { IUser } from "@/models/User";
-import { connectDB } from "../mongoose";
+import { connectDB } from "../db/mongoose";
 import { compare } from "bcryptjs";
 
 export async function authorizeUser(credentials: Record<"email" | "password", string> | undefined) {

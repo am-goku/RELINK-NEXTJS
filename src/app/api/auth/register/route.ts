@@ -1,6 +1,6 @@
 import User from "@/models/User";
 import { hashPassword } from "@/lib/hash";
-import { connectDB } from "@/lib/mongoose";
+import { connectDB } from "@/lib/db/mongoose";
 import { NextResponse } from "next/server";
 import { handleApiError } from "@/lib/errors/errorResponse";
 

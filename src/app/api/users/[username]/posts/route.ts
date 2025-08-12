@@ -3,9 +3,9 @@ import { getPostsByUsername } from "@/lib/controllers/postController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { username: string } }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ username: string }> }) {
     try {
-        const { username } = params;
+        const { username } = await context.params;
 
         await userAuth();
 
