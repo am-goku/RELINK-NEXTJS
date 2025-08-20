@@ -12,8 +12,9 @@ function ProfilePicUpdater({ image }: Props) {
             <div className="flex items-center gap-4">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                    src={image || '/images/default-profile.jpg'}
+                    src={image || '/images/default-profile.png'}
                     alt="profile"
+                    draggable={false}
                     className="w-16 h-16 rounded-full object-cover border"
                 />
                 <button className="flex items-center gap-2 text-sm text-[#6C5CE7] hover:underline">

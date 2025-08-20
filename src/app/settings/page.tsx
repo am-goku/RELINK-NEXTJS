@@ -10,6 +10,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import { useUserStore } from '@/stores/userStore';
 
 function SettingsSection({
   title,
@@ -39,32 +40,28 @@ function SettingsSection({
 }
 
 export default function SettingsPage() {
+
+  const user = useUserStore((state) => state.user);
+
   return (
     <React.Fragment>
       <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-[#2D3436]">
-        {/* <h1 className="text-2xl font-bold mb-6">Settings</h1> */}
-
         {/* Account Section */}
-        <SettingsSection title="Account" icon={User}>
-          <div className="space-y-2">
-            <div>
-              <label className="text-sm font-medium">Name</label>
-              <input
-                type="text"
-                value="John Doe"
-                className="w-full mt-1 px-3 py-2 rounded-md border border-gray-300"
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Email</label>
-              <input
-                type="email"
-                value="john@example.com"
-                className="w-full mt-1 px-3 py-2 rounded-md border border-gray-300"
-              />
-            </div>
-          </div>
-        </SettingsSection>
+        {
+          user && (
+            <SettingsSection title="Account" icon={User}>
+              <div className="space-y-2">
+                <div className="flex flex-col gap-3">
+                  <div className='flex flex-col gap-1'>
+                    <span className='font-bold text-lg'>{user?.name}</span>
+                    <span className='text-xs italic items-end'>@{user?.username}</span>
+                  </div>
+                  <span className='text- font-semibold'>{user?.email}</span>
+                </div>
+              </div>
+            </SettingsSection>
+          )
+        }
 
         {/* Notification Section */}
         <SettingsSection title="Notifications" icon={Bell}>
@@ -90,10 +87,10 @@ export default function SettingsPage() {
           </div>
           <div>
             <label className="text-sm font-medium">Font Size</label>
-            <select className="w-full mt-1 px-3 py-2 rounded-md border border-gray-300">
-              <option>Small</option>
-              <option selected>Medium</option>
-              <option>Large</option>
+            <select defaultValue={'medium'} className="w-full mt-1 px-3 py-2 rounded-md border border-gray-300">
+              <option value={'small'}>Small</option>
+              <option value={'medium'}>Medium</option>
+              <option value={'large'}>Large</option>
             </select>
           </div>
           <div className="flex items-center justify-between">
@@ -126,10 +123,10 @@ export default function SettingsPage() {
           </div>
           <div className="flex items-center justify-between">
             <span>Language</span>
-            <select className="ml-auto border border-gray-300 px-3 py-1 rounded-md">
-              <option selected>English</option>
-              <option>Spanish</option>
-              <option>Hindi</option>
+            <select defaultValue={'en'} className="ml-auto border border-gray-300 px-3 py-1 rounded-md">
+              <option value={'es'}>Spanish</option>
+              <option value={'en'}>English</option>
+              <option value={'hi'}>Hindi</option>
             </select>
           </div>
           <div className="flex items-center justify-between">

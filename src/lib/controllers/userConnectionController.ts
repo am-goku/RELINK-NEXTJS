@@ -1,7 +1,8 @@
 import User from "@/models/User";
 import { connectDB } from "../db/mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
+import { normalizeToObjectId } from "@/utils/types/normalize";
 
 
 /**
@@ -25,8 +26,8 @@ export async function followUser(c_user: string, f_user: string): Promise<{ succ
     const users = await User.find({ _id: { $in: [c_user, f_user] } });
     if (users.length !== 2) throw new NotFoundError('User not found');
 
-    const c_user_id = new Types.ObjectId(c_user);
-    const f_user_id = new Types.ObjectId(f_user);
+    const c_user_id = normalizeToObjectId(c_user);
+    const f_user_id = normalizeToObjectId(f_user);
 
     // Starting MONGOOSE TRANSACTION for atomicity
     const session = await mongoose.startSession(); // Create a new session for transaction
@@ -79,8 +80,8 @@ export async function unfollowUser(c_user: string, f_user: string): Promise<{ su
     const users = await User.find({ _id: { $in: [c_user, f_user] } });
     if (users.length !== 2) throw new NotFoundError('User not found');
 
-    const c_user_id = new Types.ObjectId(c_user);
-    const f_user_id = new Types.ObjectId(f_user);
+    const c_user_id = normalizeToObjectId(c_user);
+    const f_user_id = normalizeToObjectId(f_user);
 
     // Starting MONGOOSE TRANSACTION for atomicity
     const session = await mongoose.startSession(); // Create a new session for transaction

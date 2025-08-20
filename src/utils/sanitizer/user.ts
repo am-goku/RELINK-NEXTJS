@@ -26,6 +26,8 @@ export function sanitizeUser(user: IUserDocument, role: IUser['role'] = 'user') 
         onlineStatus: user.onlineStatus,
         created_at: user.created_at,
         updated_at: user.updated_at,
+        followers: user.followers,
+        following: user.following,
         followersCount: user.followers?.length || 0,
         followingCount: user.following?.length || 0,
     };

@@ -10,6 +10,7 @@ import {
   ChevronUp,
   UserX,
 } from 'lucide-react';
+import LoadingContent from '@/components/loaders/LoadingContent';
 
 function AccountSection({
   title,
@@ -42,7 +43,15 @@ export default function AccountPage() {
 
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [loading, setLoading] = useState(false);
+
+  // Util states
+  const [loading, setLoading] = useState<boolean>(false);
+  const [pageLoading, setPageLoading] = useState<boolean>(false);
+
+
+  const [pvtAccount, setPvtAccount] = useState(false);
+  const [onlStatus, setOnlStatus] = useState(false);
+
 
   const handleDeactivate = async () => {
     setLoading(true);
@@ -73,156 +82,174 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-[#2D3436]">
-      <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
+    <LoadingContent isLoading={pageLoading}>
+      <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-[#2D3436]">
+        <h1 className="text-2xl font-bold mb-6">Account Settings</h1>
 
-      {/* Account Privacy Section */}
-      <AccountSection title="Privacy" icon={Shield}>
-        <div className="flex items-center justify-between">
-          <span>Private Account</span>
-          <input type="checkbox" className="toggle toggle-primary" />
-        </div>
-        <div className="flex items-center justify-between">
-          <span>Show Online Status</span>
-          <input type="checkbox" className="toggle toggle-primary" defaultChecked />
-        </div>
-      </AccountSection>
+        {/* Account Privacy Section */}
+        <AccountSection title="Privacy" icon={Shield}>
+          <div className="flex items-center justify-between">
+            <span>Private Account</span>
+            {/* <input type="checkbox" className="toggle toggle-primary" /> */}
+            <button
+              onClick={() => setPvtAccount(!pvtAccount)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${pvtAccount ? "bg-blue-600" : "bg-gray-400"}`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${pvtAccount ? "translate-x-6" : "translate-x-1"}`}
+              />
+            </button>
+          </div>
+          <div className="flex items-center justify-between">
+            <span>Show Online Status</span>
+            {/* <input type="checkbox" className="toggle toggle-primary" defaultChecked /> */}
+            <button
+              onClick={() => setOnlStatus(!onlStatus)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${onlStatus ? "bg-blue-600" : "bg-gray-400"}`}
+            >
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${onlStatus ? "translate-x-6" : "translate-x-1"}`}
+              />
+            </button>
+          </div>
+        </AccountSection>
 
-      {/* Who Can Message Section */}
-      <AccountSection title="Who Can Message You" icon={MessageCircle}>
-        <div>
-          <label className="text-sm font-medium block mb-1">Message Permissions</label>
-          <select className="w-full px-3 py-2 border border-gray-300 rounded-md">
-            <option selected>Everyone</option>
-            <option>Followers Only</option>
-            <option>No One</option>
-          </select>
-        </div>
-      </AccountSection>
-
-      {/* Change Email Section */}
-      <AccountSection title="Change Email" icon={Mail}>
-        <div>
-          <label className="text-sm font-medium block mb-1">New Email</label>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
-        <button className="mt-2 px-4 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3]">
-          Update Email
-        </button>
-      </AccountSection>
-
-      {/* Change Password Section */}
-      <AccountSection title="Change Password" icon={Lock}>
-        <div className="space-y-3">
+        {/* Who Can Message Section */}
+        <AccountSection title="Who Can Message You" icon={MessageCircle}>
           <div>
-            <label className="text-sm font-medium block mb-1">Current Password</label>
+            <label className="text-sm font-medium block mb-1">Message Permissions</label>
+            <select defaultValue={'followers'} className="w-full px-3 py-2 border border-gray-300 rounded-md">
+              <option value={'everyone'}>Everyone</option>
+              <option value={'followers'}>Followers Only</option>
+              <option value={'none'}>No One</option>
+            </select>
+          </div>
+        </AccountSection>
+
+        {/* Change Email Section */}
+        <AccountSection title="Change Email" icon={Mail}>
+          <div>
+            <label className="text-sm font-medium block mb-1">New Email</label>
             <input
-              type="password"
+              type="email"
+              placeholder="you@example.com"
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">New Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium block mb-1">Confirm New Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-        </div>
-        <button className="mt-4 px-4 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3]">
-          Update Password
-        </button>
-      </AccountSection>
-
-      {/* Account Ownership and Control */}
-      <AccountSection title="Account Ownership & Control" icon={UserX}>
-        <p className="text-sm text-[#636E72] mb-4 max-w-xl">
-          Manage your account status here. You can temporarily deactivate your account or permanently delete it. Deleting your account is irreversible.
-        </p>
-        <div className="flex gap-4">
-          <button
-            onClick={() => setShowDeactivateConfirm(true)}
-            disabled={loading}
-            className="px-5 py-2 rounded-xl border border-[#6C5CE7] text-[#6C5CE7] hover:bg-[#6C5CE7] hover:text-white transition"
-          >
-            Deactivate Account
+          <button className="mt-2 px-4 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3]">
+            Update Email
           </button>
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={loading}
-            className="px-5 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 transition"
-          >
-            Delete Account
-          </button>
-        </div>
+        </AccountSection>
 
-        {/* Deactivate Confirmation Modal */}
-        {showDeactivateConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-96 max-w-full">
-              <h4 className="text-lg font-semibold mb-4 text-[#2D3436]">Confirm Deactivation</h4>
-              <p className="text-[#636E72] mb-6">
-                Are you sure you want to deactivate your account? You can reactivate it anytime by logging back in.
-              </p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowDeactivateConfirm(false)}
-                  className="px-4 py-2 rounded-lg border border-gray-300"
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDeactivate}
-                  className="px-4 py-2 rounded-lg bg-[#6C5CE7] text-white hover:bg-[#5941c6]"
-                  disabled={loading}
-                >
-                  {loading ? "Processing..." : "Deactivate"}
-                </button>
-              </div>
+        {/* Change Password Section */}
+        <AccountSection title="Change Password" icon={Lock}>
+          <div className="space-y-3">
+            <div>
+              <label className="text-sm font-medium block mb-1">Current Password</label>
+              <input
+                type="password"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">New Password</label>
+              <input
+                type="password"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium block mb-1">Confirm New Password</label>
+              <input
+                type="password"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
             </div>
           </div>
-        )}
+          <button className="mt-4 px-4 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3]">
+            Update Password
+          </button>
+        </AccountSection>
 
-        {/* Delete Confirmation Modal */}
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-96 max-w-full">
-              <h4 className="text-lg font-semibold mb-4 text-[#2D3436]">Confirm Deletion</h4>
-              <p className="text-[#636E72] mb-6">
-                Deleting your account is permanent and cannot be undone. All your data will be lost. Are you absolutely sure?
-              </p>
-              <div className="flex justify-end gap-4">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 rounded-lg border border-gray-300"
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
-                  disabled={loading}
-                >
-                  {loading ? "Processing..." : "Delete"}
-                </button>
+        {/* Account Ownership and Control */}
+        <AccountSection title="Account Ownership & Control" icon={UserX}>
+          <p className="text-sm text-[#636E72] mb-4 max-w-xl">
+            Manage your account status here. You can temporarily deactivate your account or permanently delete it. Deleting your account is irreversible.
+          </p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => setShowDeactivateConfirm(true)}
+              disabled={loading}
+              className="px-5 py-2 rounded-xl border border-[#6C5CE7] text-[#6C5CE7] hover:bg-[#6C5CE7] hover:text-white transition"
+            >
+              Deactivate Account
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={loading}
+              className="px-5 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700 transition"
+            >
+              Delete Account
+            </button>
+          </div>
+
+          {/* Deactivate Confirmation Modal */}
+          {showDeactivateConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl p-6 w-96 max-w-full">
+                <h4 className="text-lg font-semibold mb-4 text-[#2D3436]">Confirm Deactivation</h4>
+                <p className="text-[#636E72] mb-6">
+                  Are you sure you want to deactivate your account? You can reactivate it anytime by logging back in.
+                </p>
+                <div className="flex justify-end gap-4">
+                  <button
+                    onClick={() => setShowDeactivateConfirm(false)}
+                    className="px-4 py-2 rounded-lg border border-gray-300"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeactivate}
+                    className="px-4 py-2 rounded-lg bg-[#6C5CE7] text-white hover:bg-[#5941c6]"
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "Deactivate"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </AccountSection>
-    </div>
+          )}
+
+          {/* Delete Confirmation Modal */}
+          {showDeleteConfirm && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl p-6 w-96 max-w-full">
+                <h4 className="text-lg font-semibold mb-4 text-[#2D3436]">Confirm Deletion</h4>
+                <p className="text-[#636E72] mb-6">
+                  Deleting your account is permanent and cannot be undone. All your data will be lost. Are you absolutely sure?
+                </p>
+                <div className="flex justify-end gap-4">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-4 py-2 rounded-lg border border-gray-300"
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "Delete"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </AccountSection>
+      </div>
+    </LoadingContent>
   );
 }

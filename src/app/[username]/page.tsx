@@ -11,59 +11,62 @@ import { IPublicPost } from "../../models/Post";
 import { useSession } from "next-auth/react";
 import SkeletonPostCard from "@/components/skeletons/SkeletonPostCard";
 import { useParams } from "next/navigation";
-import { userService } from "@/services/api/apiServices";
 import { IUser } from "@/models/User";
-import { getErrorMessage } from "@/lib/errors/errorResponse";
 import UserNotFound from "@/components/error/userNotFound";
-import { FollowButton, MessageButton } from "@/components/buttons/connectionButtons";
+import { FollowButton, MessageButton, UnfollowButton } from "@/components/buttons/connectionButtons";
+import { getUserProfileData } from "@/services/api/user-apis";
+import { getPostsByUsername } from "@/services/api/post-apis";
+import { normalizeToObjectId } from "@/utils/types/normalize";
 
 
 function Page() {
 
     const { data: session, status } = useSession();
     const params = useParams()
-    const [user, setUsers] = useState<IUser | null>(null);
+    const [user, setUser] = useState<IUser | null>(null);
     const [error, setError] = useState<string>('');
     const [posts, setPosts] = useState<IPublicPost[] | []>([])
     const [loadingPosts, setLoadingPosts] = useState(true);
     const [isOwner, setIsOwner] = useState<boolean>(false);
 
+    // connection states
+    const [isFollowing, setIsFollowing] = useState<boolean>(false);
+
     // Fetching User
     useEffect(() => {
-        userService.getProfile(params.username as string)
-            .then((res) => {
-                console.log(res.data.user)
-                setUsers(res.data.user)
-                setIsOwner(res.data.isOwner)
+        if (params.username) {
+            getUserProfileData({
+                username: params.username as string,
+                setProfileData: setUser,
+                setIsOwner,
+                setError
             })
-            .catch((error) => {
-                console.log('This is a test error: ' + error)
-                setError(getErrorMessage(error))
-            })
+        }
     }, [params.username])
 
     // Fetching User Posts
     useEffect(() => {
-        setLoadingPosts(true)
-
         if (user) {
-            userService.getPosts(user.username)
-                .then((res) => {
-                    setPosts(res.data.posts)
-                })
-                .catch((error) => {
-                    console.log('This is a test error: ' + error)
-                    setError(getErrorMessage(error))
-                })
-                .finally(() => {
-                    setLoadingPosts(false)
-                })
+            getPostsByUsername({
+                username: user.username,
+                setResponse: setPosts,
+                setError,
+                setLoading: setLoadingPosts
+            })
         }
     }, [user])
 
+    // Connection management
+    useEffect(() => {
+        if (user && session) {
+            const sessionUserId = normalizeToObjectId(session.user.id);
+            setIsFollowing(user.followers.includes(sessionUserId));
+        }
+    }, [user, session])
+
     // Error alert
     useEffect(() => {
-        if (error) console.log('This is a test error: ' + error)
+        if (error) alert(error);
         return () => {
             setError('')
         }
@@ -86,15 +89,29 @@ function Page() {
                                     <ProfileHeader user={user} />
                                     {!isOwner && (
                                         <div className="absolute top-2 right-4 md:top-4 md:right-10 flex space-x-2">
-                                            <FollowButton />
-                                            <MessageButton />
+                                            {isFollowing ? (
+                                                <>
+                                                    <UnfollowButton
+                                                        id={user._id}
+                                                        c_userId={session?.user?.id as string}
+                                                        setUser={setUser}
+                                                        setError={setError} key="unfollow" />
+                                                    <MessageButton />
+                                                </>
+                                            ) : (
+                                                <FollowButton
+                                                    id={user._id}
+                                                    c_userId={session?.user?.id as string}
+                                                    setUser={setUser}
+                                                    setError={setError} key="follow" />
+                                            )}
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="flex flex-col md:flex-row md:justify-between px-4 md:px-10 mt-2">
                                     <div>
-                                        <ProfileStats />
+                                        <ProfileStats user={user} />
                                     </div>
                                 </div>
 

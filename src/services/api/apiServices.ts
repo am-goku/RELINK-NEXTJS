@@ -1,6 +1,14 @@
 import API_ROUTES from '@/constants/apiRoutes';
 import apiInstance from '@/lib/axios';
 
+type IUserUpdate = {
+    name: string;
+    username: string;
+    bio: string;
+    gender: string;
+    links: string[];
+}
+
 export const authService = {
     register: (data: { email: string; username: string; password: string }) => apiInstance.post(API_ROUTES.AUTH.REGISTER, data),
     login: (data: { email: string; password: string }) => apiInstance.post(API_ROUTES.AUTH.LOGIN, data),
@@ -21,6 +29,10 @@ export const userService = {
     getAll: () => apiInstance.get(API_ROUTES.USER.ROOT),
     getById: (id: string) => apiInstance.get(API_ROUTES.USER.BY_ID(id)),
     getProfile: (username: string) => apiInstance.get(API_ROUTES.USER.GET_PROFILE(username)),
+
+    // update profile
+    updateProfile: (data: IUserUpdate) => apiInstance.put(API_ROUTES.USER.ROOT, data),
+    
     getPosts: (username: string) => apiInstance.get(API_ROUTES.USER.GET_POSTS(username)),
     follow: (username: string) => apiInstance.post(API_ROUTES.USER.FOLLOW(username)),
     unfollow: (username: string) => apiInstance.post(API_ROUTES.USER.UNFOLLOW(username)),

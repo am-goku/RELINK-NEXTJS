@@ -64,11 +64,11 @@ export default function LoginPage() {
 
     return (
         <>
-            <div className="min-h-screen items-center justify-center">
+            {/* <div className="min-h-screen items-center justify-center">
                 <Navbar type="login" />
                 <div className="flex p-10 gap-28 justify-center">
 
-                    <section className="w-1/2 h-[80vh] relative">
+                    <section className="w-1/2 h-[80vh] relative hidden md:block">
                         <Image
                             src="/images/bannerImg.jpg"
                             alt="Banner"
@@ -120,7 +120,73 @@ export default function LoginPage() {
                         </section>
                     </form>
                 </div>
-            </div>
+            </div> */}
+            <div className="min-h-screen flex flex-col">
+  <Navbar type="login" />
+
+  <div className="flex flex-col md:flex-row p-6 md:p-10 gap-10 md:gap-28 justify-center items-center flex-1">
+    
+    {/* Banner Section - hidden on small screens */}
+    <section className="w-full md:w-1/2 h-64 md:h-[80vh] relative hidden md:block">
+      <Image
+        src="/images/bannerImg.jpg"
+        alt="Banner"
+        fill
+        className="object-cover rounded-lg md:rounded-l-lg"
+        priority
+      />
+    </section>
+
+    {/* Form Section */}
+    <form
+      onSubmit={handleSubmit}
+      className="w-full md:w-1/2 max-w-md p-6 rounded-lg space-y-4 bg-white shadow-md"
+    >
+      <h2 className="text-2xl font-bold text-center">Sign In</h2>
+
+      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+      <label htmlFor="email" className="sr-only">Email</label>
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="w-full border border-gray-300 p-2 rounded"
+      />
+
+      <div className="relative">
+        <input
+          type={showPassword ? "text" : "password"}
+          name="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full border border-gray-300 p-2 rounded pr-10"
+        />
+        <button
+          type="button"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
+        >
+          {showPassword ? "🙈" : "👁️"}
+        </button>
+      </div>
+
+      <Button label="Sign In" type="submit" disabled={loading} />
+
+      <section className="flex flex-col gap-2 text-center">
+        <span>
+          New here? <Link href="/auth/signup" className="text-indigo-700">Signup</Link>
+        </span>
+        <Link href="/forgot-password" className="text-indigo-700">Forgot password?</Link>
+      </section>
+    </form>
+  </div>
+</div>
+
         </>
     );
 }
