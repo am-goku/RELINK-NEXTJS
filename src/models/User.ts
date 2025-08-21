@@ -16,8 +16,8 @@ export interface IUser {
 
     password: string;
 
-    followers: Types.ObjectId[];
-    following: Types.ObjectId[];
+    followers: string[];
+    following: string[];
 
     blocked?: boolean;
     deleted?: boolean;
@@ -75,7 +75,8 @@ const UserSchema = new Schema<IUserDocument>(
             type: String
         },
         links: [{
-            type: String
+            type: String,
+            default: []
         }],
 
         email: {
@@ -94,10 +95,12 @@ const UserSchema = new Schema<IUserDocument>(
         },
 
         blocked: {
-            type: Boolean
+            type: Boolean,
+            default: false
         },
         deleted: {
-            type: Boolean
+            type: Boolean,
+            default: false
         },
 
         role: {

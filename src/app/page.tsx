@@ -3,13 +3,13 @@
 import { useSession } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/solid';
-import axios from 'axios';
 import LoaderScreen from '../components/loaders/LoaderScreen';
 import Navbar from '../components/ui/Navbar';
 import PostCard from '../components/PostCard';
 import CreatePostModal from '../components/modal/CreatePostModal';
 import SkeletonPostCard from '@/components/skeletons/SkeletonPostCard';
 import { IPublicPost } from '@/utils/sanitizer/post';
+import apiInstance from '@/lib/axios';
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -20,7 +20,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     setLoadingPosts(true);
-    axios.get('/api/posts').then((res) => {
+    apiInstance.get('/api/posts').then((res) => {
       setPosts(res.data.posts);
     }).catch((err) => {
       console.log(err)

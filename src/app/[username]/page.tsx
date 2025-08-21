@@ -15,7 +15,6 @@ import UserNotFound from "@/components/error/userNotFound";
 import { FollowButton, MessageButton, UnfollowButton } from "@/components/buttons/connectionButtons";
 import { getUserProfileData } from "@/services/api/user-apis";
 import { getPostsByUsername } from "@/services/api/post-apis";
-import { normalizeToObjectId } from "@/utils/types/normalize";
 import { IPublicPost } from "@/utils/sanitizer/post";
 
 
@@ -59,10 +58,9 @@ function Page() {
     // Connection management
     useEffect(() => {
         if (user && session) {
-            const sessionUserId = normalizeToObjectId(session.user.id);
-            setIsFollowing(user.followers.includes(sessionUserId));
+            setIsFollowing(user.followers.includes(session.user.id));
         }
-    }, [user, session])
+    }, [user, user?.followers, session])
 
     // Error alert
     useEffect(() => {
@@ -96,7 +94,11 @@ function Page() {
                                                         c_userId={session?.user?.id as string}
                                                         setUser={setUser}
                                                         setError={setError} key="unfollow" />
-                                                    <MessageButton />
+                                                    {
+                                                        user.messageFrom === 'everyone' && (
+                                                            <MessageButton />
+                                                        )
+                                                    }
                                                 </>
                                             ) : (
                                                 <FollowButton

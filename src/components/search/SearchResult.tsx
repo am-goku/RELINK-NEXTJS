@@ -47,7 +47,7 @@ function SearchResult({ searchKey }: Props) {
                                 className="flex items-center gap-3 py-2 px-2 hover:bg-gray-100 rounded-md cursor-pointer"
                             >
                                 <Image
-                                    src={user.image || '/images/default-profile.png'}
+                                    src={user.image ? user.image : '/images/default-profile.png'}
                                     alt={user.name || user.username}
                                     width={32}
                                     height={32}

@@ -4,11 +4,11 @@ import Button from "@/components/ui/Button";
 import LoaderScreen from "@/components/loaders/LoaderScreen";
 import Navbar from "@/components/ui/Navbar";
 import { authService } from "@/services/api/apiServices";
-import axios from "axios";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { getErrorMessage } from "@/lib/errors/errorResponse";
 
 export default function SignupPage() {
 
@@ -57,11 +57,8 @@ export default function SignupPage() {
             await authService.register({ email, username, password });
             router.push("/auth/login"); // redirect to login
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                setError(err.response?.data?.message || "Something went wrong.");
-            } else {
-                setError("An unexpected error occurred.");
-            }
+            console.log(err)
+            setError(getErrorMessage(err) || "Something went wrong. Please try again.");
         }
     };
 

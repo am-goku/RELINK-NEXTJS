@@ -45,7 +45,7 @@ function UserResults({ query }: Props) {
                                     >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={user.image}
+                                            src={user.image ? user.image : '/images/default-profile.png'}
                                             alt={user.name}
                                             className="w-12 h-12 rounded-full object-cover"
                                         />

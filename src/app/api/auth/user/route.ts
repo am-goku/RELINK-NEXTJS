@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth/authOptions";
-import { NotFoundError, UnauthorizedError } from "@/lib/errors/ApiErrors";
-import { handleApiError } from "@/lib/errors/errorResponse";
+import { UnauthorizedError } from "@/lib/errors/ApiErrors";
+import { getErrorMessage, handleApiError } from "@/lib/errors/errorResponse";
 import { connectDB } from "@/lib/db/mongoose";
 import User from "@/models/User";
 import { getServerSession } from "next-auth";
@@ -15,10 +15,8 @@ export async function GET() {
 
         const user = await User.findOne({ email: session.user.email }).select("-password -otp");
 
-        if (!user) throw new NotFoundError('User not found')
-
-        return NextResponse.json({user});
+        return NextResponse.json({ user });
     } catch (error) {
-        return handleApiError(error);
+        return handleApiError(new UnauthorizedError(getErrorMessage(error) || 'Unauthorized'));
     }
 }

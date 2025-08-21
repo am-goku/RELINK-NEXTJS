@@ -39,6 +39,9 @@ export async function POST(req: Request) {
         return NextResponse.json({ message: "User created", user: newUser }, { status: 201 });
 
     } catch (error) {
+        console.log(error)
         return handleApiError(error);
     }
 }
+
+//$2b$10$MXURO2kn8Ruzepv2vzoHUecoN0H06nDnJObAKzsgC48UXjsMVlCpy
