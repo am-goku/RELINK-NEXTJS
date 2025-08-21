@@ -62,9 +62,9 @@ function Page() {
         }
     }, [user, user?.followers, session])
 
-    // Error alert
+    // Error handling
     useEffect(() => {
-        if (error) alert(error);
+        if (error) console.log(error)
         return () => {
             setError('')
         }

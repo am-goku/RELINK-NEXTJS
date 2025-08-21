@@ -20,11 +20,8 @@ export function toggleFollower(
     return {
       ...prev,
       followers: isAlreadyFollowing
-        ? prev.followers.filter((f) => f.toString() !== userIdStr) // remove
-        : [
-            ...prev.followers,
-            typeof userId === "string" ? new Types.ObjectId(userId) : userId, // add
-          ],
+        ? prev.followers.filter((f) => f !== userIdStr) // remove
+        : [...prev.followers, userIdStr]
     };
   });
 }

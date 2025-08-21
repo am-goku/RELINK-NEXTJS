@@ -11,6 +11,7 @@ import {
   UserX,
 } from 'lucide-react';
 import LoadingContent from '@/components/loaders/LoadingContent';
+import { AccTypeToggler, OnlStatusToggler } from '@/components/buttons/toggleButtons';
 
 function AccountSection({
   title,
@@ -48,7 +49,7 @@ export default function AccountPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
 
-
+  // Account states
   const [pvtAccount, setPvtAccount] = useState(false);
   const [onlStatus, setOnlStatus] = useState(false);
 
@@ -90,27 +91,11 @@ export default function AccountPage() {
         <AccountSection title="Privacy" icon={Shield}>
           <div className="flex items-center justify-between">
             <span>Private Account</span>
-            {/* <input type="checkbox" className="toggle toggle-primary" /> */}
-            <button
-              onClick={() => setPvtAccount(!pvtAccount)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${pvtAccount ? "bg-blue-600" : "bg-gray-400"}`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${pvtAccount ? "translate-x-6" : "translate-x-1"}`}
-              />
-            </button>
+            <AccTypeToggler pvtAccount={pvtAccount} setPvtAccount={setPvtAccount} />
           </div>
           <div className="flex items-center justify-between">
             <span>Show Online Status</span>
-            {/* <input type="checkbox" className="toggle toggle-primary" defaultChecked /> */}
-            <button
-              onClick={() => setOnlStatus(!onlStatus)}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${onlStatus ? "bg-blue-600" : "bg-gray-400"}`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${onlStatus ? "translate-x-6" : "translate-x-1"}`}
-              />
-            </button>
+            <OnlStatusToggler onlStatus={onlStatus} setOnlStatus={setOnlStatus} />
           </div>
         </AccountSection>
 
