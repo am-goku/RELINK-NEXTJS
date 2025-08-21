@@ -1,6 +1,25 @@
 import { IPostDocument } from "@/models/Post";
 import { IUserDocument } from "@/models/User";
 
+// Public view (sanitized version)
+export interface IPublicPost {
+    _id: string;
+    content?: string;
+    image?: string;
+    likes_count: number;
+    comments_count: number;
+    share_count: number;
+    views: number;
+    hashtags: string;
+    user: {
+        _id: string;
+        name: string;
+        username: string;
+        image: string;
+    };
+    created_at: Date;
+}
+
 type PopulatedUser = Pick<IUserDocument, "_id" | "name" | "username" | "image">;
 
 type PopulatedPost = Omit<IPostDocument, "user"> & {

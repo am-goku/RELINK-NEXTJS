@@ -1,5 +1,37 @@
 import { IUser, IUserDocument } from "@/models/User";
 
+type BaseSanitizedUser = {
+  _id: IUser['_id'];
+  username: IUser['username'];
+  role: IUser['role'];
+  name: IUser['name'];
+  bio: IUser['bio'];
+  gender: IUser['gender'];
+  image: IUser['image'];
+  cover: IUser['cover'];
+  links: IUser['links'];
+  accountType: IUser['accountType'];
+  messageFrom: IUser['messageFrom'];
+  onlineStatus: IUser['onlineStatus'];
+  created_at: IUser['created_at'];
+  updated_at: IUser['updated_at'];
+  followers: IUser['followers'];
+  following: IUser['following'];
+  followersCount: number;
+  followingCount: number;
+};
+
+type AdminSanitizedUser = BaseSanitizedUser & {
+  email: IUser['email'];
+  blocked: IUser['blocked'];
+  deleted: IUser['deleted'];
+  otp: IUser['otp'];
+};
+
+// Conditional type based on role
+export type SanitizedUser<R extends IUser['role'] = 'user'> =
+  R extends 'admin' | 'super-admin' ? AdminSanitizedUser : BaseSanitizedUser;
+
 /**
  * Sanitizes a user object by selecting specific fields based on the user's role.
  *

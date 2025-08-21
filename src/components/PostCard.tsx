@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import Image from "next/image";
-import { IPublicPost } from '../models/Post';
+import { IPublicPost } from '@/utils/sanitizer/post';
 
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

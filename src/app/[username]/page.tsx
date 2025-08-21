@@ -7,7 +7,6 @@ import PostCard from "../../components/PostCard";
 import ProfileHeader from "../../components/ProfileHeader";
 import ProfileStats from "../../components/ProfileStats";
 import LoaderScreen from "../../components/loaders/LoaderScreen";
-import { IPublicPost } from "../../models/Post";
 import { useSession } from "next-auth/react";
 import SkeletonPostCard from "@/components/skeletons/SkeletonPostCard";
 import { useParams } from "next/navigation";
@@ -17,6 +16,7 @@ import { FollowButton, MessageButton, UnfollowButton } from "@/components/button
 import { getUserProfileData } from "@/services/api/user-apis";
 import { getPostsByUsername } from "@/services/api/post-apis";
 import { normalizeToObjectId } from "@/utils/types/normalize";
+import { IPublicPost } from "@/utils/sanitizer/post";
 
 
 function Page() {

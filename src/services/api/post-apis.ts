@@ -1,6 +1,6 @@
 import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
-import { IPublicPost } from "@/models/Post";
+import { IPublicPost } from "@/utils/sanitizer/post";
 
 export async function getPostsByUsername({ username, setResponse, setError, setLoading }: {
     username: string,

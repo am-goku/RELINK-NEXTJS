@@ -23,25 +23,6 @@ export interface IPostBase {
 // For MongoDB Document
 export type IPostDocument = IPostBase & Document;
 
-// Public view (sanitized version)
-export interface IPublicPost {
-    _id: string;
-    content?: string;
-    image?: string;
-    likes_count: number;
-    comments_count: number;
-    share_count: number;
-    views: number;
-    hashtags: string;
-    user: {
-        _id: string;
-        name: string;
-        username: string;
-        image: string;
-    };
-    created_at: Date;
-}
-
 
 // Post Schema
 const PostSchema = new Schema<IPostDocument>(
