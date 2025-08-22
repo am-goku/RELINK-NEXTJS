@@ -1,6 +1,6 @@
 import User, { IUser, IUserDocument } from "@/models/User";
 import { connectDB } from "../db/mongoose";
-import { BadRequestError, NotFoundError } from "../errors/ApiErrors";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors/ApiErrors";
 import { FilterQuery } from "mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
 import { hashPassword } from "../hash";
@@ -71,7 +71,8 @@ export async function getUserByUsername(
         query.role = 'user';
     }
 
-    const user: IUserDocument | null = await User.findOne(query);
+    const user = await User.findOne(query).lean<IUser>();
+
     if (!user) throw new NotFoundError('User not found')
 
     return sanitizeUser(user, role)
@@ -95,7 +96,7 @@ export async function getUserByUsername(
 export async function updateUserProfile({ email, data }: {
     email: string;
     data: Record<string, unknown>;
-}): Promise<Partial<IUserDocument>> {
+}): Promise<Partial<IUser>> {
     if (!email) throw new NotFoundError("User email is required");
 
     const allowedFields = ["name", "bio", "username", "gender", "links"];
@@ -196,4 +197,29 @@ export async function searchUser(searchKey: string | null, page: number = 1, pre
     }).skip(skip).limit(limit); // Optional: limit to prevent abuse
 
     return users.map(user => sanitizeUser(user, 'user'));
+}
+
+
+/**
+ * Retrieves a sanitized user object by ID.
+ * 
+ * Connects to the database and fetches a user document based on the provided user ID.
+ * The user object is populated with follower and following information and sanitized
+ * before being returned.
+ * 
+ * @param id - The unique identifier of the user to be fetched.
+ * @returns A sanitized version of the user object, containing only the fields permitted by the user's role.
+ * @throws {UnauthorizedError} If the user is not found.
+ */
+export async function getAuthenticatedUserById(id: string) {
+    await connectDB();
+
+    const user: IUser | null = await User.findById(id)
+        .populate({ path: "followers", select: "name username _id image" })
+        .populate({ path: "following", select: "name username _id image" })
+        .lean<IUser>();
+
+    if (!user) throw new UnauthorizedError("User not found");
+
+    return sanitizeUser(user, 'user');
 }

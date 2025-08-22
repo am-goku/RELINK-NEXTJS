@@ -1,7 +1,7 @@
-import User from "@/models/User";
+import User, { IUser } from "@/models/User";
 import { connectDB } from "../db/mongoose";
-import { NotFoundError } from "../errors/ApiErrors";
-import mongoose from "mongoose";
+import { BadRequestError, NotFoundError } from "../errors/ApiErrors";
+import mongoose, { Types } from "mongoose";
 import { normalizeToObjectId } from "@/utils/types/normalize";
 
 
@@ -110,4 +110,43 @@ export async function unfollowUser(c_user: string, f_user: string): Promise<{ su
     } finally {
         session.endSession();
     }
+}
+
+
+    /**
+     * Retrieves a list of either followers or following of a user.
+     * 
+     * Connects to the database and fetches a user document based on the provided user ID.
+     * The user document is filtered to only include the specified type of connections.
+     * The connections field is populated with the _id, username, name, and image fields.
+     * 
+     * @param id - The unique identifier of the user whose connections are to be fetched.
+     * @param type - The type of connections to be fetched, either 'followers' or 'following'.
+     * @returns The populated connections field, containing an array of user objects.
+     * @throws {BadRequestError} If the user ID is not valid.
+     * @throws {NotFoundError} If the user is not found.
+     */
+export async function getConnections(id: string, type: 'followers' | 'following') {
+
+    await connectDB();
+
+    // Ensure valid ObjectId
+    if (!Types.ObjectId.isValid(id)) {
+        throw new BadRequestError("Invalid user id");
+    }
+
+    const user = await User.findById(id)
+        .select(type) // only fetch that field
+        .populate({
+            path: type,
+            select: "_id username name image",
+        })
+        .lean<IUser>();
+
+    if (!user) {
+        throw new NotFoundError("User not found");
+    }
+
+    // return populated field only
+    return user[type];
 }

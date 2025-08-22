@@ -15,8 +15,8 @@ type BaseSanitizedUser = {
   onlineStatus: IUser['onlineStatus'];
   created_at: IUser['created_at'];
   updated_at: IUser['updated_at'];
-  followers: IUser['followers'];
-  following: IUser['following'];
+  followers: { _id: string, username: string, name: string, image: string }[];
+  following: { _id: string, username: string, name: string, image: string }[];
   followersCount: number;
   followingCount: number;
 };
@@ -32,6 +32,15 @@ type AdminSanitizedUser = BaseSanitizedUser & {
 export type SanitizedUser<R extends IUser['role'] = 'user'> =
   R extends 'admin' | 'super-admin' ? AdminSanitizedUser : BaseSanitizedUser;
 
+export type ShortUser = {
+  _id: string;
+  username: string;
+  name?: string;
+  image?: string;
+};
+
+type TConnection = string | ShortUser;
+
 /**
  * Sanitizes a user object by selecting specific fields based on the user's role.
  *
@@ -42,37 +51,56 @@ export type SanitizedUser<R extends IUser['role'] = 'user'> =
  *          email, blocked status, deleted status, and otp are included.
  */
 
-export function sanitizeUser(user: IUserDocument, role: IUser['role'] = 'user') {
-    const baseUser = {
-        _id: user._id,
-        username: user.username,
-        role: user.role,
-        name: user.name,
-        bio: user.bio,
-        gender: user.gender,
-        image: user.image,
-        cover: user.cover,
-        links: user.links,
-        accountType: user.accountType,
-        messageFrom: user.messageFrom,
-        onlineStatus: user.onlineStatus,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-        followers: user.followers,
-        following: user.following,
-        followersCount: user.followers?.length || 0,
-        followingCount: user.following?.length || 0,
+export function sanitizeUser(
+  user: IUserDocument | IUser,
+  role: IUser["role"] = "user"
+) {
+  // normalize followers/following
+  const normalizeConnections = (
+    connections: TConnection[] = []
+  ) => {
+    return connections.map((conn) =>
+      typeof conn === "string"
+        ? { _id: conn, username: "", name: "", image: "" } // fallback for non-populated
+        : {
+          _id: conn._id,
+          username: conn.username,
+          name: conn.name,
+          image: conn.image || "",
+        }
+    );
+  };
+
+  const baseUser = {
+    _id: user._id,
+    username: user.username,
+    role: user.role,
+    name: user.name,
+    bio: user.bio,
+    gender: user.gender,
+    image: user.image,
+    cover: user.cover,
+    links: user.links,
+    accountType: user.accountType,
+    messageFrom: user.messageFrom,
+    onlineStatus: user.onlineStatus,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+    followers: normalizeConnections(user.followers as TConnection[]),
+    following: normalizeConnections(user.following as TConnection[]),
+    followersCount: user.followers?.length || 0,
+    followingCount: user.following?.length || 0,
+  };
+
+  if (role === "admin" || role === "super-admin") {
+    return {
+      ...baseUser,
+      email: user.email,
+      blocked: user.blocked,
+      deleted: user.deleted,
+      otp: user.otp,
     };
+  }
 
-    if (role === 'admin' || role === 'super-admin') {
-        return {
-            ...baseUser,
-            email: user.email,
-            blocked: user.blocked,
-            deleted: user.deleted,
-            otp: user.otp,
-        };
-    }
-
-    return baseUser;
+  return baseUser;
 }

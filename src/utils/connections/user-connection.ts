@@ -1,27 +1,28 @@
-import { Types } from "mongoose";
-import { ObjectId } from "bson";
-import { IUser } from "@/models/User";
+import { SanitizedUser } from "../sanitizer/user";
+
+export type FollowerUser = {
+  _id: string;
+  username: string;
+  name: string;
+  image: string;
+};
 
 export function toggleFollower(
-  setUser: React.Dispatch<React.SetStateAction<IUser | null>> | undefined,
-  userId: string | Types.ObjectId
+  setUser: React.Dispatch<React.SetStateAction<SanitizedUser | null>> | undefined,
+  user: FollowerUser
 ) {
-  // normalize for comparison
-  const userIdStr =
-    typeof userId === "string" ? userId : (userId as ObjectId).toString();
-
   setUser?.((prev) => {
     if (!prev) return prev;
 
     const isAlreadyFollowing = prev.followers.some(
-      (f) => f.toString() === userIdStr
+      (f) => f._id.toString() === user._id.toString()
     );
 
     return {
       ...prev,
       followers: isAlreadyFollowing
-        ? prev.followers.filter((f) => f !== userIdStr) // remove
-        : [...prev.followers, userIdStr]
+        ? prev.followers.filter((f) => f._id !== user._id) // remove the user
+        : [...prev.followers, user] // add the full user object
     };
   });
 }

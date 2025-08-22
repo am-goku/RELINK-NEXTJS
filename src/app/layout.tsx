@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Poppins } from '@next/font/google'
+import { Poppins } from 'next/font/google'
 import '@/styles/nprogress.css';
-import NProgressProvider from "../components/NProgressProvider";
 import UserProvider from "../providers/UserProvider";
 import SessionProviderWrapper from "@/providers/SessionProviderWrapper";
 import ProtectedRoute from "@/providers/ProtectedRoute";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/authOptions";
+import NProgressProvider from "@/providers/NProgressProvider";
 
 
 const poppins = Poppins({
@@ -19,17 +21,19 @@ export const metadata: Metadata = {
   description: "A social media application.",
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en">
       <body className={poppins.className}>
-        <SessionProviderWrapper>
-          <ProtectedRoute>
-            <UserProvider>
-              <NProgressProvider />
-              {children}
-            </UserProvider>
-          </ProtectedRoute>
+        <SessionProviderWrapper session={session}>
+          <UserProvider>
+            <ProtectedRoute>
+              <NProgressProvider>
+                {children}
+              </NProgressProvider>
+            </ProtectedRoute>
+          </UserProvider>
         </SessionProviderWrapper>
       </body>
     </html>

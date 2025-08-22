@@ -10,7 +10,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import { useUserStore } from '@/stores/userStore';
+import { useUser } from '@/providers/UserProvider';
 
 function SettingsSection({
   title,
@@ -42,7 +42,7 @@ function SettingsSection({
 
 export default function SettingsPage() {
 
-  const user = useUserStore((state) => state.user);
+  const { user } = useUser();
 
   return (
     <React.Fragment>

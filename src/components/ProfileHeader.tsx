@@ -1,9 +1,9 @@
 // components/ProfileHeader.tsx
-import { IUser } from "@/models/User";
+import { SanitizedUser } from "@/utils/sanitizer/user";
 import Image from "next/image";
 
 interface ProfileHeaderProps {
-  user: IUser | null;
+  user: SanitizedUser | null;
 }
 
 export default function ProfileHeader({ user }: ProfileHeaderProps) {

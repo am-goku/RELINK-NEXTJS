@@ -6,9 +6,9 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 
 const conversations = [
-    { id: 1, name: 'Emily White', lastMessage: 'Hey, how are you?', avatar: '/avatars/emily.png' },
-    { id: 2, name: 'Jake Doe', lastMessage: 'Let’s catch up tomorrow!', avatar: '/avatars/jake.png' },
-    { id: 3, name: 'Sophia Ray', lastMessage: 'Got the file!', avatar: '/avatars/sophia.png' },
+    { id: 1, name: 'Emily White', lastMessage: 'Hey, how are you?', avatar: '/images/default-profile.png' },
+    { id: 2, name: 'Jake Doe', lastMessage: 'Let’s catch up tomorrow!', avatar: '/images/default-profile.png' },
+    { id: 3, name: 'Sophia Ray', lastMessage: 'Got the file!', avatar: '/images/default-profile.png' },
 ];
 
 const messages = [

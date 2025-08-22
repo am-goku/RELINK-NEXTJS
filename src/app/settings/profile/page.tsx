@@ -12,9 +12,9 @@ import {
 } from 'lucide-react';
 import ProfilePicUpdater from '@/components/ProfilePicUpdater';
 import CoverPicUpdater from '@/components/CoverPicUpdater';
-import { useUserStore } from '@/stores/userStore';
 import { getProfileData, updateUserProfile } from '@/services/api/user-apis';
 import LoadingContent from '@/components/loaders/LoadingContent';
+import { useUser } from '@/providers/UserProvider';
 
 type ProfileFormData = {
   name: string;
@@ -53,8 +53,7 @@ function ProfileSection({
 
 export default function EditProfilePage() {
   // State Management
-  const updateUser = useUserStore((state) => state.updateUser);
-  const user = useUserStore((state) => state.user);
+  const {user, setUser} = useUser()
 
   // Util states
   const [error, setError] = useState<string>('');
@@ -163,7 +162,7 @@ export default function EditProfilePage() {
 
         <div className="flex justify-end">
           <button
-            onClick={() => updateUserProfile({ formData, originalData, updateUser, setError, setIsLoading })}
+            onClick={() => updateUserProfile({ formData, originalData, updateUser:setUser, setError, setIsLoading })}
             className="mt-4 px-6 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3]"
             disabled={isLoading}
           >

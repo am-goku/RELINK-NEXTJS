@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { signOut, useSession } from 'next-auth/react'
 import RelinkLogo from '../icons/RelinkLogo'
 import Image from 'next/image'
-import { useUserStore } from '@/stores/userStore'
 import { Session } from 'next-auth'
+import { useUser } from '@/providers/UserProvider'
 
 interface NavProps {
   type: 'home' | 'explore' | 'chat' | 'profile' | 'login'
@@ -38,7 +38,7 @@ const Navbar: React.FC<NavProps> = ({ type }) => {
 }
 
 const Navigation = ({ session }: { session: Session }) => {
-  const user = useUserStore((state) => state.user);
+  const { user } = useUser();
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

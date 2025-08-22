@@ -1,23 +1,19 @@
-'use client';
+"use client";
 
-import LoaderScreen from '@/components/loaders/LoaderScreen';
-import { useSession } from 'next-auth/react';
-import { usePathname, useRouter } from 'next/navigation';
-import { ReactNode, useEffect } from 'react';
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+// import { useUser } from "./UserProvider";
+import LoaderScreen from "@/components/loaders/LoaderScreen";
+import { useSession } from "next-auth/react";
 
-interface ProtectedRouteProps {
-  children: ReactNode;
-}
+const publicRoutes = ["/", "/auth/login", "/auth/signup"];
 
-// List of public paths that don't require auth
-const publicPaths = ['/auth/login', '/auth/signup'];
-
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const router = useRouter();
 
-  const isPublicPath = publicPaths.includes(pathname);
+  const isPublicPath = publicRoutes.includes(pathname);
 
   useEffect(() => {
     if (status === 'unauthenticated' && !isPublicPath) {

@@ -1,7 +1,7 @@
 import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
-import { IUser } from "@/models/User";
 import { toggleFollower } from "@/utils/connections/user-connection";
+import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
 import { Types } from "mongoose";
 import React from "react";
 
@@ -62,7 +62,7 @@ export async function getProfileData({ setFormData, setError, setOriginalData, s
 
 
 type update_profile_Props = {
-    updateUser: (user: IUser) => void;
+    updateUser: (user: SanitizedUser) => void;
     formData: ProfileFormData;
     originalData: Partial<ProfileFormData>;
     setError: React.Dispatch<React.SetStateAction<string>>;
@@ -134,19 +134,19 @@ export async function updateUserProfile({ updateUser, formData, originalData, se
  * @prop {React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>} setResponse - The function to update the response state.
  * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
  */
-export async function followUser({ id, c_userId, setResponse, setUser, setError }: {
+export async function followUser({ id, c_user, setResponse, setUser, setError }: {
     id: Types.ObjectId,
-    c_userId: string,
+    c_user: ShortUser,
     setResponse?: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>,
-    setUser?: React.Dispatch<React.SetStateAction<IUser | null>>,
+    setUser?: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
     setError: React.Dispatch<React.SetStateAction<string>>
 }) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/follow`)).data;
         setResponse?.(res);
-        toggleFollower(setUser, c_userId);
+        toggleFollower(setUser, c_user);
     } catch (error) {
-        console.log(id, c_userId, error)
+        console.log(id, c_user, error)
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
@@ -158,17 +158,17 @@ export async function followUser({ id, c_userId, setResponse, setUser, setError 
  * @prop {React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>} setResponse - The function to update the response state.
  * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
  */
-export async function unfollowUser({ id, c_userId, setResponse, setUser, setError }: {
+export async function unfollowUser({ id, c_user, setResponse, setUser, setError }: {
     id: Types.ObjectId,
-    c_userId: string,
+    c_user: ShortUser,
     setResponse?: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>,
-    setUser?: React.Dispatch<React.SetStateAction<IUser | null>>,
+    setUser?: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
     setError: React.Dispatch<React.SetStateAction<string>>
 }) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/unfollow`)).data;
         setResponse?.(res);
-        toggleFollower(setUser, c_userId);
+        toggleFollower(setUser, c_user);
     } catch (error) {
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
@@ -184,7 +184,7 @@ export async function unfollowUser({ id, c_userId, setResponse, setUser, setErro
  */
 export async function getUserProfileData({ username, setProfileData, setIsOwner, setError }: {
     username: string,
-    setProfileData: React.Dispatch<React.SetStateAction<IUser | null>>,
+    setProfileData: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
     setIsOwner?: React.Dispatch<React.SetStateAction<boolean>>,
     setError: React.Dispatch<React.SetStateAction<string>>
 }) {
