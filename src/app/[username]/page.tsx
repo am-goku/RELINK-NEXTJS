@@ -15,14 +15,15 @@ import { FollowButton, MessageButton, UnfollowButton } from "@/components/button
 import { getUserProfileData } from "@/services/api/user-apis";
 import { getPostsByUsername } from "@/services/api/post-apis";
 import { IPublicPost } from "@/utils/sanitizer/post";
-import { SanitizedUser } from "@/utils/sanitizer/user";
+import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
 import { useUser } from "@/providers/UserProvider";
+import { hasConnection, toggleFollower } from "@/utils/connections/user-connection";
 
 
 function Page() {
 
     const { data: session, status } = useSession();
-    const {user: c_user} = useUser();
+    const { setUser: set_c_user } = useUser();
     const params = useParams()
     const [user, setUser] = useState<SanitizedUser | null>(null);
     const [error, setError] = useState<string>('');
@@ -33,6 +34,7 @@ function Page() {
 
     // connection states
     const [isFollowing, setIsFollowing] = useState<boolean>(false);
+    const [followers, setFollowers] = React.useState<number>(0);
 
     // Fetching User
     useEffect(() => {
@@ -62,9 +64,21 @@ function Page() {
     // Connection management
     useEffect(() => {
         if (user && session) {
-            setIsFollowing(user.followers.includes(session.user.id));
+            setFollowers(user.followersCount);
+            const following = hasConnection(user.followers as ShortUser[], session.user.id);
+            setIsFollowing(following);
+
+            // only toggle follower in context if needed
+            if (following && !hasConnection(user.followers as ShortUser[], session.user.id)) {
+                toggleFollower(set_c_user, user);
+            }
         }
-    }, [user, user?.followers, session])
+
+        return () => {
+            setFollowers(0);
+            setIsFollowing(false);
+        }
+    }, [user, session, set_c_user]); // removed isFollowing from deps
 
     // Error handling
     useEffect(() => {
@@ -96,13 +110,8 @@ function Page() {
                                     <>
                                         <UnfollowButton
                                             id={user?._id}
-                                            c_user={{
-                                            _id: session?.user?.id as string,
-                                            username: session?.user?.username as string,
-                                            name: c_user?.name as string,
-                                            image: c_user?.image as string
-                                        }}
-                                            setUser={setUser}
+                                            setFollowers={setFollowers}
+                                            setIsFollowing={setIsFollowing}
                                             setError={setError} key="unfollow" />
                                         {
                                             user?.messageFrom === 'everyone' && (
@@ -113,13 +122,8 @@ function Page() {
                                 ) : (
                                     <FollowButton
                                         id={user?._id}
-                                        c_user={{
-                                            _id: session?.user?.id as string,
-                                            username: session?.user?.username as string,
-                                            name: c_user?.name as string,
-                                            image: c_user?.image as string
-                                        }}
-                                        setUser={setUser}
+                                        setFollowers={setFollowers}
+                                        setIsFollowing={setIsFollowing}
                                         setError={setError} key="follow" />
                                 )}
                             </div>
@@ -128,7 +132,7 @@ function Page() {
 
                     <div className="flex flex-col md:flex-row md:justify-between px-4 md:px-10 mt-2">
                         <div>
-                            <ProfileStats user={user} />
+                            <ProfileStats user={user} followers={followers} />
                         </div>
                     </div>
 

@@ -2,7 +2,10 @@ import { SanitizedUser } from "@/utils/sanitizer/user";
 import React from "react";
 import FollowModal from "./modal/FollowModal";
 
-export default function ProfileStats({ user }: { user: SanitizedUser | null }) {
+export default function ProfileStats({ user, followers }: {
+    user: SanitizedUser | null;
+    followers: number;
+}) {
 
     const [isFollowingOpen, setIsFollowingOpen] = React.useState(false);
     const [isFollowersOpen, setIsFollowersOpen] = React.useState(false);
@@ -15,14 +18,14 @@ export default function ProfileStats({ user }: { user: SanitizedUser | null }) {
                         onClick={() => { setIsFollowersOpen(true) }}
                         key="followers"
                         className="cursor-pointer">
-                        <p className="text-xl font-semibold">{user?.followers.length}</p>
+                        <p className="text-xl font-semibold">{followers}</p>
                         <p className="text-sm text-gray-500">Followers</p>
                     </div>
                     <div
                         onClick={() => { setIsFollowingOpen(true) }}
                         key="following"
                         className="cursor-pointer">
-                        <p className="text-xl font-semibold">{user?.following.length}</p>
+                        <p className="text-xl font-semibold">{user?.followingCount}</p>
                         <p className="text-sm text-gray-500">Following</p>
                     </div>
                 </div>
@@ -34,8 +37,8 @@ export default function ProfileStats({ user }: { user: SanitizedUser | null }) {
                         isOpen={isFollowersOpen}
                         onClose={() => setIsFollowersOpen(false)}
                         title="Followers"
-                        users={user?.followers}
-                        key={"followers"}
+                        user_id={user?._id}
+                        key={"followers_modal"}
                     />
                 )}
 
@@ -44,8 +47,8 @@ export default function ProfileStats({ user }: { user: SanitizedUser | null }) {
                         isOpen={isFollowingOpen}
                         onClose={() => setIsFollowingOpen(false)}
                         title="Following"
-                        users={user?.following}
-                        key={"following"}
+                        user_id={user?._id}
+                        key={"following_modal"}
                     />
                 )}
             </>

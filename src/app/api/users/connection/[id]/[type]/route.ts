@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 
         const users = await getConnections(id, type);
 
-        return NextResponse.json(users);
+        return NextResponse.json({users});
 
     } catch (error) {
         return handleApiError(error);

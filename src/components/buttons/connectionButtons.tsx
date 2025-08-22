@@ -1,20 +1,44 @@
 import { followUser, unfollowUser } from '@/services/api/user-apis'
-import { SanitizedUser, ShortUser } from '@/utils/sanitizer/user'
 import { Types } from 'mongoose'
 import React, { useCallback } from 'react'
 
-export function FollowButton({ id, c_user, setUser, setError }: {
-    id: Types.ObjectId | undefined,
-    c_user: ShortUser,
-    setUser: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
-    setError: React.Dispatch<React.SetStateAction<string>>
+const updateConnection = ({
+    setFollowers,
+    type,
+    setConnection,
+}: {
+    setFollowers: React.Dispatch<React.SetStateAction<number>>;
+    type: "add" | "remove";
+    setConnection: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+    setFollowers((prev) => {
+        if (type === "add") return prev + 1;
+        if (type === "remove") return Math.max(prev - 1, 0);
+        return prev;
+    });
+
+    setConnection(type === "add"); // ✅ set explicitly
+};
+
+export function FollowButton({ id, setFollowers, setIsFollowing, setError }: {
+    id: Types.ObjectId | undefined;
+    setFollowers: React.Dispatch<React.SetStateAction<number>>;
+    setIsFollowing: React.Dispatch<React.SetStateAction<boolean>>;
+    setError: React.Dispatch<React.SetStateAction<string>>;
 }) {
 
     const handleClick = useCallback(() => {
         if (id) {
-            followUser({ id, c_user, setUser, setError })
+            updateConnection({ setFollowers, type: "add", setConnection: setIsFollowing });
+            followUser({
+                id,
+                setError,
+                setFollowers,
+                updateConn: updateConnection,
+                setConnection: setIsFollowing
+            })
         }
-    }, [id, setError, setUser, c_user])
+    }, [id, setFollowers, setIsFollowing, setError])
 
     return (
         <button onClick={handleClick} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow">
@@ -24,18 +48,25 @@ export function FollowButton({ id, c_user, setUser, setError }: {
 }
 
 
-export function UnfollowButton({ id, c_user, setUser, setError }: {
-    id: Types.ObjectId | undefined,
-    c_user: ShortUser,
-    setUser: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
-    setError: React.Dispatch<React.SetStateAction<string>>
+export function UnfollowButton({ id, setFollowers, setIsFollowing, setError }: {
+    id: Types.ObjectId | undefined;
+    setFollowers: React.Dispatch<React.SetStateAction<number>>;
+    setIsFollowing: React.Dispatch<React.SetStateAction<boolean>>;
+    setError: React.Dispatch<React.SetStateAction<string>>;
 }) {
 
     const handleClick = useCallback(() => {
         if (id) {
-            unfollowUser({ id, c_user, setUser, setError })
+            updateConnection({ setFollowers, type: "remove", setConnection: setIsFollowing });
+            unfollowUser({
+                id,
+                setError,
+                setFollowers,
+                updateConn: updateConnection,
+                setConnection: setIsFollowing
+            })
         }
-    }, [id, setError, setUser, c_user])
+    }, [id, setFollowers, setIsFollowing, setError])
 
     return (
         <button onClick={handleClick} className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow">

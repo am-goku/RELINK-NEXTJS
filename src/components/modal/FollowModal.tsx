@@ -1,15 +1,18 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-// import { SanitizedUser } from "@/utils/sanitizer/user";
+import { getUserConnectionList } from "@/services/api/user-apis";
+import { ShortUser } from "@/utils/sanitizer/user";
+import { Types } from "mongoose";
+import UserListSkeleton from "../loaders/UserListSkeleton";
 
 interface FollowModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: "Followers" | "Following";
-    users: {_id: string, username: string, name: string, image: string}[];
+    user_id: Types.ObjectId;
     onToggleFollow?: (userId: string) => void;
 }
 
@@ -17,9 +20,15 @@ export default function FollowModal({
     isOpen,
     onClose,
     title,
-    users,
-    // onToggleFollow,
+    user_id,
 }: FollowModalProps) {
+
+    const [users, setUsers] = useState<ShortUser[]>([])
+    const [error, setError] = useState<string | null>(null)
+
+    // UI States
+    const [loading, setLoading] = useState<boolean>(false)
+
     // Close modal on ESC press
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
@@ -29,6 +38,32 @@ export default function FollowModal({
         return () => document.removeEventListener("keydown", handler);
     }, [onClose]);
 
+    //fetch user list
+    const fetchUserList = useCallback(async () => {
+        await getUserConnectionList({
+            id: user_id,
+            setUsers,
+            type: title === "Followers" ? "followers" : "following",
+            setError,
+            setLoading
+        })
+    }, [user_id, title])
+
+
+    //Fetching user connection list
+    useEffect(() => {
+        if (user_id) {
+            fetchUserList()
+        }
+    }, [fetchUserList, user_id])
+
+    // Error handling from error state
+    useEffect(() => {
+        if (error) {
+            console.log(error)
+        }
+        return () => setError(null)
+    }, [error])
 
 
     return (
@@ -37,7 +72,7 @@ export default function FollowModal({
                 <>
                     {/* Overlay */}
                     <motion.div
-                        className="fixed inset-0 bg-black/40 z-40"
+                        className="fixed inset-0 bg-black/20 z-40"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
@@ -51,29 +86,31 @@ export default function FollowModal({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                     >
-                        <div className="bg-white dark:bg-neutral-900 w-full max-w-md rounded-2xl shadow-lg overflow-hidden">
+                        <div className="bg-white w-full max-w-md rounded-2xl shadow-lg overflow-hidden">
                             {/* Header */}
-                            <div className="flex justify-between items-center border-b border-neutral-200 dark:border-neutral-700 px-4 py-3">
-                                <h2 className="text-lg font-semibold">{title}</h2>
+                            <div className="flex justify-between items-center border-b border-gray-200 px-4 py-3">
+                                <h2 className="text-lg font-semibold text-gray-800">{title}</h2>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full"
+                                    className="p-2 hover:bg-gray-100 rounded-full transition"
                                 >
-                                    <X size={20} />
+                                    <X size={20} className="text-gray-600" />
                                 </button>
                             </div>
 
                             {/* User List */}
                             <div className="max-h-96 overflow-y-auto">
-                                {users.length === 0 ? (
-                                    <p className="text-center text-neutral-500 py-6">
+                                {loading ? (
+                                    <UserListSkeleton />
+                                ) : users?.length === 0 ? (
+                                    <p className="text-center text-gray-500 py-6">
                                         No {title.toLowerCase()} yet
                                     </p>
                                 ) : (
-                                    users.map((user) => (
+                                    users?.map((user) => (
                                         <div
                                             key={user._id}
-                                            className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition"
+                                            className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition"
                                         >
                                             <div className="flex items-center gap-3">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -86,26 +123,11 @@ export default function FollowModal({
                                                     className="w-10 h-10 rounded-full object-cover"
                                                 />
                                                 <div>
-                                                    <p className="font-medium">{user.name}</p>
-                                                    <p className="text-sm text-neutral-500">
-                                                        @{user.username}
-                                                    </p>
+                                                    <p className="font-medium text-gray-800">{user.name}</p>
+                                                    <p className="text-sm text-gray-500">@{user.username}</p>
                                                 </div>
                                             </div>
-                                            {/* <button
-                                                onClick={() => onToggleFollow(user._id)}
-                                                className={`px-4 py-1.5 text-sm font-medium rounded-full border transition 
-                          ${title === "Following" || user.isFollowing
-                                                        ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 border-neutral-300 dark:border-neutral-700 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-                                                        : "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
-                                                    }`}
-                                            >
-                                                {title === "Following"
-                                                    ? "Following"
-                                                    : user.isFollowing
-                                                        ? "Following"
-                                                        : "Follow"}
-                                            </button> */}
+                                            {/* Follow button can be added here */}
                                         </div>
                                     ))
                                 )}

@@ -15,8 +15,8 @@ type BaseSanitizedUser = {
   onlineStatus: IUser['onlineStatus'];
   created_at: IUser['created_at'];
   updated_at: IUser['updated_at'];
-  followers: { _id: string, username: string, name: string, image: string }[];
-  following: { _id: string, username: string, name: string, image: string }[];
+  followers: TConnection[];
+  following: TConnection[];
   followersCount: number;
   followingCount: number;
 };

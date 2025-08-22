@@ -8,7 +8,7 @@ import { useEffect, useCallback, useContext, createContext, useState } from "rea
 
 interface UserContextType {
     user: SanitizedUser | null;
-    setUser: (user: SanitizedUser | null) => void;
+    setUser: React.Dispatch<React.SetStateAction<SanitizedUser | null>>;
     loading: boolean;
 }
 

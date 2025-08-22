@@ -1,6 +1,5 @@
 import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
-import { toggleFollower } from "@/utils/connections/user-connection";
 import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
 import { Types } from "mongoose";
 import React from "react";
@@ -134,19 +133,25 @@ export async function updateUserProfile({ updateUser, formData, originalData, se
  * @prop {React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>} setResponse - The function to update the response state.
  * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
  */
-export async function followUser({ id, c_user, setResponse, setUser, setError }: {
+export async function followUser({ id, setResponse, setFollowers, setError, updateConn, setConnection }: {
     id: Types.ObjectId,
-    c_user: ShortUser,
     setResponse?: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>,
-    setUser?: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
-    setError: React.Dispatch<React.SetStateAction<string>>
+    setFollowers: React.Dispatch<React.SetStateAction<number>>,
+    setError: React.Dispatch<React.SetStateAction<string>>;
+    setConnection: React.Dispatch<React.SetStateAction<boolean>>;
+    updateConn?: ({ setFollowers, setConnection, type }:
+        {
+            setFollowers: React.Dispatch<React.SetStateAction<number>>;
+            type: "add" | "remove";
+            setConnection: React.Dispatch<React.SetStateAction<boolean>>
+        }) => void
 }) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/follow`)).data;
         setResponse?.(res);
-        toggleFollower(setUser, c_user);
     } catch (error) {
-        console.log(id, c_user, error)
+        console.log(id, error)
+        updateConn?.({ setFollowers, type: "remove", setConnection }); // now sets false explicitly
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
@@ -158,18 +163,25 @@ export async function followUser({ id, c_user, setResponse, setUser, setError }:
  * @prop {React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>} setResponse - The function to update the response state.
  * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
  */
-export async function unfollowUser({ id, c_user, setResponse, setUser, setError }: {
+export async function unfollowUser({ id, setResponse, setFollowers, setError, setConnection, updateConn }: {
     id: Types.ObjectId,
-    c_user: ShortUser,
     setResponse?: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>,
-    setUser?: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
-    setError: React.Dispatch<React.SetStateAction<string>>
+    setFollowers: React.Dispatch<React.SetStateAction<number>>,
+    setError: React.Dispatch<React.SetStateAction<string>>;
+    setConnection: React.Dispatch<React.SetStateAction<boolean>>;
+    updateConn?: ({ setFollowers, setConnection, type }:
+        {
+            setFollowers: React.Dispatch<React.SetStateAction<number>>;
+            type: "add" | "remove";
+            setConnection: React.Dispatch<React.SetStateAction<boolean>>
+        }) => void
 }) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/unfollow`)).data;
         setResponse?.(res);
-        toggleFollower(setUser, c_user);
     } catch (error) {
+        console.log(error)
+        updateConn?.({ setFollowers: setFollowers, type: "add", setConnection: setConnection });
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
@@ -194,5 +206,32 @@ export async function getUserProfileData({ username, setProfileData, setIsOwner,
         setIsOwner?.(res.isOwner);
     } catch (error) {
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+    }
+}
+
+/**
+ * Fetches the list of users who are either followers or following the user with the given ID.
+ * @param {{ id: Types.ObjectId, setUsers: React.Dispatch<React.SetStateAction<ShortUser[]>>, type: "followers" | "following", setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to fetch the connection list.
+ * @prop {Types.ObjectId} id - The ID of the user whose connection list is to be fetched.
+ * @prop {React.Dispatch<React.SetStateAction<ShortUser[]>>} setUsers - The function to update the users state.
+ * @prop {"followers" | "following"} type - The type of connection list to be fetched.
+ * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to update the error state.
+ */
+export async function getUserConnectionList({ id, setUsers, type, setError, setLoading }: {
+    id: Types.ObjectId,
+    setUsers: React.Dispatch<React.SetStateAction<ShortUser[]>>,
+    type: "followers" | "following",
+    setError?: React.Dispatch<React.SetStateAction<string | null>>,
+    setLoading?: React.Dispatch<React.SetStateAction<boolean>>
+}) {
+    try {
+        setLoading?.(true);
+        const res = (await apiInstance.get(`/api/users/connection/${id}/${type}`)).data;
+        setUsers(res.users);
+        console.log(res)
+    } catch (error) {
+        setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
+    } finally {
+        setLoading?.(false);
     }
 }
