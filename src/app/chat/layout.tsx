@@ -34,31 +34,38 @@ export default function Layout({ children }: Props) {
     return (
         <React.Fragment>
             <div className="flex flex-col min-h-screen">
-                <Navbar type='chat' />
-                <div className="h-[calc(100vh-80px)] flex bg-[#F0F2F5] text-[#2D3436]">
+                <Navbar type="chat" />
+
+                <div className="h-[calc(100vh-80px)] flex bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 transition-colors">
 
                     {/* Sidebar */}
-                    <aside className={`md:w-72 w-full md:flex flex-col border-r border-gray-200 bg-white shadow-sm ${selectedUser ? 'hidden' : ''}`}>
-                        <div className="p-4 border-b text-lg font-semibold flex items-center gap-2 justify-between">
+                    <aside
+                        className={clsx(
+                            'md:w-72 w-full md:flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800 shadow-sm',
+                            selectedUser ? 'hidden' : ''
+                        )}
+                    >
+                        <div className="p-4 border-b text-lg font-semibold flex items-center gap-2 justify-between border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-2">
                                 <MessageCircle size={20} /> Messages
                             </div>
                             <button
                                 onClick={() => setShowNewChatModal(true)}
-                                className="p-1 rounded-full hover:bg-gray-100 transition"
+                                className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                                 title="Start new chat"
                             >
                                 <UserPlus size={18} />
                             </button>
                         </div>
+
                         <div className="flex-1 overflow-y-auto">
                             {conversations.length > 0 ? (
                                 conversations.map((user) => (
                                     <div
                                         key={user.id}
                                         className={clsx(
-                                            'flex items-center gap-3 p-4 cursor-pointer transition hover:bg-gray-100',
-                                            selectedUser?.id === user.id && 'bg-[#ECECFA]'
+                                            'flex items-center gap-3 p-4 cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-700',
+                                            selectedUser?.id === user.id && 'bg-[#ECECFA] dark:bg-gray-700'
                                         )}
                                         onClick={() => {
                                             setSelectedUser(user);
@@ -73,7 +80,7 @@ export default function Layout({ children }: Props) {
                                         />
                                         <div className="flex flex-col">
                                             <p className="font-medium">{user.name}</p>
-                                            <p className="text-sm text-[#636E72] truncate max-w-[160px]">
+                                            <p className="text-sm text-[#636E72] dark:text-gray-400 truncate max-w-[160px]">
                                                 {user.lastMessage}
                                             </p>
                                         </div>
@@ -81,12 +88,9 @@ export default function Layout({ children }: Props) {
                                 ))
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                                    <MessageCircle size={40} className="text-gray-400 mb-4" />
-                                    <p className="text-gray-600 mb-4">No conversations yet</p>
-                                    <button
-                                        onClick={() => setShowNewChatModal(true)}
-                                        className="px-4 py-2 bg-[#6C5CE7] text-white rounded-lg hover:bg-[#5b4dd4] transition"
-                                    >
+                                    <MessageCircle size={40} className="text-gray-400 dark:text-gray-500 mb-4" />
+                                    <p className="text-gray-600 dark:text-gray-300 mb-4">No conversations yet</p>
+                                    <button className="px-4 py-2 bg-[#6C5CE7] hover:bg-[#5b4dd4] text-white rounded-lg transition">
                                         Start New Chat
                                     </button>
                                 </div>
@@ -100,23 +104,18 @@ export default function Layout({ children }: Props) {
                 {/* Modal for new chat */}
                 {showNewChatModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                        <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-                            <h2 className="text-lg font-semibold mb-4">Start a New Chat</h2>
+                        <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-lg w-full max-w-md p-6 transition-colors">
+                            <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Start a New Chat</h2>
                             <input
                                 type="text"
                                 placeholder="Search user by name or username..."
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] mb-4"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] mb-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
                             />
                             <div className="flex justify-end gap-2">
-                                <button
-                                    onClick={() => setShowNewChatModal(false)}
-                                    className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
-                                >
+                                <button className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">
                                     Cancel
                                 </button>
-                                <button
-                                    className="px-4 py-2 bg-[#6C5CE7] text-white rounded-lg hover:bg-[#5b4dd4] transition"
-                                >
+                                <button className="px-4 py-2 bg-[#6C5CE7] hover:bg-[#5b4dd4] text-white rounded-lg transition">
                                     Start
                                 </button>
                             </div>
@@ -124,6 +123,7 @@ export default function Layout({ children }: Props) {
                     </div>
                 )}
             </div>
+
         </React.Fragment>
     )
 }

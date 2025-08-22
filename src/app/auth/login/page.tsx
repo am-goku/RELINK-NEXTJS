@@ -1,9 +1,8 @@
 'use client';
 
 import { signIn, useSession } from 'next-auth/react';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Navbar from '@/components/ui/Navbar';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
@@ -63,26 +62,33 @@ export default function LoginPage() {
     };
 
     return (
-        <>
-            {/* <div className="min-h-screen items-center justify-center">
+        <React.Fragment>
+            <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
                 <Navbar type="login" />
-                <div className="flex p-10 gap-28 justify-center">
 
-                    <section className="w-1/2 h-[80vh] relative hidden md:block">
-                        <Image
-                            src="/images/bannerImg.jpg"
-                            alt="Banner"
-                            fill
-                            className="object-cover rounded-l-lg"
-                            priority
-                        />
+                <div className="flex flex-col md:flex-row p-6 md:p-10 gap-10 md:gap-28 justify-center items-center flex-1">
+
+                    {/* Banner Section - hidden on small screens */}
+                    <section className="w-full md:w-1/2 h-64 md:h-[80vh] flex items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-100 to-purple-200 dark:from-indigo-900 dark:to-purple-800">
+                        <svg
+                            className="w-48 h-48 text-indigo-500 dark:text-indigo-300"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2 .896 2 2 2 2-.896 2-2zM12 11v2m0-2c0 1.104.896 2 2 2s2-.896 2-2-.896-2-2-2-2 .896-2 2zM12 19v-2m0 2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z" />
+                        </svg>
                     </section>
 
+                    {/* Form Section */}
                     <form
                         onSubmit={handleSubmit}
-                        className="w-1/2 max-w-md p-6 rounded-lg space-y-4"
+                        className="w-full md:w-1/2 max-w-md p-6 rounded-lg space-y-4 bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 transition-colors duration-300"
                     >
-                        <h2 className="text-2xl font-bold text-center">Sign In</h2>
+                        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+                            Sign In
+                        </h2>
 
                         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
@@ -93,8 +99,9 @@ export default function LoginPage() {
                             placeholder="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full border border-gray-300 p-2 rounded"
+                            className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-300"
                         />
+
                         <div className="relative">
                             <input
                                 type={showPassword ? "text" : "password"}
@@ -102,91 +109,31 @@ export default function LoginPage() {
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full border border-gray-300 p-2 rounded pr-10"
+                                className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded pr-10 placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-300"
                             />
                             <button
                                 type="button"
                                 aria-label={showPassword ? "Hide password" : "Show password"}
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 dark:text-gray-300"
                             >
                                 {showPassword ? "🙈" : "👁️"}
                             </button>
                         </div>
-                        <Button label='Sign In' type='submit' disabled={loading} />
-                        <section className='flex flex-col gap-2'>
-                            <span>New here? <Link href="/auth/signup" className='text-indigo-700'>Signup</Link></span>
-                            <Link href="/forgot-password" className="text-indigo-700">Forgot password?</Link>
+
+                        <Button label="Sign In" type="submit" disabled={loading} />
+
+                        <section className="flex flex-col gap-2 text-center text-gray-700 dark:text-gray-300">
+                            <span>
+                                New here? <Link href="/auth/signup" className="text-indigo-600 dark:text-indigo-400">Signup</Link>
+                            </span>
+                            <Link href="/forgot-password" className="text-indigo-600 dark:text-indigo-400">
+                                Forgot password?
+                            </Link>
                         </section>
                     </form>
                 </div>
-            </div> */}
-            <div className="min-h-screen flex flex-col">
-  <Navbar type="login" />
-
-  <div className="flex flex-col md:flex-row p-6 md:p-10 gap-10 md:gap-28 justify-center items-center flex-1">
-    
-    {/* Banner Section - hidden on small screens */}
-    <section className="w-full md:w-1/2 h-64 md:h-[80vh] relative hidden md:block">
-      <Image
-        src="/images/bannerImg.jpg"
-        alt="Banner"
-        fill
-        className="object-cover rounded-lg md:rounded-l-lg"
-        priority
-      />
-    </section>
-
-    {/* Form Section */}
-    <form
-      onSubmit={handleSubmit}
-      className="w-full md:w-1/2 max-w-md p-6 rounded-lg space-y-4 bg-white shadow-md"
-    >
-      <h2 className="text-2xl font-bold text-center">Sign In</h2>
-
-      {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-      <label htmlFor="email" className="sr-only">Email</label>
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="w-full border border-gray-300 p-2 rounded"
-      />
-
-      <div className="relative">
-        <input
-          type={showPassword ? "text" : "password"}
-          name="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-gray-300 p-2 rounded pr-10"
-        />
-        <button
-          type="button"
-          aria-label={showPassword ? "Hide password" : "Show password"}
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
-        >
-          {showPassword ? "🙈" : "👁️"}
-        </button>
-      </div>
-
-      <Button label="Sign In" type="submit" disabled={loading} />
-
-      <section className="flex flex-col gap-2 text-center">
-        <span>
-          New here? <Link href="/auth/signup" className="text-indigo-700">Signup</Link>
-        </span>
-        <Link href="/forgot-password" className="text-indigo-700">Forgot password?</Link>
-      </section>
-    </form>
-  </div>
-</div>
-
-        </>
+            </div>
+        </React.Fragment>
     );
 }

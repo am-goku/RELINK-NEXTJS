@@ -98,7 +98,7 @@ function Page() {
 
     return (
         <React.Fragment>
-            <div className="min-h-screen bg-gray-100">
+            <div className="min-h-screen bg-gray-100 dark:bg-neutral-900 transition-colors">
                 <Navbar type="profile" />
                 <div className="md:px-20">
                     <CoverImage />
@@ -112,19 +112,19 @@ function Page() {
                                             id={user?._id}
                                             setFollowers={setFollowers}
                                             setIsFollowing={setIsFollowing}
-                                            setError={setError} key="unfollow" />
-                                        {
-                                            user?.messageFrom === 'everyone' && (
-                                                <MessageButton />
-                                            )
-                                        }
+                                            setError={setError}
+                                            key="unfollow"
+                                        />
+                                        {user?.messageFrom === 'everyone' && <MessageButton />}
                                     </>
                                 ) : (
                                     <FollowButton
                                         id={user?._id}
                                         setFollowers={setFollowers}
                                         setIsFollowing={setIsFollowing}
-                                        setError={setError} key="follow" />
+                                        setError={setError}
+                                        key="follow"
+                                    />
                                 )}
                             </div>
                         )}
@@ -143,7 +143,9 @@ function Page() {
                             posts.map((post, index) => (
                                 <React.Fragment key={post._id}>
                                     <PostCard {...post} currentUserID={session?.user?.id as string} />
-                                    {index !== posts.length - 1 && <div className="border-t my-4" />}
+                                    {index !== posts.length - 1 && (
+                                        <div className="border-t border-gray-200 dark:border-gray-700 my-4 transition-colors" />
+                                    )}
                                 </React.Fragment>
                             ))
                         )}

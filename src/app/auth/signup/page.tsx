@@ -5,9 +5,8 @@ import LoaderScreen from "@/components/loaders/LoaderScreen";
 import Navbar from "@/components/ui/Navbar";
 import { authService } from "@/services/api/apiServices";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import React, { useState } from "react";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
 
 export default function SignupPage() {
@@ -63,26 +62,33 @@ export default function SignupPage() {
     };
 
     return (
-        <>
-            <div className="min-h-screen items-center justify-center">
+        <React.Fragment>
+            <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900 transition-colors duration-300">
                 <Navbar type="login" />
-                <div className="flex p-10 gap-28 justify-center">
 
-                    <section className="w-1/2 h-[80vh] relative">
-                        <Image
-                            src="/images/bannerImg.jpg"
-                            alt="Banner"
-                            fill
-                            className="object-cover rounded-l-lg"
-                            priority
-                        />
+                <div className="flex flex-col md:flex-row p-6 md:p-10 gap-10 md:gap-28 justify-center items-center flex-1">
+
+                    {/* Illustration Section */}
+                    <section className="w-full md:w-1/2 h-64 md:h-[80vh] flex items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-100 to-purple-200 dark:from-indigo-900 dark:to-purple-800">
+                        <svg
+                            className="w-48 h-48 text-indigo-500 dark:text-indigo-300"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2 .896 2 2 2 2-.896 2-2zM12 11v2m0-2c0 1.104.896 2 2 2s2-.896 2-2-.896-2-2-2-2 .896-2 2zM12 19v-2m0 2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z" />
+                        </svg>
                     </section>
 
+                    {/* Form Section */}
                     <form
                         onSubmit={handleSubmit}
-                        className="w-1/2 max-w-md p-6 rounded-lg space-y-4"
+                        className="w-full md:w-1/2 max-w-md p-6 rounded-lg space-y-4 bg-white dark:bg-gray-800 shadow-md dark:shadow-gray-700 transition-colors duration-300"
                     >
-                        <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+                        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-gray-100">
+                            Sign Up
+                        </h2>
 
                         {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
@@ -92,7 +98,7 @@ export default function SignupPage() {
                             placeholder="Email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 p-2 rounded"
+                            className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-300"
                         />
 
                         <input
@@ -101,7 +107,7 @@ export default function SignupPage() {
                             placeholder="Username"
                             value={formData.username}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 p-2 rounded"
+                            className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-300"
                         />
 
                         <div className="relative">
@@ -111,10 +117,10 @@ export default function SignupPage() {
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
-                                className="w-full border border-gray-300 p-2 rounded pr-10"
+                                className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded pr-10 placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-300"
                             />
                             <span
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-sm text-gray-500"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-sm text-gray-500 dark:text-gray-300"
                                 onClick={() => setShowPassword(!showPassword)}
                             >
                                 {showPassword ? "🙈" : "👁️"}
@@ -127,17 +133,20 @@ export default function SignupPage() {
                             placeholder="Confirm Password"
                             value={formData.confirmPassword}
                             onChange={handleChange}
-                            className="w-full border border-gray-300 p-2 rounded"
+                            className="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded placeholder-gray-400 dark:placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-300"
                         />
 
                         <Button label="Sign Up" type="submit" />
-                        <section className='flex flex-col'>
-                            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                            <span>Have an account? <a href="/auth/login" className='text-indigo-700'>Login.</a></span>
+
+                        <section className="flex flex-col text-gray-700 dark:text-gray-300 text-center">
+                            <span>
+                                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                                Have an account? <a href="/auth/login" className="text-indigo-600 dark:text-indigo-400">Login.</a>
+                            </span>
                         </section>
                     </form>
                 </div>
             </div>
-        </>
+        </React.Fragment>
     )
 }

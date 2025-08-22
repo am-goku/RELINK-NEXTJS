@@ -5,8 +5,6 @@ import {
   User,
   Image as ImageIcon,
   Globe,
-  ChevronDown,
-  ChevronUp,
   Text,
   Pencil,
 } from 'lucide-react';
@@ -15,6 +13,7 @@ import CoverPicUpdater from '@/components/CoverPicUpdater';
 import { getProfileData, updateUserProfile } from '@/services/api/user-apis';
 import LoadingContent from '@/components/loaders/LoadingContent';
 import { useUser } from '@/providers/UserProvider';
+import AnimatedSection from '@/components/ui/AnimatedSection';
 
 type ProfileFormData = {
   name: string;
@@ -24,36 +23,9 @@ type ProfileFormData = {
   links: string[]; // [website, instagram, linkedin]
 };
 
-function ProfileSection({
-  title,
-  icon: Icon,
-  children,
-}: {
-  title: string;
-  icon: React.ElementType;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(true);
-  return (
-    <div className="bg-white rounded-xl shadow-md p-4 mb-6">
-      <div
-        className="flex items-center justify-between cursor-pointer"
-        onClick={() => setOpen(!open)}
-      >
-        <div className="flex items-center gap-3 text-[#2D3436] font-semibold">
-          <Icon className="text-[#6C5CE7]" size={20} />
-          <h2>{title}</h2>
-        </div>
-        {open ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-      </div>
-      {open && <div className="mt-4 space-y-4">{children}</div>}
-    </div>
-  );
-}
-
 export default function EditProfilePage() {
   // State Management
-  const {user, setUser} = useUser()
+  const { user, setUser } = useUser()
 
   // Util states
   const [error, setError] = useState<string>('');
@@ -93,19 +65,21 @@ export default function EditProfilePage() {
       [name]: value,
     }));
   };
+
+
   return (
     <LoadingContent isLoading={pageLoading}>
-      <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-[#2D3436]">
+      <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-gray-800 dark:text-gray-200">
         <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
 
-        <ProfileSection title="Photos" icon={ImageIcon}>
+        <AnimatedSection title="Photos" icon={ImageIcon}>
           <div className="space-y-4">
             <ProfilePicUpdater image={profilePic} />
             <CoverPicUpdater cover={coverPic} />
           </div>
-        </ProfileSection>
+        </AnimatedSection>
 
-        <ProfileSection title="Basic Info" icon={User}>
+        <AnimatedSection title="Basic Info" icon={User}>
           <div className="space-y-3">
             <div>
               <label className="text-sm font-medium block mb-1">Full Name</label>
@@ -114,7 +88,7 @@ export default function EditProfilePage() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200 rounded-md"
               />
             </div>
             <div>
@@ -124,29 +98,29 @@ export default function EditProfilePage() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200 rounded-md"
               />
             </div>
           </div>
-        </ProfileSection>
+        </AnimatedSection>
 
-        <ProfileSection title="Bio" icon={Text}>
+        <AnimatedSection title="Bio" icon={Text}>
           <textarea
             rows={3}
             name="bio"
             value={formData.bio}
             onChange={handleChange}
             placeholder="Tell us something about you..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200 rounded-md resize-none"
           />
-        </ProfileSection>
+        </AnimatedSection>
 
-        <ProfileSection title="Gender" icon={Pencil}>
+        <AnimatedSection title="Gender" icon={Pencil}>
           <select
             name="gender"
             value={formData.gender}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-200 rounded-md"
           >
             <option value="" disabled>
               Select your gender
@@ -156,20 +130,23 @@ export default function EditProfilePage() {
             <option>Non-binary</option>
             <option>Prefer not to say</option>
           </select>
-        </ProfileSection>
+        </AnimatedSection>
 
         <LinksSection formData={formData} setFormData={setFormData} />
 
         <div className="flex justify-end">
           <button
-            onClick={() => updateUserProfile({ formData, originalData, updateUser:setUser, setError, setIsLoading })}
-            className="mt-4 px-6 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3]"
+            onClick={() =>
+              updateUserProfile({ formData, originalData, updateUser: setUser, setError, setIsLoading })
+            }
+            className={`mt-4 px-6 py-2 rounded-md bg-[#6C5CE7] text-white hover:bg-[#5A4BD3] dark:bg-[#5A4BD3] dark:hover:bg-[#483ab8] disabled:opacity-50 disabled:cursor-not-allowed`}
             disabled={isLoading}
           >
             {isLoading ? 'Saving changes...' : 'Save Changes'}
           </button>
         </div>
       </div>
+
     </LoadingContent>
   );
 }
@@ -207,7 +184,7 @@ function LinksSection({ formData, setFormData }: props) {
   };
 
   return (
-    <ProfileSection title="Links" icon={Globe}>
+    <AnimatedSection title="Links" icon={Globe}>
       <div className="space-y-3">
         {(formData.links || [""]).map((link, index) => (
           <div key={index} className="flex gap-2 items-center">
@@ -223,14 +200,14 @@ function LinksSection({ formData, setFormData }: props) {
                       ? "https://instagram.com/yourhandle"
                       : "https://linkedin.com/in/yourhandle"
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-gray-800 dark:bg-neutral-900 dark:border-neutral-700 dark:text-gray-200"
               />
             </div>
             {index > 0 && (
               <button
                 type="button"
                 onClick={() => handleRemoveLink(index)}
-                className="text-red-500 text-sm"
+                className="text-red-500 text-sm hover:underline dark:text-red-400"
               >
                 Remove
               </button>
@@ -242,12 +219,12 @@ function LinksSection({ formData, setFormData }: props) {
           <button
             type="button"
             onClick={handleAddLink}
-            className="text-blue-600 text-sm mt-2"
+            className="text-blue-600 text-sm mt-2 hover:underline dark:text-blue-400"
           >
             + Add another link
           </button>
         )}
       </div>
-    </ProfileSection>
+    </AnimatedSection>
   );
 }

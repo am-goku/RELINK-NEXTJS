@@ -13,20 +13,22 @@ export default function ProfileStats({ user, followers }: {
     return (
         <React.Fragment>
             <>
-                <div className="px-4 md:px-10 mt-6 md:mt-4 flex space-x-6 text-gray-700">
+                <div className="px-4 md:px-10 mt-6 md:mt-4 flex space-x-6 text-gray-900 dark:text-gray-100 transition-colors">
                     <div
-                        onClick={() => { setIsFollowersOpen(true) }}
+                        onClick={() => setIsFollowersOpen(true)}
                         key="followers"
-                        className="cursor-pointer">
+                        className="cursor-pointer"
+                    >
                         <p className="text-xl font-semibold">{followers}</p>
-                        <p className="text-sm text-gray-500">Followers</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Followers</p>
                     </div>
                     <div
-                        onClick={() => { setIsFollowingOpen(true) }}
+                        onClick={() => setIsFollowingOpen(true)}
                         key="following"
-                        className="cursor-pointer">
+                        className="cursor-pointer"
+                    >
                         <p className="text-xl font-semibold">{user?.followingCount}</p>
-                        <p className="text-sm text-gray-500">Following</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Following</p>
                     </div>
                 </div>
             </>

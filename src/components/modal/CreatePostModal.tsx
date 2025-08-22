@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { XMarkIcon, PhotoIcon, TrashIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
 import '../../styles/cropper.css'
@@ -86,23 +86,27 @@ export default function CreatePostModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <>
+    <React.Fragment>
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
+        <div className="bg-white dark:bg-neutral-900 rounded-xl shadow-lg w-full max-w-lg p-6 relative">
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
 
-          <h3 className="text-xl font-semibold mb-4">Create New Post</h3>
+          <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+            Create New Post
+          </h3>
 
           <textarea
             placeholder="What's on your mind?"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            className="w-full p-3 border rounded-md mb-4 resize-none min-h-[100px] focus:outline-none focus:ring focus:border-blue-300"
+            className="w-full p-3 border border-gray-300 dark:border-neutral-700 rounded-md mb-4 resize-none min-h-[100px] 
+                 bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100
+                 focus:outline-none focus:ring focus:border-blue-300"
           />
 
           <div className="mb-4">
@@ -124,9 +128,11 @@ export default function CreatePostModal({ onClose }: { onClose: () => void }) {
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-gray-300 p-6 flex items-center justify-center rounded-md cursor-pointer hover:bg-gray-50 transition"
+                className="border-2 border-dashed border-gray-300 dark:border-neutral-700 
+                     p-6 flex items-center justify-center rounded-md cursor-pointer 
+                     hover:bg-gray-50 dark:hover:bg-neutral-800 transition"
               >
-                <div className="flex flex-col items-center text-gray-500">
+                <div className="flex flex-col items-center text-gray-500 dark:text-gray-400">
                   <PhotoIcon className="h-8 w-8 mb-2" />
                   <span className="text-sm">Click to upload an image (optional)</span>
                 </div>
@@ -145,8 +151,8 @@ export default function CreatePostModal({ onClose }: { onClose: () => void }) {
             onClick={handleSubmit}
             disabled={!content.trim() && !image}
             className={`w-full py-2 rounded-md text-white font-semibold transition ${content.trim() || image
-              ? 'bg-blue-600 hover:bg-blue-700'
-              : 'bg-gray-300 cursor-not-allowed'
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-gray-300 dark:bg-neutral-700 cursor-not-allowed'
               }`}
           >
             Post
@@ -165,6 +171,6 @@ export default function CreatePostModal({ onClose }: { onClose: () => void }) {
 
       {/* Loading Modal Section */}
       {loading && (<LoadingModal message='Uploading' />)}
-    </>
+    </React.Fragment>
   );
 }

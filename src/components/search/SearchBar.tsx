@@ -22,20 +22,22 @@ function SearchBar({ searchKey }: Props) {
                     defaultValue={searchQuery || searchKey}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
+                        if (e.key === "Enter") {
                             const query = searchQuery.trim();
                             if (query) {
                                 window.location.href = `/search?q=${encodeURIComponent(query)}`;
                             }
                         }
                     }}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#F0F2F5] text-sm focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] placeholder-[#636E72]"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl
+               bg-gray-100 dark:bg-neutral-800
+               text-gray-900 dark:text-gray-100
+               placeholder-gray-500 dark:placeholder-gray-400
+               text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
                 />
-                <Search className="absolute top-3 left-3 text-[#636E72]" size={20} />
+                <Search className="absolute top-3 left-3 text-gray-500 dark:text-gray-400" size={20} />
 
-                {searchQuery.trim() !== '' && (
-                    <SearchResult searchKey={searchQuery} />
-                )}
+                {searchQuery.trim() !== "" && <SearchResult searchKey={searchQuery} />}
             </div>
         </React.Fragment>
     )

@@ -35,16 +35,16 @@ function SearchResult({ searchKey }: Props) {
 
     return (
         <React.Fragment>
-            <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-xl shadow-md z-10 max-h-[400px] overflow-y-auto p-4 space-y-4 text-sm">
+            <div className="absolute left-0 right-0 top-full mt-2 bg-white dark:bg-neutral-900 rounded-xl shadow-md z-10 max-h-[400px] overflow-y-auto p-4 space-y-4 text-sm transition-colors">
 
                 {/* Users */}
                 {users.length > 0 && (
                     <div>
-                        <p className="font-semibold text-[#2D3436] mb-2">Users</p>
+                        <p className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Users</p>
                         {users.slice(0, 3).map((user) => (
                             <div
                                 key={user._id.toString()}
-                                className="flex items-center gap-3 py-2 px-2 hover:bg-gray-100 rounded-md cursor-pointer"
+                                className="flex items-center gap-3 py-2 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
                             >
                                 <Image
                                     src={user.image ? user.image : '/images/default-profile.png'}
@@ -54,13 +54,13 @@ function SearchResult({ searchKey }: Props) {
                                     className="rounded-full object-cover"
                                 />
                                 <div>
-                                    <p>{user.name}</p>
-                                    <p className="text-xs text-gray-500">@{user.username}</p>
+                                    <p className="text-gray-900 dark:text-gray-100">{user.name}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">@{user.username}</p>
                                 </div>
                             </div>
                         ))}
                         {users.length > 3 && (
-                            <div className="text-[#6C5CE7] hover:underline cursor-pointer mt-1 px-2">
+                            <div className="text-primary hover:underline cursor-pointer mt-1 px-2">
                                 See more users...
                             </div>
                         )}
@@ -70,14 +70,17 @@ function SearchResult({ searchKey }: Props) {
                 {/* Tags */}
                 {filteredTags.length > 0 && (
                     <div>
-                        <p className="font-semibold text-[#2D3436] mb-2">Tags</p>
+                        <p className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Tags</p>
                         {filteredTags.slice(0, 3).map((tag, index) => (
-                            <div key={index} className="py-2 px-2 hover:bg-gray-100 rounded-md cursor-pointer">
+                            <div
+                                key={index}
+                                className="py-2 px-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md cursor-pointer transition-colors"
+                            >
                                 #{tag}
                             </div>
                         ))}
                         {filteredTags.length > 3 && (
-                            <div className="text-[#6C5CE7] hover:underline cursor-pointer mt-1 px-2">
+                            <div className="text-primary hover:underline cursor-pointer mt-1 px-2">
                                 See more tags...
                             </div>
                         )}
@@ -85,12 +88,11 @@ function SearchResult({ searchKey }: Props) {
                 )}
 
                 {/* No results */}
-                {users.length === 0 &&
-                    filteredTags.length === 0 && (
-                        <div className="text-center text-gray-500 py-4">
-                            No results found.
-                        </div>
-                    )}
+                {users.length === 0 && filteredTags.length === 0 && (
+                    <div className="text-center text-gray-500 dark:text-gray-400 py-4">
+                        No results found.
+                    </div>
+                )}
             </div>
         </React.Fragment>
     )

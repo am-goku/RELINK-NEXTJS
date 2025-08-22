@@ -55,12 +55,15 @@ export const OnlStatusToggler: FC<OnlStatusTogglerProps> = ({ onlStatus, setOnlS
         <React.Fragment>
             <button
                 onClick={() => setModalIsOpen(true)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${onlStatus ? "bg-blue-600" : "bg-gray-400"}`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300
+      ${onlStatus ? "bg-blue-600 dark:bg-blue-500" : "bg-gray-400 dark:bg-gray-600"}`}
             >
                 <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${onlStatus ? "translate-x-6" : "translate-x-1"}`}
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300
+          ${onlStatus ? "translate-x-6" : "translate-x-1"}`}
                 />
             </button>
+
             <ConfirmationModal
                 isOpen={modalIsOpen}
                 onClose={() => setModalIsOpen(false)}

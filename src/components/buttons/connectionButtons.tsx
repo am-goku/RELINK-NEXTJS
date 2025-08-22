@@ -41,7 +41,10 @@ export function FollowButton({ id, setFollowers, setIsFollowing, setError }: {
     }, [id, setFollowers, setIsFollowing, setError])
 
     return (
-        <button onClick={handleClick} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow">
+        <button
+            onClick={handleClick}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors text-sm md:text-base shadow"
+        >
             Follow
         </button>
     )
@@ -69,7 +72,10 @@ export function UnfollowButton({ id, setFollowers, setIsFollowing, setError }: {
     }, [id, setFollowers, setIsFollowing, setError])
 
     return (
-        <button onClick={handleClick} className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base shadow">
+        <button
+            onClick={handleClick}
+            className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-blue-700 dark:bg-gray-600 dark:hover:bg-blue-500 transition-colors text-sm md:text-base shadow"
+        >
             Following
         </button>
     )
@@ -78,7 +84,9 @@ export function UnfollowButton({ id, setFollowers, setIsFollowing, setError }: {
 
 export function MessageButton() {
     return (
-        <button className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors text-sm md:text-base shadow">
+        <button
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-600 transition-colors text-sm md:text-base shadow"
+        >
             Message
         </button>
     )

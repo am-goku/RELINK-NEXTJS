@@ -8,6 +8,7 @@ import ProtectedRoute from "@/providers/ProtectedRoute";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 import NProgressProvider from "@/providers/NProgressProvider";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 
 const poppins = Poppins({
@@ -29,9 +30,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <SessionProviderWrapper session={session}>
           <UserProvider>
             <ProtectedRoute>
-              <NProgressProvider>
-                {children}
-              </NProgressProvider>
+              <ThemeProvider>
+                <NProgressProvider>
+                  {children}
+                </NProgressProvider>
+              </ThemeProvider>
             </ProtectedRoute>
           </UserProvider>
         </SessionProviderWrapper>
