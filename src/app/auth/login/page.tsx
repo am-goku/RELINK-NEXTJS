@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Navbar from '@/components/ui/Navbar';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
+import HeroLogo from '@/components/icons/HeroLogo';
 
 export default function LoginPage() {
     const { status } = useSession();
@@ -69,17 +70,7 @@ export default function LoginPage() {
                 <div className="flex flex-col md:flex-row p-6 md:p-10 gap-10 md:gap-28 justify-center items-center flex-1">
 
                     {/* Banner Section - hidden on small screens */}
-                    <section className="w-full md:w-1/2 h-64 md:h-[80vh] flex items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-100 to-purple-200 dark:from-indigo-900 dark:to-purple-800">
-                        <svg
-                            className="w-48 h-48 text-indigo-500 dark:text-indigo-300"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2 .896 2 2 2 2-.896 2-2zM12 11v2m0-2c0 1.104.896 2 2 2s2-.896 2-2-.896-2-2-2-2 .896-2 2zM12 19v-2m0 2c-1.104 0-2 .896-2 2s.896 2 2 2 2-.896 2-2-.896-2-2-2z" />
-                        </svg>
-                    </section>
+                    <HeroLogo />
 
                     {/* Form Section */}
                     <form
