@@ -33,7 +33,7 @@ type get_profile_Props = {
 export async function getProfileData({ setFormData, setError, setOriginalData, setProfilePic, setCoverPic, setIsLoading }: get_profile_Props) {
     try {
         setIsLoading(true);
-        const res = (await apiInstance.get('/api/users')).data;
+        const res = (await apiInstance.get('/api/users')).data.user;
         const data: ProfileFormData = {
             name: res.name || '',
             username: res.username || '',
@@ -83,14 +83,7 @@ export async function updateUserProfile({ updateUser, formData, originalData, se
         const updatedFields: Partial<ProfileFormData> = {};
 
         Object.entries(formData).forEach(([key, value]) => {
-            if (key === 'links') {
-                if (
-                    Array.isArray(value) &&
-                    JSON.stringify(value) !== JSON.stringify(originalData.links)
-                ) {
-                    updatedFields.links = value; // value is string[]
-                }
-            } else {
+            if (key !== 'links') {
                 const originalValue = originalData[key as keyof ProfileFormData];
                 if (value !== originalValue) {
                     // Only assign if value is a string
@@ -109,11 +102,7 @@ export async function updateUserProfile({ updateUser, formData, originalData, se
         const data = new FormData();
         for (const key in updatedFields) {
             const value = updatedFields[key as keyof ProfileFormData];
-            if (key === 'links' && Array.isArray(value)) {
-                value.forEach((link, index) => {
-                    data.append(`links[${index}]`, link);
-                });
-            } else if (typeof value === 'string') {
+            if (typeof value === 'string') {
                 data.append(key, value);
             }
         }
@@ -233,5 +222,19 @@ export async function getUserConnectionList({ id, setUsers, type, setError, setL
         setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
     } finally {
         setLoading?.(false);
+    }
+}
+
+export async function updateUserLinks({ links, setError, updateUser }: {
+    links: string[],
+    setError?: React.Dispatch<React.SetStateAction<string | null>>,
+    updateUser?: (user: SanitizedUser) => void
+}) {
+    try {
+        const res = (await apiInstance.put(`/api/users/update/links`, { links })).data;
+        updateUser?.(res.user)
+    } catch (error) {
+        console.log(error)
+        setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }

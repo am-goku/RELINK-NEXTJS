@@ -10,3 +10,11 @@ html, body {
 html.dark body {
   @apply bg-dark-bg text-dark-text;
 }
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none; /* IE & Edge */
+  scrollbar-width: none; /* Firefox */
+}

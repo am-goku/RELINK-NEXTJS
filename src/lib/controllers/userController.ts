@@ -96,10 +96,10 @@ export async function getUserByUsername(
 export async function updateUserProfile({ email, data }: {
     email: string;
     data: Record<string, unknown>;
-}): Promise<Partial<IUser>> {
+}) {
     if (!email) throw new NotFoundError("User email is required");
 
-    const allowedFields = ["name", "bio", "username", "gender", "links"];
+    const allowedFields = ["name", "bio", "username", "gender"];
 
     await connectDB();
 
@@ -132,7 +132,7 @@ export async function updateUserProfile({ email, data }: {
         { email },
         updates,
         { new: true }
-    );
+    ).lean<IUser>();
 
     if (!updatedUser) throw new NotFoundError("User not found");
 
@@ -222,4 +222,19 @@ export async function getAuthenticatedUserById(id: string) {
     if (!user) throw new UnauthorizedError("User not found");
 
     return sanitizeUser(user, 'user');
+}
+
+
+export async function updateLinksById(id: string, links: string[]) {
+    await connectDB();
+
+    const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { $set: { links } },
+        { new: true } // return the updated document
+    ).lean<IUser>();
+
+    if (!updatedUser) throw new NotFoundError("User not found");
+
+    return sanitizeUser(updatedUser, 'user');
 }
