@@ -2,7 +2,7 @@ import Post from "@/models/Post";
 import { BadRequestError, NetworkError, NotFoundError } from "../errors/ApiErrors";
 import { getUserByUsername } from "./userController";
 import { connectDB } from "../db/mongoose";
-import cloudinary from "../cloudinary";
+import cloudinary from "../cloudinary/cloudinary";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { SessionUser } from "@/types/instance";
 import { sanitizePost } from "@/utils/sanitizer/post";

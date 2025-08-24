@@ -4,6 +4,7 @@ import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors/Api
 import { FilterQuery } from "mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
 import { hashPassword } from "../hash";
+import { UploadResult, uploadToCloudinary } from "../cloudinary/cloudinaryUpload";
 
 
 /**
@@ -225,6 +226,17 @@ export async function getAuthenticatedUserById(id: string) {
 }
 
 
+/**
+ * Updates the links field of a user with the given ID.
+ * 
+ * Connects to the database and finds the user by ID.
+ * Updates the links field with the provided value.
+ * 
+ * @param id - The unique identifier of the user whose links are to be updated.
+ * @param links - The new links to be set for the user.
+ * @returns A sanitized version of the user object, containing only the fields permitted by the user's role.
+ * @throws {NotFoundError} If the user is not found.
+ */
 export async function updateLinksById(id: string, links: string[]) {
     await connectDB();
 
@@ -237,4 +249,46 @@ export async function updateLinksById(id: string, links: string[]) {
     if (!updatedUser) throw new NotFoundError("User not found");
 
     return sanitizeUser(updatedUser, 'user');
+}
+
+/**
+ * Updates the profile picture of a user with the given ID.
+ * 
+ * Connects to the database and finds the user by ID.
+ * Uploads the provided file to Cloudinary and updates the user document with the new image URL.
+ * 
+ * @param file - The image file to be uploaded.
+ * @param userId - The unique identifier of the user whose profile picture is to be updated.
+ * @returns The URL of the newly uploaded image.
+ * @throws {NotFoundError} If the user is not found.
+ */
+export async function updateProfilePic(file: File, userId: string) {
+    await connectDB();
+
+    const cloudResponse = await uploadToCloudinary(file, 'users/profile_pic') as UploadResult;
+
+    await User.findByIdAndUpdate(userId, { $set: { image: cloudResponse?.url } });
+
+    return cloudResponse.url;
+}
+
+/**
+ * Updates the cover picture of a user with the given ID.
+ * 
+ * Connects to the database and finds the user by ID.
+ * Uploads the provided file to Cloudinary and updates the user document with the new image URL.
+ * 
+ * @param file - The image file to be uploaded.
+ * @param userId - The unique identifier of the user whose cover picture is to be updated.
+ * @returns The URL of the newly uploaded image.
+ * @throws {NotFoundError} If the user is not found.
+ */
+export async function updateCoverPic(file: File, userId: string) {
+    await connectDB();
+
+    const cloudResponse = await uploadToCloudinary(file, 'users/cover_pic') as UploadResult;
+
+    await User.findByIdAndUpdate(userId, { $set: { cover: cloudResponse?.url } });
+
+    return cloudResponse.url;
 }
