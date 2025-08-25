@@ -6,7 +6,7 @@ import { signOut, useSession } from 'next-auth/react'
 import RelinkLogo from '../icons/RelinkLogo'
 import Image from 'next/image'
 import { Session } from 'next-auth'
-import { useUser } from '@/providers/UserProvider'
+import { useUser } from '@/context/UserContext'
 
 interface NavProps {
   type: 'home' | 'explore' | 'chat' | 'profile' | 'login'

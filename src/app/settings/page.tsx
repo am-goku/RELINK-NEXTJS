@@ -8,7 +8,7 @@ import {
   Shield,
   SlidersHorizontal,
 } from 'lucide-react';
-import { useUser } from '@/providers/UserProvider';
+import { useUser } from '@/context/UserContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useSession } from 'next-auth/react';
 import AnimatedSection from '@/components/ui/AnimatedSection';

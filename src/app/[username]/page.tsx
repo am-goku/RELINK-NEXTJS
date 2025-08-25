@@ -1,11 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
-import CoverImage from "../../components/CoverImage";
+import CoverImage from "../../components/profile/CoverImage";
 import Navbar from "../../components/ui/Navbar";
-import PostCard from "../../components/PostCard";
-import ProfileHeader from "../../components/ProfileHeader";
-import ProfileStats from "../../components/ProfileStats";
+import PostCard from "../../components/cards/PostCard";
+import ProfileHeader from "../../components/profile/ProfileHeader";
 import LoaderScreen from "../../components/loaders/LoaderScreen";
 import { useSession } from "next-auth/react";
 import SkeletonPostCard from "@/components/skeletons/SkeletonPostCard";
@@ -16,7 +15,7 @@ import { getUserProfileData } from "@/services/api/user-apis";
 import { getPostsByUsername } from "@/services/api/post-apis";
 import { IPublicPost } from "@/utils/sanitizer/post";
 import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
-import { useUser } from "@/providers/UserProvider";
+import { useUser } from "@/context/UserContext";
 import { hasConnection, toggleFollower } from "@/utils/connections/user-connection";
 
 
@@ -51,7 +50,7 @@ function Page() {
 
     // Fetching User Posts
     useEffect(() => {
-        if (user) {
+        if (user?.username) {
             getPostsByUsername({
                 username: user.username,
                 setResponse: setPosts,
@@ -59,13 +58,13 @@ function Page() {
                 setLoading: setLoadingPosts
             })
         }
-    }, [user])
+    }, [user?.username])
 
     // Connection management
     useEffect(() => {
         if (user && session) {
-            setFollowers(user.followersCount);
             const following = hasConnection(user.followers as ShortUser[], session.user.id);
+            setFollowers(user.followersCount);
             setIsFollowing(following);
 
             // only toggle follower in context if needed
@@ -101,9 +100,9 @@ function Page() {
             <div className="min-h-screen bg-gray-100 dark:bg-neutral-900 transition-colors">
                 <Navbar type="profile" />
                 <div className="md:px-20">
-                    <CoverImage />
+                    <CoverImage user={user} setUser={isOwner ? setUser : undefined} isOwner={isOwner} />
                     <div className="relative">
-                        <ProfileHeader user={user} />
+                        <ProfileHeader user={user} isOwner={isOwner} setUser={setUser} followers={followers} />
                         {!isOwner && (
                             <div className="absolute top-2 right-4 md:top-4 md:right-10 flex space-x-2">
                                 {isFollowing ? (
@@ -128,12 +127,6 @@ function Page() {
                                 )}
                             </div>
                         )}
-                    </div>
-
-                    <div className="flex flex-col md:flex-row md:justify-between px-4 md:px-10 mt-2">
-                        <div>
-                            <ProfileStats user={user} followers={followers} />
-                        </div>
                     </div>
 
                     <div className="px-4 md:px-10 mt-6 max-w-2xl mx-auto">

@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { PlusIcon } from '@heroicons/react/24/solid';
 import LoaderScreen from '../components/loaders/LoaderScreen';
 import Navbar from '../components/ui/Navbar';
-import PostCard from '../components/PostCard';
+import PostCard from '../components/cards/PostCard';
 import CreatePostModal from '../components/modal/CreatePostModal';
 import SkeletonPostCard from '@/components/skeletons/SkeletonPostCard';
 import { IPublicPost } from '@/utils/sanitizer/post';

@@ -15,7 +15,8 @@
     "cloudinary": "^2.6.1",
     "clsx": "^2.1.1",
     "cookie": "^1.0.2",
-    "framer-motion": "^12.15.0",
+    "cropperjs": "^1.5.13",
+    "framer-motion": "^12.23.12",
     "lucide-react": "^0.510.0",
     "mongoose": "^8.14.2",
     "next": "15.3.2",
@@ -24,6 +25,7 @@
     "nodemailer": "^6.10.1",
     "nprogress": "^0.2.0",
     "react": "^19.0.0",
+    "react-cropper": "^2.3.3",
     "react-dom": "^19.0.0",
     "react-easy-crop": "^5.4.2",
     "zustand": "^5.0.5"

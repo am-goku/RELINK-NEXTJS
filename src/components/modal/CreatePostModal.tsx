@@ -1,88 +1,70 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { XMarkIcon, PhotoIcon, TrashIcon } from '@heroicons/react/24/outline';
-import axios from 'axios';
 import '../../styles/cropper.css'
-import { getCroppedImg } from '@/utils/cropper/cropImage';
-import CropComponent from './CropComponent';
 import LoadingModal from '../loaders/LoadingModal';
-
-type CroppedArea = {
-  width: number;
-  height: number;
-  x: number;
-  y: number;
-};
+import { createNewPost } from '@/services/api/post-apis';
+import CropModal from '../cropper/cropModal';
 
 export default function CreatePostModal({ onClose }: { onClose: () => void }) {
-  const [content, setContent] = useState('');
-  const [image, setImage] = useState<File | undefined>();
-  const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [showCropper, setShowCropper] = useState(false);
+
+  // Content State
+  const [content, setContent] = useState('');
+
+  // Image States
+  const [preview, setPreview] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
+
+  // Util States
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // UI States
+  const [showCropper, setShowCropper] = useState(false);
 
   // Handling Image Change
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
+      setUploadedImage(URL.createObjectURL(file));
       setShowCropper(true);
     }
   };
 
   // Handling Image Removal
   const handleRemoveImage = () => {
-    setImage(undefined);
+    setCroppedImage(null);
     setPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   // Submiting Data to the Backend
   const handleSubmit = async () => {
-    try {
-      if (!content.trim() && !image) return;
-
-      setLoading(true);
-
-      const formData = new FormData();
-      if (content.trim()) formData.append('content', content.trim());
-      if (image) formData.append('image', image);
-
-      formData.forEach((key) => console.log(key))
-
-      // TODO: Send formData to backend and manage it in the front end
-      const res = await axios.post('/api/posts', formData);
-
-      console.log(res.data)
-
-    } catch (error) {
-      console.log(error)
-    } finally {
-      setLoading(false);
-      onClose();
-    }
-
+    setLoading(true);
+    await createNewPost({
+      content: content,
+      file: croppedImage,
+      setError,
+      doFun: () => {
+        setLoading(false);
+        onClose();
+      }
+    })
   };
 
-  // Handling Cropped Image Pixels
-  const cropDone = async (croppedAreaPixels: CroppedArea | null) => {
-    if (!preview) return;
-
-    try {
-      if (croppedAreaPixels) {
-        const croppedBlob = await getCroppedImg(preview, croppedAreaPixels);
-        const file = new File([croppedBlob], 'cropped.jpg', { type: 'image/jpeg' });
-        setImage(file);
-        setPreview(URL.createObjectURL(file));
-      }
-    } catch (err) {
-      console.error('Crop failed', err);
+  // Error handling
+  useEffect(() => {
+    if (error) {
+      console.log(error)
     }
+  }, [error])
 
-    setShowCropper(false);
+  const handleCropDone = async (croppedBlob: Blob, croppedUrl: string) => {
+    setCroppedImage(croppedBlob);
+    setPreview(croppedUrl);
   };
 
   return (
@@ -149,10 +131,10 @@ export default function CreatePostModal({ onClose }: { onClose: () => void }) {
 
           <button
             onClick={handleSubmit}
-            disabled={!content.trim() && !image}
-            className={`w-full py-2 rounded-md text-white font-semibold transition ${content.trim() || image
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-gray-300 dark:bg-neutral-700 cursor-not-allowed'
+            disabled={!content.trim() && !croppedImage}
+            className={`w-full py-2 rounded-md text-white font-semibold transition ${content.trim() || croppedImage
+              ? 'bg-blue-600 hover:bg-blue-700'
+              : 'bg-gray-300 dark:bg-neutral-700 cursor-not-allowed'
               }`}
           >
             Post
@@ -160,12 +142,12 @@ export default function CreatePostModal({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
-      {/* Cropping Modal Section */}
-      {showCropper && preview && (
-        <CropComponent
-          image={preview}
+      {showCropper && (
+        <CropModal
+          isOpen={showCropper}
+          imageSrc={uploadedImage || ""}
           onClose={() => setShowCropper(false)}
-          cropDone={cropDone}
+          onSave={handleCropDone}
         />
       )}
 

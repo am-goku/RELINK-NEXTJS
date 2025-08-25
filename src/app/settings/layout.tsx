@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../../components/ui/Navbar'
-import ProfileSidebar from '../../components/ProfileSidebar'
+import ProfileSidebar from '../../components/profile/ProfileSidebar'
 import SessionContainer from '../../providers/SessionContainer'
 
 function Layout({ children }: { children: React.ReactNode }) {

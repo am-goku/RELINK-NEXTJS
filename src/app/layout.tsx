@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from 'next/font/google'
 import '@/styles/nprogress.css';
-import UserProvider from "../providers/UserProvider";
+import UserProvider from "../context/UserContext";
 import SessionProviderWrapper from "@/providers/SessionProviderWrapper";
 import ProtectedRoute from "@/providers/ProtectedRoute";
 import { getServerSession } from "next-auth";

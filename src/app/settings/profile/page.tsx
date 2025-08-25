@@ -5,11 +5,9 @@ import {
   User,
   Image as ImageIcon,
 } from 'lucide-react';
-import ProfilePicUpdater from '@/components/ProfilePicUpdater';
-import CoverPicUpdater from '@/components/CoverPicUpdater';
 import { getProfileData, updateUserProfile } from '@/services/api/user-apis';
 import LoadingContent from '@/components/loaders/LoadingContent';
-import { useUser } from '@/providers/UserProvider';
+import { useUser } from '@/context/UserContext';
 import AnimatedSection from '@/components/ui/AnimatedSection';
 import { LinksSection } from '@/components/settings/LinkSection';
 
@@ -70,12 +68,12 @@ export default function EditProfilePage() {
       <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-gray-800 dark:text-gray-200">
         <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
 
-        <AnimatedSection title="Photos" icon={ImageIcon}>
+        {/* <AnimatedSection title="Photos" icon={ImageIcon}>
           <div className="space-y-4">
             <ProfilePicUpdater image={profilePic} />
             <CoverPicUpdater cover={coverPic} />
           </div>
-        </AnimatedSection>
+        </AnimatedSection> */}
 
         <AnimatedSection title="Basic Info" icon={User}>
           <div className="space-y-3">

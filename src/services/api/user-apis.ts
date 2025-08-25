@@ -225,6 +225,13 @@ export async function getUserConnectionList({ id, setUsers, type, setError, setL
     }
 }
 
+/**
+ * Updates the links of the currently logged in user.
+ * @param {{ links: string[], setError?: React.Dispatch<React.SetStateAction<string | null>>, updateUser?: (user: SanitizedUser) => void }} props - The props to update the links.
+ * @prop {string[]} links - The links to update.
+ * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to update the error state. Optional.
+ * @prop {(user: SanitizedUser) => void} updateUser - The function to update the user state. Optional.
+ */
 export async function updateUserLinks({ links, setError, updateUser }: {
     links: string[],
     setError?: React.Dispatch<React.SetStateAction<string | null>>,
@@ -236,5 +243,57 @@ export async function updateUserLinks({ links, setError, updateUser }: {
     } catch (error) {
         console.log(error)
         setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
+    }
+}
+
+/**
+ * Updates the cover picture of the currently logged in user.
+ * @param {{ file: Blob, onDone: (data: any) => void, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the cover picture.
+ * @prop {Blob} file - The file to update the cover picture with.
+ * @prop {(data: any) => void} onDone - The function to call when the update is successful.
+ * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to call when there is an error.
+ */
+export async function updateUserCover({ file, onDone, setError }: {
+    file: Blob,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onDone: (data: any) => void
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+}) {
+    try {
+        if (!file) throw new Error("No file provided");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await apiInstance.put(`/api/users/update/cover_pic`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        onDone(response.data);
+    } catch (error) {
+        setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+    }
+}
+
+/**
+ * Updates the profile picture of the currently logged in user.
+ * @param {{ file: Blob, onDone: (data: any) => void, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the profile picture.
+ * @prop {Blob} file - The file to update the profile picture with.
+ * @prop {(data: any) => void} onDone - The function to call when the update is successful.
+ * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to call when there is an error.
+ */
+export async function updateUserProfilePic({ file, onDone, setError }: {
+    file: Blob,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onDone: (data: any) => void
+    setError: React.Dispatch<React.SetStateAction<string | null>>
+}) {
+    try {
+        if (!file) throw new Error("No file provided");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await apiInstance.put(`/api/users/update/profile_pic`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+        onDone(response.data);
+    } catch (error) {
+        setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }

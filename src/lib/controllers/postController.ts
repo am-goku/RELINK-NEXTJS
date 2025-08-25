@@ -29,14 +29,14 @@ export async function createPost(formData: FormData, user: SessionUser) {
 
     const content = (formData.get('content') as string || '').trim();
     const hashtagsRaw = (formData.get('hashtags') as string || '').trim();
-    const image = formData.get('image') as File | null;
+    const file = formData.get('file') as File | null;
 
     let image_url: string | undefined;
 
     // Uploading image to Cloudinary
-    if (image) {
+    if (file) {
         try {
-            const buffer = Buffer.from(await image.arrayBuffer());
+            const buffer = Buffer.from(await file.arrayBuffer());
 
             const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(

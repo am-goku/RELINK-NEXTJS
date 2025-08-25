@@ -22,7 +22,7 @@ apiInstance.interceptors.response.use(
       signOut({ callbackUrl: "/auth/login" });
     }
 
-    return Promise.reject(error.response.data.error);
+    return Promise.reject(error);
   }
 );
 
