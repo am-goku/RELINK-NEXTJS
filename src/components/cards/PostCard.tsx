@@ -37,7 +37,7 @@ export default function PostCard({ _id, comments_count, created_at, currentUserI
     <React.Fragment>
       <div
         id={`${_id}`}
-        className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md mb-6 w-full relative transition-colors"
+        className="bg-white dark:bg-gray-800 md:p-4 p-2 rounded-lg shadow-md mb-6 w-full relative transition-colors"
       >
         {/* User Header */}
         <div className="flex items-center justify-between mb-4">
@@ -98,18 +98,20 @@ export default function PostCard({ _id, comments_count, created_at, currentUserI
 
         {/* Image */}
         {image && (
-          <div className="relative w-full h-60 mb-4 rounded-md overflow-hidden">
+          <div className="relative w-full mb-4 rounded-md overflow-hidden">
             {!imageLoaded && (
               <div className="absolute inset-0 animate-pulse bg-gray-300 dark:bg-gray-700 rounded-md z-0" />
             )}
             <Image
               src={image}
               alt="Post image"
-              fill
+              width={0} // let Next.js decide
+              height={0} // let Next.js decide
+              sizes="100vw"
+              unoptimized
+              style={{ width: "100%", height: "auto", objectFit: "cover" }}
               onLoad={() => setImageLoaded(true)}
-              style={{ objectFit: "cover" }}
-              className={`rounded-md transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"
-                }`}
+              className={`rounded-md transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-0"}`}
             />
           </div>
         )}

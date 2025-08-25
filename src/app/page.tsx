@@ -39,7 +39,7 @@ export default function Dashboard() {
       <div className="flex flex-col min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors">
         <Navbar type="home" />
         <main className="flex-grow px-4">
-          <div className="px-4 md:px-10 max-w-2xl mx-auto py-4">
+          <div className="md:px-10 max-w-2xl md:mx-auto py-4">
             {/* CREATE POST OPTION */}
             <div
               id="app-post"
