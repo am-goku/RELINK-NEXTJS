@@ -9,10 +9,13 @@ import {
   UserX,
 } from 'lucide-react';
 import LoadingContent from '@/components/loaders/LoadingContent';
-import { AccTypeToggler, OnlStatusToggler } from '@/components/buttons/toggleButtons';
 import AnimatedSection from '@/components/ui/AnimatedSection';
+import { useUser } from '@/context/UserContext';
+import PrivacySection from '@/components/settings/PrivacySection';
 
 export default function AccountPage() {
+
+  const { user, setUser } = useUser(); // setUser function from user context
 
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -21,11 +24,6 @@ export default function AccountPage() {
   const [loading, setLoading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-
-  // Account states
-  const [pvtAccount, setPvtAccount] = useState(false);
-  const [onlStatus, setOnlStatus] = useState(false);
-
 
   const handleDeactivate = async () => {
     setLoading(true);
@@ -62,14 +60,7 @@ export default function AccountPage() {
 
         {/* Account Privacy Section */}
         <AnimatedSection title="Privacy" icon={Shield}>
-          <div className="flex items-center justify-between">
-            <span>Private Account</span>
-            <AccTypeToggler pvtAccount={pvtAccount} setPvtAccount={setPvtAccount} />
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Show Online Status</span>
-            <OnlStatusToggler onlStatus={onlStatus} setOnlStatus={setOnlStatus} />
-          </div>
+          <PrivacySection accountType={user?.accountType} onlineStatus={user?.onlineStatus} setUser={setUser} />
         </AnimatedSection>
 
         {/* Who Can Message Section */}

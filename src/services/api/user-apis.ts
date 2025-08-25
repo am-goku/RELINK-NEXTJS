@@ -2,7 +2,7 @@ import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
 import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
 import { Types } from "mongoose";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 type ProfileFormData = {
     name: string;
@@ -295,5 +295,33 @@ export async function updateUserProfilePic({ file, onDone, setError }: {
         onDone(response.data);
     } catch (error) {
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+    }
+}
+
+export async function updateType({ onDone, doFun, setError }: {
+    onDone?: (data: unknown) => void
+    doFun?: () => void;
+    setError: Dispatch<SetStateAction<string | null>>;
+}) {
+    try {
+        const res = (await apiInstance.patch(`/api/users/update/account/type`)).data;
+        onDone?.(res);
+        doFun?.();
+    } catch (error) {
+        setError(getErrorMessage(error))
+    }
+}
+
+export async function updateStatus({ onDone, doFun, setError }: {
+    onDone?: (data: unknown) => void
+    doFun?: () => void;
+    setError: Dispatch<SetStateAction<string | null>>;
+}) {
+    try {
+        const res = (await apiInstance.patch(`/api/users/update/account/online`)).data;
+        onDone?.(res);
+        doFun?.();
+    } catch (error) {
+        setError(getErrorMessage(error))
     }
 }

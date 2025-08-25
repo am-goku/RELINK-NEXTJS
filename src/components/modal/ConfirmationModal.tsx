@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
     confirmText?: string;
     cancelText?: string;
     type?: "info" | "danger" | "success"; // different icon styles
+    loading?: boolean
 }
 
 const ConfirmationModal: FC<ConfirmationModalProps> = ({
@@ -21,6 +22,7 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
     confirmText = "Confirm",
     cancelText = "Cancel",
     type = "info",
+    loading
 }) => {
     if (!isOpen) return null;
 
@@ -60,7 +62,7 @@ const ConfirmationModal: FC<ConfirmationModalProps> = ({
                             onClick={onConfirm}
                             className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition"
                         >
-                            {confirmText}
+                            {loading ? "...." : confirmText}
                         </button>
                     </div>
                 </div>
