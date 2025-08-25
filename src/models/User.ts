@@ -25,9 +25,9 @@ export interface IUser {
     otp?: string;
     otp_expiry?: Date;
 
-    accountType?: 'public' | 'private';
-    messageFrom?: 'everyone' | 'followers' | 'none';
-    onlineStatus?: boolean;
+    accountType: 'public' | 'private';
+    messageFrom: 'everyone' | 'followers' | 'none';
+    onlineStatus: boolean;
 
     created_at?: Date;
     updated_at?: Date;
@@ -37,24 +37,6 @@ export interface IUser {
 }
 
 export type IUserDocument = Document & IUser;
-
-
-const accountRelated = {
-    accountType: {
-        type: String,
-        default: 'public'
-    },
-
-    messageFrom: {
-        type: String,
-        default: 'everyone'
-    },
-
-    onlineStatus: {
-        type: Boolean,
-        default: true
-    }
-}
 
 
 const UserSchema = new Schema<IUserDocument>(
@@ -129,7 +111,22 @@ const UserSchema = new Schema<IUserDocument>(
         }],
 
         //Account setting
-        ...accountRelated
+        accountType: {
+            type: String,
+            enum: ['public', 'private'],
+            default: 'public'
+        },
+
+        messageFrom: {
+            type: String,
+            enum: ['everyone', 'followers', 'none'],
+            default: 'everyone'
+        },
+
+        onlineStatus: {
+            type: Boolean,
+            default: true
+        }
     },
     {
         timestamps: {
@@ -140,7 +137,7 @@ const UserSchema = new Schema<IUserDocument>(
 );
 
 UserSchema.methods.compareOTP = async function (enteredOtp: string): Promise<boolean> {
-  return bcrypt.compare(enteredOtp, this.otp);
+    return bcrypt.compare(enteredOtp, this.otp);
 };
 
 const User = models.User || model<IUserDocument>("User", UserSchema);

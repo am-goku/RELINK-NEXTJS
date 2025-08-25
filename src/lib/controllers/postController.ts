@@ -1,5 +1,5 @@
 import Post from "@/models/Post";
-import { BadRequestError, NetworkError, NotFoundError } from "../errors/ApiErrors";
+import { BadRequestError, ForbiddenError, NetworkError, NotFoundError } from "../errors/ApiErrors";
 import { getUserByUsername } from "./userController";
 import { connectDB } from "../db/mongoose";
 import cloudinary from "../cloudinary/cloudinary";
@@ -119,11 +119,17 @@ export async function getPosts(page = 1) {
  * @returns An array of sanitized post objects.
  * @throws {NotFoundError} If the user is not found.
  */
-export async function getPostsByUsername(username: string, page = 1) {
+export async function getPostsByUsername(username: string, page = 1, c_user_id: string) {
     await connectDB()
 
     const user = await getUserByUsername(username);
     if (!user) throw new NotFoundError('User not found');
+
+    const isFollowing = user.followers.some(
+        (follower) => follower._id.toString() === c_user_id
+    );
+
+    if (user.accountType === "private" && !isFollowing) throw new ForbiddenError('You are not following this user');
 
     const limit = 15;
     const skip = (page - 1) * limit;

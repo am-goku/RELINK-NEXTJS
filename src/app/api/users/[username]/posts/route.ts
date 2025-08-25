@@ -7,9 +7,13 @@ export async function GET(req: NextRequest, context: { params: Promise<{ usernam
     try {
         const { username } = await context.params;
 
-        await userAuth();
+        const { searchParams } = new URL(req.url);
 
-        const posts = await getPostsByUsername(username)
+        const page = searchParams.get("page");
+
+        const user = await userAuth();
+
+        const posts = await getPostsByUsername(username, Number(page), user.id);
 
         return NextResponse.json({ message: 'Posts fetched successfully', posts }, { status: 200 });
     } catch (error) {
