@@ -1,3 +1,4 @@
+import User, { IUser } from "@/models/User";
 import { Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
@@ -10,6 +11,16 @@ export const callbacks = {
             token.username = user.username;
             token.role = user.role;
         }
+
+        if (token.id) {
+            const dbUser = await User.findById(token.id).lean<IUser>();
+            if (dbUser) {
+                token.email = dbUser.email;
+                token.username = dbUser.username;
+                token.role = dbUser.role;
+            }
+        }
+
         return token;
     },
 

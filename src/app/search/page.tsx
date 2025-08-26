@@ -2,21 +2,22 @@
 
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import Navbar from '@/components/ui/Navbar';
+import Navbar from '@/components/ui/navbar/Navbar';
 import SearchBar from '@/components/search/SearchBar';
 import UserResults from '@/components/search/UserResults';
 import PostResults from '@/components/search/PostResults';
+import { useSession } from 'next-auth/react';
 
 export default function SearchResultsPage() {
     const searchParams = useSearchParams();
     const query = searchParams.get('q')?.toLowerCase() || '';
     const [activeTab, setActiveTab] = useState<'users' | 'posts'>('users');
-
+    const {data: session} = useSession();
 
     return (
         <>
             <div className="flex flex-col min-h-screen">
-                <Navbar type="explore" />
+                <Navbar type="explore" session={session} />
                 <main className="px-4 py-6 max-w-6xl mx-auto text-[#2D3436] space-y-8">
 
                     {/* Search Bar */}

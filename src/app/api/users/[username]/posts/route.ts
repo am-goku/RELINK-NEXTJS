@@ -9,7 +9,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ usernam
 
         const { searchParams } = new URL(req.url);
 
-        const page = searchParams.get("page");
+        const page = searchParams.get("page") || 1;
 
         const user = await userAuth();
 

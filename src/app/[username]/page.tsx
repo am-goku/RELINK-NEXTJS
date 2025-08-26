@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CoverImage from "../../components/profile/CoverImage";
-import Navbar from "../../components/ui/Navbar";
+import Navbar from "../../components/ui/navbar/Navbar";
 import PostCard from "../../components/cards/PostCard";
 import ProfileHeader from "../../components/profile/ProfileHeader";
 import LoaderScreen from "../../components/loaders/LoaderScreen";
@@ -98,7 +98,7 @@ function Page() {
     return (
         <React.Fragment>
             <div className="min-h-screen bg-gray-100 dark:bg-neutral-900 transition-colors">
-                <Navbar type="profile" />
+                <Navbar type="profile" session={session} />
                 <div className="md:px-20">
                     <CoverImage user={user} setUser={isOwner ? setUser : undefined} isOwner={isOwner} />
                     <div className="relative">

@@ -7,19 +7,19 @@ interface ButtonProps {
   onClick?: () => void;
   variant?: 'primary' | 'secondary';
   type: 'button' | 'submit' | 'reset';
-  disabled?: boolean;
+  loading?: boolean
 }
 
-const Button: React.FC<ButtonProps> = ({ label, onClick, type, disabled }) => {
+const Button: React.FC<ButtonProps> = ({ label, onClick, type, loading }) => {
 
   return (
     <button
       type={type}
       onClick={onClick}
       className="w-full bg-black text-white py-2 rounded hover:opacity-90"
-      disabled={disabled || false}
+      disabled={loading || false}
     >
-      {label}
+      {loading ? 'Loading...' : label}
     </button>
   )
 }

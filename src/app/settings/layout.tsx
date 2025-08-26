@@ -1,14 +1,17 @@
 import React from 'react'
-import Navbar from '../../components/ui/Navbar'
+import Navbar from '../../components/ui/navbar/Navbar'
 import ProfileSidebar from '../../components/profile/ProfileSidebar'
 import SessionContainer from '../../providers/SessionContainer'
+import { useSession } from 'next-auth/react'
 
 function Layout({ children }: { children: React.ReactNode }) {
+
+    const {data: session} = useSession();
 
     return (
         <SessionContainer>
             <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-[#2D3436] dark:text-gray-100">
-                <Navbar type="profile" />
+                <Navbar type="profile" session={session} />
 
                 <div className="p-8 flex flex-1 overflow-auto gap-5">
                     <ProfileSidebar />

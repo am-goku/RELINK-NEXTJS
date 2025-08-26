@@ -68,6 +68,7 @@ export async function getPostsByUsername({ username, setResponse, setError, setL
         const res = (await apiInstance.get(`/api/users/${username}/posts`)).data;
         setResponse(res.posts);
     } catch (error) {
+        console.log(error)
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     } finally {
         setLoading?.(false);

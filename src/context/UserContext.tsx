@@ -1,5 +1,6 @@
 'use client';
 
+import LoaderScreen from "@/components/loaders/LoaderScreen";
 import { authService } from "@/services/api/apiServices";
 import { SanitizedUser } from "@/utils/sanitizer/user";
 import { useSession, signOut } from "next-auth/react";
@@ -17,6 +18,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export default function UserProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState<boolean>(true);
     const [user, setUser] = useState<SanitizedUser | null>(null);
+    const { status } = useSession();
 
     const fetchUser = useCallback(async () => {
         try {
@@ -33,12 +35,15 @@ export default function UserProvider({ children }: { children: React.ReactNode }
         }
     }, [setUser]);
 
-    const { status } = useSession();
     useEffect(() => {
         if (status === "authenticated") {
             fetchUser();
         }
     }, [status, fetchUser]);
+
+    if (status === "loading") {
+        return <LoaderScreen />
+    }
 
     return (
         <UserContext.Provider value={{ user, setUser, loading }}>
