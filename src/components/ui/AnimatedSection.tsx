@@ -9,7 +9,7 @@ interface AnimatedSectionProps {
 }
 
 export default function AnimatedSection({ title, icon: Icon, children }: AnimatedSectionProps) {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     return (
         <React.Fragment>

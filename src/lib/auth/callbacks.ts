@@ -1,6 +1,7 @@
 import User, { IUser } from "@/models/User";
 import { Session } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { connectDB } from "../db/mongoose";
 
 export const callbacks = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,6 +14,7 @@ export const callbacks = {
         }
 
         if (token.id) {
+            await connectDB();
             const dbUser = await User.findById(token.id).lean<IUser>();
             if (dbUser) {
                 token.email = dbUser.email;

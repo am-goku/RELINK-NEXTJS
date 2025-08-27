@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { Session } from 'next-auth'
 import { UserPlus } from 'lucide-react';
 import SearchBar from '@/components/search/SearchBar';
-import Navbar from '../../components/ui/navbar/Navbar';
+import Navbar from '../../ui/navbar/Navbar';
 import { useRouter } from 'next/navigation';
 
 const suggestedUsers = [
@@ -32,7 +32,7 @@ function ExploreClient({ session }: Props) {
 
     return (
         <React.Fragment>
-            <div className="flex flex-col min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors">
+            <div className="flex flex-col flex-grow px-4 pt-20 min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors">
                 <Navbar type="explore" session={session} />
 
                 <div className="px-4 py-6 max-w-6xl mx-auto">

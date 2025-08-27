@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import ConfirmationModal from "../modal/ConfirmationModal";
+import ConfirmationModal from "../../modal/ConfirmationModal";
 import { IUser } from "@/models/User";
 import { updateStatus, updateType } from "@/services/api/user-apis";
 import { SanitizedUser } from "@/utils/sanitizer/user";

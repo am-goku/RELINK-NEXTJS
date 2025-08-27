@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 // import { useUser } from "./UserProvider";
-import LoaderScreen from "@/components/loaders/LoaderScreen";
+import LoaderScreen from "@/components/ui/loaders/LoaderScreen";
 import { useSession } from "next-auth/react";
 
 const publicRoutes = ["/", "/auth/login", "/auth/signup"];

@@ -1,5 +1,5 @@
 import React from 'react';
-import ExploreClient from './ExploreClient';
+import ExploreClient from '../../components/client/pages/Explore.client';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth/authOptions';

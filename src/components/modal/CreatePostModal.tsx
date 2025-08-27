@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { XMarkIcon, PhotoIcon, TrashIcon } from '@heroicons/react/24/outline';
 import '../../styles/cropper.css'
-import LoadingModal from '../loaders/LoadingModal';
+import LoadingModal from '../ui/loaders/LoadingModal';
 import { createNewPost } from '@/services/api/post-apis';
 import CropModal from '../cropper/cropModal';
 

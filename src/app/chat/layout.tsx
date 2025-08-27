@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import ChatLayoutClient from "./ChatLayoutClient"
+import ChatLayoutClient from "../../components/client/pages/chat/ChatLayout.client"
 import { authOptions } from "@/lib/auth/authOptions";
 import { redirect } from "next/navigation";
 

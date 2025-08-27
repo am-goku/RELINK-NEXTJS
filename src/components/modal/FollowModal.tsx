@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getUserConnectionList } from "@/services/api/user-apis";
 import { ShortUser } from "@/utils/sanitizer/user";
 import { Types } from "mongoose";
-import UserListSkeleton from "../loaders/UserListSkeleton";
+import UserListSkeleton from "../ui/loaders/UserListSkeleton";
 
 interface FollowModalProps {
     isOpen: boolean;

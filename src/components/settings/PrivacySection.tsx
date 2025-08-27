@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { AccTypeToggler, OnlStatusToggler } from '../buttons/toggleButtons'
+import { AccTypeToggler, OnlStatusToggler } from '../ui/buttons/toggleButtons'
 import { IUser } from '@/models/User'
 import { SanitizedUser } from '@/utils/sanitizer/user';
 

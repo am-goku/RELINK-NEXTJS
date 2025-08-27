@@ -1,6 +1,6 @@
 'use client';
 
-import LoaderScreen from "@/components/loaders/LoaderScreen";
+import LoaderScreen from "@/components/ui/loaders/LoaderScreen";
 import { authService } from "@/services/api/apiServices";
 import { SanitizedUser } from "@/utils/sanitizer/user";
 import { useSession, signOut } from "next-auth/react";

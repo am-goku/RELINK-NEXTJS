@@ -16,8 +16,6 @@ type get_profile_Props = {
     setFormData: React.Dispatch<React.SetStateAction<ProfileFormData>>;
     setError: React.Dispatch<React.SetStateAction<string>>;
     setOriginalData: React.Dispatch<React.SetStateAction<Partial<ProfileFormData>>>;
-    setProfilePic: React.Dispatch<React.SetStateAction<string>>;
-    setCoverPic: React.Dispatch<React.SetStateAction<string>>;
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 };
 /**
@@ -30,7 +28,7 @@ type get_profile_Props = {
  * @prop {React.Dispatch<React.SetStateAction<string>>} setCoverPic - The function to update the cover picture URL state.
  * @prop {React.Dispatch<React.SetStateAction<boolean>>} setIsLoading - The function to update the isLoading state.
  */
-export async function getProfileData({ setFormData, setError, setOriginalData, setProfilePic, setCoverPic, setIsLoading }: get_profile_Props) {
+export async function getProfileData({ setFormData, setError, setOriginalData, setIsLoading }: get_profile_Props) {
     try {
         setIsLoading(true);
         const res = (await apiInstance.get('/api/users')).data.user;
@@ -41,14 +39,6 @@ export async function getProfileData({ setFormData, setError, setOriginalData, s
             gender: res.gender || '',
             links: res.links || ['', '', ''],
         };
-
-        // Updating profile pic state to manage profile picture update
-        setProfilePic(res.image || '/images/default-profile.png');
-
-        // Updating cover pic state to manage cover picture update
-        setCoverPic(res.cover || '/images/default-cover.png')
-
-        console.log("state Data::", res);
 
         setFormData(data);
         setOriginalData(data);
@@ -183,18 +173,23 @@ export async function unfollowUser({ id, setResponse, setFollowers, setError, se
  * @prop {React.Dispatch<React.SetStateAction<boolean>>} setIsOwner - The function to update the isOwner state. Optional.
  * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
  */
-export async function getUserProfileData({ username, setProfileData, setIsOwner, setError }: {
-    username: string,
-    setProfileData: React.Dispatch<React.SetStateAction<SanitizedUser | null>>,
-    setIsOwner?: React.Dispatch<React.SetStateAction<boolean>>,
-    setError: React.Dispatch<React.SetStateAction<string>>
+export async function getUserProfileData({ username, setProfileData, setIsOwner, setError, cookie }: {
+    username: string;
+    setProfileData?: React.Dispatch<React.SetStateAction<SanitizedUser | null>>;
+    setIsOwner?: React.Dispatch<React.SetStateAction<boolean>>;
+    setError?: React.Dispatch<React.SetStateAction<string>>;
+    cookie?: string;
 }) {
     try {
-        const res = (await apiInstance.get(`/api/users/${username}`)).data;
-        setProfileData(res.user);
+        const headers = { "cookie": cookie ?? "" };
+        const res = (await apiInstance.get(`/api/users/${username}`, { headers })).data;
+        setProfileData?.(res.user);
         setIsOwner?.(res.isOwner);
+        console.log("Response::::", res)
+        return res.user;
     } catch (error) {
-        setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+        setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
+        return null;
     }
 }
 
