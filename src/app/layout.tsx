@@ -15,6 +15,8 @@ const poppins = Poppins({
   weight: ['400', '500', '600', '700'],
   subsets: ['latin'],
   display: 'swap', // Ensures the font is loaded first, avoiding "flash of unstyled text"
+  style: 'normal',
+  variable: '--font-poppins',
 })
 
 export const metadata: Metadata = {
