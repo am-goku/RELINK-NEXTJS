@@ -11,11 +11,16 @@ import CreatePostModal from "@/components/modal/CreatePostModal";
 import PostCard from "@/components/post/PostCard.client";
 import FramerScroll from "@/components/ui/scrolls/FramerScroll";
 import ScrollToTop from "@/components/ui/scrolls/ScrollToTop";
+import PostCommentsModal from "@/components/modal/CommentModal";
 
 export default function DashboardClient({ session }: { session: Session }) {
     const [showModal, setShowModal] = useState(false);
     const [posts, setPosts] = useState<IPublicPost[]>([]);
     const [loadingPosts, setLoadingPosts] = useState(true);
+
+    // Post Modal states
+    const [selectedPost, setSelectedPost] = useState<IPublicPost | null>(null);
+
 
     useEffect(() => {
         setLoadingPosts(true);
@@ -48,7 +53,10 @@ export default function DashboardClient({ session }: { session: Session }) {
                         ) : (
                             posts.map((post, index) => (
                                 <div key={post._id}>
-                                    <PostCard {...post} currentUserID={session.user?.id as string} />
+                                    <PostCard 
+                                    {...post} 
+                                    onOpenComments={() => setSelectedPost(post)}
+                                    currentUserID={session.user?.id as string} />
                                     {index !== posts.length - 1 && (
                                         <div className="border-t my-4 border-gray-200 dark:border-gray-700" />
                                     )}
@@ -58,6 +66,15 @@ export default function DashboardClient({ session }: { session: Session }) {
                     </div>
                 </main>
                 {showModal && <CreatePostModal onClose={() => setShowModal(false)} />}
+
+                {selectedPost && (
+                    <PostCommentsModal
+                        isOpen={selectedPost !== null}
+                        onClose={() => setSelectedPost(null)}
+                        post={selectedPost}
+                    />
+                )}
+
                     <ScrollToTop />
             </div>
         </FramerScroll>

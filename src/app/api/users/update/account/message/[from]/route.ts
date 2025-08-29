@@ -4,7 +4,7 @@ import { handleApiError } from "@/lib/errors/errorResponse";
 import { IUser } from "@/models/User";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PATCH(req: NextRequest, context: { params: Promise<{ from: string }> }) {
+export async function PATCH(_req: NextRequest, context: { params: Promise<{ from: string }> }) {
     try {
         const user = await userAuth();
 

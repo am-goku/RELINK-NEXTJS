@@ -9,7 +9,6 @@ export default withAuth(
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        console.log("Middleware token:", token); // 👈 check this
         const { pathname } = req.nextUrl;
 
         // Public pages

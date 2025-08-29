@@ -4,12 +4,12 @@ import React, { useState } from "react";
 
 interface PostActionsProps {
   comments: number;
+  onToggleComments: () => void;
 }
 
-export default function PostActions({ comments }: PostActionsProps) {
+export default function PostActions({ comments, onToggleComments }: PostActionsProps) {
   const [likes, setLikes] = useState(10);
   const [liked, setLiked] = useState(false);
-  const [expanded, setExpanded] = useState(false);
 
   const toggleLike = () => {
     setLiked(!liked);
@@ -27,7 +27,7 @@ export default function PostActions({ comments }: PostActionsProps) {
       </button>
 
       <button
-        onClick={() => setExpanded(!expanded)}
+        onClick={onToggleComments}
         className="flex items-center space-x-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
       >
         <span>💬</span>

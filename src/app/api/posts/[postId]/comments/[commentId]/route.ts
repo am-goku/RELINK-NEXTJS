@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { deleteComment, getCommentById } from "@/lib/controllers/commentController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 
-export async function GET(_req: NextRequest, { params }: { params: { postId: string, commentId: string } }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ postId: string, commentId: string }> }) {
     try {
-        const { commentId } = params;
+        const { commentId } = await context.params;
 
         const comment = await getCommentById(commentId);
 
@@ -15,14 +15,14 @@ export async function GET(_req: NextRequest, { params }: { params: { postId: str
     }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { postId: string, commentId: string } }) {
+export async function DELETE(_req: NextRequest, context: { params: Promise<{ postId: string, commentId: string }> }) {
     try {
         const authUser = await userAuth();
         if (!authUser) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { postId, commentId } = params;
+        const { postId, commentId } = await context.params;
 
         await deleteComment(commentId, postId, authUser.id);
 

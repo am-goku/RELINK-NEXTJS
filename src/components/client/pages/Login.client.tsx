@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Navbar from '@/components/ui/navbar/Navbar';
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/AuthButton';
 import Link from 'next/link';
 import HeroLogo from '@/components/icons/HeroLogo';
 import { signIn, useSession } from 'next-auth/react';

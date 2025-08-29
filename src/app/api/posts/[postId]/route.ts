@@ -4,11 +4,11 @@ import { connectDB } from "@/lib/db/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET(_req: NextRequest, { params }: { params: { postId: string } }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ postId: string }> }) {
     try {
         await connectDB();
 
-        const { postId } = params;
+        const { postId } = await context.params;
 
         const post = await Post.findOne({
             _id: postId,
@@ -27,7 +27,7 @@ export async function GET(_req: NextRequest, { params }: { params: { postId: str
     }
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { postId: string } }) {
+export async function PATCH(req: NextRequest, context: { params: Promise<{ postId: string }> }) {
     try {
         await connectDB();
 
@@ -36,7 +36,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { postId: st
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { postId } = params;
+        const { postId } = await context.params;
         const body = await req.json();
 
         const updateData: Record<string, string | string[] | boolean> = {};

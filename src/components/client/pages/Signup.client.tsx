@@ -1,6 +1,6 @@
 "use client"
 
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/buttons/AuthButton";
 import Navbar from "@/components/ui/navbar/Navbar";
 import { authService } from "@/services/api/apiServices";
 import { useRouter } from "next/navigation";
