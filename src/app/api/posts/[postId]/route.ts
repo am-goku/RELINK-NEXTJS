@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/db/mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 
-export async function GET(req: NextRequest, { params }: { params: { postId: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: { postId: string } }) {
     try {
         await connectDB();
 

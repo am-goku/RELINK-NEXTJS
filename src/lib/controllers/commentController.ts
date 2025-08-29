@@ -10,12 +10,12 @@ export async function createComment(postId: string, text: string, userId: string
 
     const newComment = new Comment({
         post: postId,
-        comment: text,
-        user: userId
+        content: text,
+        author: userId
     });
 
     const comment = await newComment.save();
-    await comment.populate('user');
+    await comment.populate('author', 'username image');
 
     return sanitizeComment(comment);
 }
@@ -24,12 +24,22 @@ export async function getComments(postId: string, page: number = 1) {
     await connectDB();
 
     const comments = await Comment.find({ post: postId })
-        .populate("user")
+        .populate("author", "username image")
         .sort({ created_at: -1 })
         .skip((page - 1) * PAGE_SIZE)
         .limit(PAGE_SIZE);
 
     return comments.map(sanitizeComment);
+}
+
+export async function getCommentById(commentId: string) {
+    await connectDB();
+
+    const comment = await Comment.findById(commentId)
+        .populate("author", "username image")
+        .populate("replies.author", "username image");
+
+    return comment ? sanitizeComment(comment) : null;
 }
 
 export async function deleteComment(commentId: string, postId: string, userId: string): Promise<void> {
@@ -38,7 +48,7 @@ export async function deleteComment(commentId: string, postId: string, userId: s
     const result = await Comment.deleteOne({
         _id: commentId,
         post: postId,
-        user: userId
+        author: userId
     });
 
     if (!result.acknowledged || result.deletedCount === 0) {

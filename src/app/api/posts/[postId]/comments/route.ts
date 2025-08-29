@@ -13,13 +13,13 @@ export async function POST(req: NextRequest, { params }: { params: { postId: str
         }
 
         const { postId } = params;
-        const { comment }: IComment = await req.json();
+        const { content }: IComment = await req.json();
 
-        if (!comment) {
+        if (!content) {
             return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
         }
 
-        const commentData = await createComment(postId, comment, authUser.id);
+        const commentData = await createComment(postId, content, authUser.id);
 
         return NextResponse.json({ message: "Comments created successfully", comment: commentData }, { status: 200 });
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: { params: { postId: str
 }
 
 
-export async function GET(req: NextRequest, { params }: { params: { postId: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: { postId: string } }) {
     try {
         const { postId } = params;
 

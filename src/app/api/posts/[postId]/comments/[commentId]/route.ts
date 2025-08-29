@@ -1,9 +1,21 @@
 import { userAuth } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
-import { deleteComment } from "@/lib/controllers/commentController";
+import { deleteComment, getCommentById } from "@/lib/controllers/commentController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 
-export async function DELETE(req: NextRequest, { params }: { params: { postId: string, commentId: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: { postId: string, commentId: string } }) {
+    try {
+        const { commentId } = params;
+
+        const comment = await getCommentById(commentId);
+
+        return NextResponse.json({ message: "Comment fetched successfully", comment }, { status: 200 });
+    } catch (error) {
+        return handleApiError(error);
+    }
+}
+
+export async function DELETE(_req: NextRequest, { params }: { params: { postId: string, commentId: string } }) {
     try {
         const authUser = await userAuth();
         if (!authUser) {
