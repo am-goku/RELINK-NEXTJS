@@ -20,7 +20,7 @@ const messages = [
 function Page() {
     const params = useParams()
     const router = useRouter();
-    const [selectedUser, setSelectedUser] = useState<typeof conversations[0]>();
+    const [selectedUser, setSelectedUser] = useState<typeof conversations[0] | null>(null);
     const [input, setInput] = useState('');
 
     useEffect(() => {
@@ -34,19 +34,23 @@ function Page() {
 
     return (
         <React.Fragment>
-            <main className="flex-1 flex flex-col h-full">
+            <main className="flex-1 flex flex-col h-screen">
                 {/* Header */}
-                <div className="flex items-center gap-3 p-4 bg-white dark:bg-neutral-800 border-b shadow-sm sticky top-0 z-10 transition-colors">
-                    <ArrowLeft size={20} onClick={() => router.back()} />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src={selectedUser?.avatar}
-                        alt={selectedUser?.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                        <p className="font-medium truncate text-gray-800 dark:text-gray-200">{selectedUser?.name}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Online</p>
+                <div className="p-4 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800">
+                    <button
+                        onClick={() => router.back()}
+                        className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                    >
+                        <ArrowLeft size={20} />
+                    </button>
+                    <div className="flex items-center gap-2">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={selectedUser?.avatar}
+                            alt={selectedUser?.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                        />
+                        <span className="font-medium">{selectedUser?.name}</span>
                     </div>
                 </div>
 

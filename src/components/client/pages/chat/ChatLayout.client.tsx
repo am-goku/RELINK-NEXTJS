@@ -2,7 +2,7 @@
 
 import Navbar from '@/components/ui/navbar/Navbar';
 import clsx from 'clsx';
-import { MessageCircle, UserPlus } from 'lucide-react';
+import { ArrowLeft, MessageCircle, UserPlus } from 'lucide-react';
 import { Session } from 'next-auth';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
@@ -25,6 +25,8 @@ function ChatLayoutClient({ session, children }: Props) {
     const [selectedUser, setSelectedUser] = useState<typeof conversations[0] | null>(null);
     const [showNewChatModal, setShowNewChatModal] = useState(false);
 
+    const [isMobile, setIsMobile] = useState(false);
+
     const router = useRouter();
 
     useEffect(() => {
@@ -35,9 +37,17 @@ function ChatLayoutClient({ session, children }: Props) {
         console.log(user)
     }, [params])
 
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+
     return (
         <React.Fragment>
-            <div className="flex flex-col min-h-screen">
+            <div className="h-screen flex-grow pt-20 flex flex-col min-h-screen">
                 <Navbar type="chat" session={session} />
 
                 <div className="h-[calc(100vh-80px)] flex bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 transition-colors">
@@ -46,7 +56,7 @@ function ChatLayoutClient({ session, children }: Props) {
                     <aside
                         className={clsx(
                             'md:w-72 w-full md:flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800 shadow-sm',
-                            selectedUser ? 'hidden' : ''
+                            isMobile && selectedUser ? 'hidden' : 'flex'
                         )}
                     >
                         <div className="p-4 border-b text-lg font-semibold flex items-center gap-2 justify-between border-gray-200 dark:border-gray-700">
@@ -102,7 +112,11 @@ function ChatLayoutClient({ session, children }: Props) {
                         </div>
                     </aside>
 
-                    {children}
+                    {/* Chat Area */}
+                    <div className={clsx("flex-1 flex-col", isMobile && !selectedUser ? 'hidden' : 'flex')}>
+                        
+                        {children}
+                    </div>
                 </div>
 
                 {/* Modal for new chat */}
@@ -116,7 +130,10 @@ function ChatLayoutClient({ session, children }: Props) {
                                 className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] mb-4 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-200 border-gray-300 dark:border-gray-600"
                             />
                             <div className="flex justify-end gap-2">
-                                <button className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition">
+                                <button
+                                    onClick={() => setShowNewChatModal(false)}
+                                    className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500 transition"
+                                >
                                     Cancel
                                 </button>
                                 <button className="px-4 py-2 bg-[#6C5CE7] hover:bg-[#5b4dd4] text-white rounded-lg transition">

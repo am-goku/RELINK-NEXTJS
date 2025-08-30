@@ -32,7 +32,7 @@ export default function DashboardClient({ session }: { session: Session }) {
 
     return (
         <FramerScroll>
-            <div className="flex flex-grow px-4 pt-20 flex-col min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors">
+            <div className="flex flex-grow md:px-4 pt-20 flex-col min-h-screen bg-light-bg text-light-text dark:bg-dark-bg dark:text-dark-text transition-colors">
                 <Navbar type="home" session={session} />
                 <main className="flex-grow px-4">
                     <div className="md:px-10 max-w-2xl md:mx-auto py-4">
