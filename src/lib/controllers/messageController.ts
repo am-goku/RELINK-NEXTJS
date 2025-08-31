@@ -2,7 +2,7 @@ import User from "@/models/User";
 import { connectDB } from "../db/mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
 import Message from "@/models/Message";
-import Conversation from "@/models/Conversation";
+import Conversation, { IConversationPopulated } from "@/models/Conversation";
 import { Types } from "mongoose";
 import { sanitizeMessage } from "@/utils/sanitizer/message";
 
@@ -52,7 +52,7 @@ export async function createMessage(c_user: string, receiver: string, message: s
         conversation_id: conversation?._id,
         sender: c_user,
         text: message,
-    }, { new: true });
+    });
 
     // Optionally update last_message field in Conversation
     conversation.last_message = {
@@ -65,58 +65,97 @@ export async function createMessage(c_user: string, receiver: string, message: s
     return sanitizeMessage(newMessage);
 }
 
-
-
 /**
- * Retrieves a list of messages between two users.
- * 
- * Connects to the database and fetches messages associated with the conversation
- * between the current user and the receiver. Messages are sorted by creation date
- * in descending order and paginated based on the provided skip value.
- * Deleted messages are masked with a placeholder text.
- * 
- * @param c_user - The current user's ID.
- * @param receiver - The receiver user's ID.
- * @param skip - The number of messages to skip for pagination, defaults to 0.
- * @returns An array of sanitized message objects.
- * @throws {NotFoundError} If one or both users are not found.
+ * Creates a new message in a conversation.
+ *
+ * Connects to the database and checks if the conversation exists and the user is a participant.
+ * If so, creates a new message in the conversation with the given content.
+ * Optionally updates the last_message field in the conversation.
+ * Returns the sanitized message object.
+ * @throws {NotFoundError} If the conversation is not found or the user is not a participant
+ * @throws {Error} If the message content is empty
  */
-export async function getMessages(c_user: string, receiver: string, skip?: number) {
+export async function createMessageInConversation(
+    conversationId: string,
+    c_user: string,
+    message: string
+) {
     await connectDB();
 
-    // Confirm both users exist
-    const users = await User.find({ _id: { $in: [c_user, receiver] } });
-    if (users.length !== 2) throw new NotFoundError('One or both users not found');
+    if (!message.trim()) {
+        throw new Error("Message content cannot be empty");
+    }
 
-    // Sort participant IDs for consistent query
-    const participants = [c_user, receiver].sort();
-
-    // Find the existing conversation
+    // Make sure conversation exists and user is a participant
     const conversation = await Conversation.findOne({
-        participants,
-        is_group: false
+        _id: new Types.ObjectId(conversationId),
+        participants: new Types.ObjectId(c_user),
     });
 
     if (!conversation) {
-        return []; // No message if conversation does't exist
+        throw new NotFoundError("Conversation not found or access denied");
     }
 
-    // Fetch messages by conversation_id
+    // Create the new message
+    const newMessage = await Message.create({
+        conversation_id: conversation._id,
+        sender: new Types.ObjectId(c_user),
+        text: message,
+    });
+
+    // Update last_message in conversation for quick access
+    conversation.last_message = {
+        text: message,
+        sender_id: new Types.ObjectId(c_user),
+        created_at: new Date(),
+    };
+    await conversation.save();
+
+    return sanitizeMessage(newMessage);
+}
+
+/**
+ * Retrieves messages in a conversation.
+ * 
+ * Connects to the database and finds a conversation with the given ID,
+ * if the current user is a participant in the conversation.
+ * Then, it fetches the newest 20 messages in that conversation,
+ * skipping the first `skip` messages.
+ * The messages are sanitized according to the current user's role.
+ * 
+ * @param c_user - The current user's ID
+ * @param conversationId - The ID of the conversation to retrieve messages from
+ * @param skip - The number of messages to skip, from the newest, defaults to 0
+ * @returns An array of sanitized message objects, or an empty array if no messages are found
+ * @throws {NotFoundError} If the conversation is not found or the user is not a participant
+ */
+export async function getMessages(c_user: string, conversationId: string, skip: number = 0) {
+    await connectDB();
+
+    // Make sure the conversation exists and user is a participant
+    const conversation = await Conversation.findOne({
+        _id: new Types.ObjectId(conversationId),
+        participants: new Types.ObjectId(c_user),
+    });
+
+    if (!conversation) {
+        throw new NotFoundError("Conversation not found or access denied");
+    }
+
+    // Fetch messages in that conversation
     const rawMessages = await Message.find({
-        conversation_id: conversation._id
+        conversation_id: conversation._id,
     })
-        .sort({ created_at: -1 })
-        .limit(20)   // latest 20 messages
-        .skip(skip || 0)  // for pagination
+        .sort({ created_at: -1 }) // newest first
+        .limit(20)
+        .skip(skip)
         .lean();
 
-    // Format/Mask deleted messages with placeholder
+    // Sanitize or mask deleted messages if needed
     const messages = rawMessages.map(sanitizeMessage);
 
     return messages;
 }
-
-
 
 /**
  * Deletes a message by updating its `deleted` field to `true`.
@@ -129,11 +168,11 @@ export async function getMessages(c_user: string, receiver: string, skip?: numbe
  * @returns A sanitized version of the deleted message object.
  * @throws {NotFoundError} If the message is not found or is already deleted.
  */
-export async function deleteMessage(userId: string, messageId: string) {
+export async function deleteMessage(userId: string, messageId: string, conversationId: string) {
     await connectDB();
 
     const deletedMessage = await Message.findOneAndUpdate(
-        { _id: messageId, sender: userId, deleted: { $ne: true } },
+        { _id: messageId, sender: userId, deleted: { $ne: true }, conversation_id: conversationId },
         { $set: { deleted: true } },
         { new: true } // returns updated doc
     );
@@ -143,4 +182,48 @@ export async function deleteMessage(userId: string, messageId: string) {
     }
 
     return deletedMessage;
+}
+
+/**
+ * Retrieves all conversations of a user.
+ * 
+ * Connects to the database and finds all conversation documents that contain the given user ID in their `participants` field.
+ * The `participants` field is populated with the names and avatars of the other users in the conversation.
+ * 
+ * @param userId - The unique identifier of the user whose conversations to retrieve.
+ * @returns An array of conversation objects, each with its `participants` field populated.
+ */
+export async function getConversations(userId: string): Promise<IConversationPopulated[]> {
+    await connectDB();
+
+    const conversations = await Conversation.find({
+        participants: new Types.ObjectId(userId),
+    }).populate("participants", "name avatar");
+
+    return conversations || [];
+}
+
+/**
+ * Retrieves a conversation by its ID.
+ * 
+ * Connects to the database and finds a conversation document with the given ID,
+ * if the current user is a participant in the conversation.
+ * The `participants` field is populated with the names and avatars of the other users in the conversation.
+ * 
+ * @param id - The unique identifier of the conversation to retrieve.
+ * @param c_user - The unique identifier of the current user.
+ * @returns A conversation object with its `participants` field populated, or null if the conversation is not found or the user is not a participant.
+ */
+export async function getAConversation(
+    id: string,
+    c_user: string
+): Promise<IConversationPopulated | null> {
+    await connectDB();
+
+    const conversation = await Conversation.findOne({
+        _id: new Types.ObjectId(id),                 // cast conversation ID
+        participants: new Types.ObjectId(c_user)     // ensure user is a participant
+    }).populate("participants", "name avatar");
+
+    return conversation || null;
 }

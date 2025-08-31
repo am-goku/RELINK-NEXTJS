@@ -15,6 +15,15 @@ export interface IConversation {
     updated_at?: Date;
 }
 
+export interface IConversationPopulated extends Omit<IConversation, 'participants'> {
+    participants: {
+        _id: Types.ObjectId;
+        username: string;
+        name?: string;
+        image?: string;
+    }[];
+}
+
 export type IConversationDocument = IConversation & Document;
 
 const ConversationSchema = new Schema<IConversationDocument>(
@@ -23,10 +32,13 @@ const ConversationSchema = new Schema<IConversationDocument>(
             type: Boolean,
             required: true
         },
-        participants: {
-            type: [Schema.Types.ObjectId],
-            required: true
-        },
+        participants: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",   // <-- this is required for populate to work
+                required: true
+            }
+        ],
         group_name: {
             type: String,
             required: false

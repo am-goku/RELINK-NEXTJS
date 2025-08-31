@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function ChatPage() {
     return (
-        <main className="flex-1 md:flex hidden flex-col items-center justify-center bg-[#F8F9FA] dark:bg-neutral-900 p-6 text-center transition-colors">
+        <main className="flex-1 md:flex hidden flex-col items-center justify-center bg-[#F8F9FA] dark:bg-neutral-900 p-6 text-center transition-colors select-none">
             <div className="max-w-sm w-full">
                 <div className="flex justify-center mb-6">
                     <div className="w-20 h-20 rounded-full bg-[#6C5CE7] flex items-center justify-center text-white text-3xl font-bold shadow-lg">

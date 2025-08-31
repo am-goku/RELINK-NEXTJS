@@ -1,17 +1,13 @@
 'use client'
 
 import Navbar from '@/components/ui/navbar/Navbar';
+import { IConversationPopulated } from '@/models/Conversation';
+import { fetchConversations } from '@/services/api/chat-apis';
 import clsx from 'clsx';
-import { ArrowLeft, MessageCircle, UserPlus } from 'lucide-react';
+import { MessageCircle, UserPlus } from 'lucide-react';
 import { Session } from 'next-auth';
 import { useParams, useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
-
-const conversations = [
-    { id: 1, name: 'Emily White', lastMessage: 'Hey, how are you?', avatar: '/images/default-profile.png' },
-    { id: 2, name: 'Jake Doe', lastMessage: 'Let’s catch up tomorrow!', avatar: '/images/default-profile.png' },
-    { id: 3, name: 'Sophia Ray', lastMessage: 'Got the file!', avatar: '/images/default-profile.png' },
-];
+import React, { useCallback, useEffect, useState } from 'react'
 
 type Props = {
     session: Session | null;
@@ -21,29 +17,45 @@ type Props = {
 function ChatLayoutClient({ session, children }: Props) {
 
     const params = useParams();
-
-    const [selectedUser, setSelectedUser] = useState<typeof conversations[0] | null>(null);
-    const [showNewChatModal, setShowNewChatModal] = useState(false);
-
-    const [isMobile, setIsMobile] = useState(false);
-
     const router = useRouter();
 
-    useEffect(() => {
-        const user = conversations.find((user) => user.id === Number(params.id));
-        if (user) {
-            setSelectedUser(user);
-        }
-        console.log(user)
-    }, [params])
+    
+    // Conversation state
+    const [conversations, setConversations] = useState<IConversationPopulated[]>([]);
+    const [selectedRoom, setSelectedRoom] = useState<IConversationPopulated | null>(null);
 
+    // UI States
+    const [isMobile, setIsMobile] = useState(false);
+    const [showNewChatModal, setShowNewChatModal] = useState(false);
+
+
+    // Setting selected user state
+    useEffect(() => {
+        const room = conversations.find((c) => c._id.toString() === params?.id);
+        if (room) {
+            setSelectedRoom(room);
+        }
+        console.log(room)
+    }, [conversations, params])
+
+    // Conversations fetching
+    const fetchRooms = useCallback(async () => {
+        if (session) {
+            const conversations = await fetchConversations();
+            setConversations(conversations);
+        }
+    }, [session]);
+    useEffect(() => {
+        fetchRooms();
+    }, [fetchRooms])
+
+    // Responsive design handling
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
         checkMobile();
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
-
 
     return (
         <React.Fragment>
@@ -56,7 +68,7 @@ function ChatLayoutClient({ session, children }: Props) {
                     <aside
                         className={clsx(
                             'md:w-72 w-full md:flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800 shadow-sm',
-                            isMobile && selectedUser ? 'hidden' : 'flex'
+                            isMobile && selectedRoom ? 'hidden' : 'flex'
                         )}
                     >
                         <div className="p-4 border-b text-lg font-semibold flex items-center gap-2 justify-between border-gray-200 dark:border-gray-700">
@@ -72,30 +84,31 @@ function ChatLayoutClient({ session, children }: Props) {
                             </button>
                         </div>
 
+                        {/* Conversation List */}
                         <div className="flex-1 overflow-y-auto">
                             {conversations.length > 0 ? (
-                                conversations.map((user) => (
+                                conversations.map((c) => (
                                     <div
-                                        key={user.id}
+                                        key={c._id.toString()}
                                         className={clsx(
                                             'flex items-center gap-3 p-4 cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-700',
-                                            selectedUser?.id === user.id && 'bg-[#ECECFA] dark:bg-gray-700'
+                                            selectedRoom?._id === c._id && 'bg-[#ECECFA] dark:bg-gray-700'
                                         )}
                                         onClick={() => {
-                                            setSelectedUser(user);
-                                            router.push(`/chat/${user.id}`);
+                                            setSelectedRoom(c);
+                                            router.push(`/chat/${c._id}`);
                                         }}
                                     >
                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                         <img
-                                            src={user.avatar}
-                                            alt={user.name}
+                                            src={c.group_image}
+                                            alt={c.group_name}
                                             className="w-10 h-10 rounded-full object-cover"
                                         />
                                         <div className="flex flex-col">
-                                            <p className="font-medium">{user.name}</p>
+                                            <p className="font-medium">{c.group_name}</p>
                                             <p className="text-sm text-[#636E72] dark:text-gray-400 truncate max-w-[160px]">
-                                                {user.lastMessage}
+                                                {c.last_message?.text}
                                             </p>
                                         </div>
                                     </div>
@@ -113,8 +126,8 @@ function ChatLayoutClient({ session, children }: Props) {
                     </aside>
 
                     {/* Chat Area */}
-                    <div className={clsx("flex-1 flex-col", isMobile && !selectedUser ? 'hidden' : 'flex')}>
-                        
+                    <div className={clsx("flex-1 flex-col", isMobile && !selectedRoom ? 'hidden' : 'flex')}>
+
                         {children}
                     </div>
                 </div>
