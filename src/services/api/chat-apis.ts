@@ -2,6 +2,16 @@ import apiInstance from "@/lib/axios";
 import { IConversationPopulated } from "@/models/Conversation";
 import { IMessage } from "@/models/Message";
 
+export async function fetchReceiver(receiver_id:string) {
+    try {
+        const res = await apiInstance.get(`/api/chat/${receiver_id}`);
+        return res.data.receiver;
+    } catch (error) {
+        console.error("Error fetching receiver:", error);
+        throw error;
+    }
+}
+
 /**
  * Fetches all the conversations of the current user.
  * @returns {Promise<Conversation[]>} The list of conversations.
@@ -75,6 +85,23 @@ export async function sendMessage(conversationId: string, content: string): Prom
     try {
         const res = await apiInstance.post(`/api/chat/${conversationId}/messages`, { content });
         return res.data.messageData;
+    } catch (error) {
+        console.error("Error sending message:", error);
+        throw error;
+    }
+}
+
+/**
+ * Starts a conversation with a given user and sends a message in the conversation.
+ * @param {string} receiver_id The ID of the user to start the conversation with.
+ * @param {string} content The content of the message to send.
+ * @returns {Promise<{message:IMessage; conversation: IConversationPopulated}>} The newly created message and conversation.
+ * @throws {Error} If there is an error starting the conversation or sending the message.
+ */
+export async function startMessage(receiver_id: string, content: string): Promise<{ message: IMessage; conversation: IConversationPopulated }> {
+    try {
+        const res = await apiInstance.post(`/api/chat/${receiver_id}`, { content });
+        return { message: res.data.messageData, conversation: res.data.conversation };
     } catch (error) {
         console.error("Error sending message:", error);
         throw error;

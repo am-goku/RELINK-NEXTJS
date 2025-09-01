@@ -1,93 +1,83 @@
-'use client'
+import { getServerSession } from "next-auth"
+import ChatRoomClient from "../../../components/client/pages/chat/ChatRoom.client"
+import { authOptions } from "@/lib/auth/authOptions"
+import NotFound from "@/app/[username]/not-found";
+import { redirect } from "next/navigation";
+import { IConversationPopulated } from "@/models/Conversation";
+import { getAConversation, getConversationUser } from "@/lib/controllers/messageController";
 
-import ChatHeader from '@/components/client/pages/chat/ChatHeader';
-import { IConversationPopulated } from '@/models/Conversation';
-import { IMessage } from '@/models/Message';
-import { fetchMessages, fetchSelectedConversation } from '@/services/api/chat-apis';
-import clsx from 'clsx';
-import { Send } from 'lucide-react'
-import { useSession } from 'next-auth/react';
-import { notFound, useParams } from 'next/navigation';
-import React, { useCallback, useEffect, useState } from 'react'
+type Props = {
+    params: Promise<{ roomId: string }>;
+    searchParams: Promise<{ new?: string }>; // mark as Promise
+};
 
-function Page() {
-    const params = useParams()
-    const [input, setInput] = useState('');
+async function Page({ params, searchParams }: Props) {
+    const session = await getServerSession(authOptions);
+    if (!session) return redirect("/auth/login");
 
-    const {data: session} = useSession();
-    
-    // Conversation States
-    const [selectedRoom, setSelectedRoom] = useState<IConversationPopulated | null>(null);
+    const { roomId } = await params;
+    const { new: isNewChatParam } = await searchParams; // ✅ await it
+    const isNewChat = isNewChatParam?.toLowerCase() === "true";
 
-    // Message States
-    const [messages, setMessages] = useState<IMessage[]>([]);
+    let room: IConversationPopulated | null = null;
+    let receiver: IConversationPopulated['participants'][number] | null = null;
 
-    //Fetch selected room details
-    const fetchRoomDetails = useCallback(async () => {
-        if (params?.roomId) {
-            try {
-                const conversation = await fetchSelectedConversation(params.roomId.toString());
-                setSelectedRoom(conversation);
-            } catch (error) {
-                console.error("Error fetching room details:", error);
-                notFound();
+    console.log("starting chat page fetch", { roomId, isNewChat });
+
+    try {
+        if (isNewChat) {
+            // Case 1: chat/[roomId]?new=true
+            // here roomId is actually the receiver's userId
+            receiver = await getConversationUser(roomId);
+
+            if (!receiver) {
+                console.warn("Receiver not found for new chat:", roomId);
+                return <NotFound />;
+            }
+        } else {
+            // Case 2: chat/[roomId]
+            room = await getAConversation(roomId, session.user.id);
+
+            if (!room) {
+                console.warn("Room not found:", roomId);
+                return <NotFound />;
+            }
+
+            // Validate that the current user is a participant
+            const isParticipant = room.participants?.some(
+                (p) => p._id.toString() === session.user.id
+            );
+
+            if (!isParticipant) {
+                console.warn("User not authorized for this room:", session.user.id);
+                return <NotFound />;
+            }
+
+            // Set receiver (the other person in the chat)
+            receiver =
+                room.participants?.find(
+                    (p) => p._id.toString() !== session.user.id
+                ) ?? null;
+
+            if (!receiver) {
+                console.warn("No valid receiver found in room:", roomId);
+                return <NotFound />;
             }
         }
-    }, [params.roomId]);
-    useEffect(() => {
-        fetchRoomDetails();
-    }, [fetchRoomDetails]);
-
-    // Fetch messages
-    const getMessages = useCallback(async () => {
-        if (selectedRoom) {
-            const messages = await fetchMessages(selectedRoom?._id.toString());
-            setMessages(messages);
-        }
-    }, [selectedRoom]);
-    useEffect(() => {
-        getMessages();
-    }, [getMessages]);
+    } catch (error) {
+        console.error("Chat page error:", error);
+        return <NotFound />;
+    } finally {
+        console.log({ room, receiver });
+    }
 
     return (
-        <React.Fragment>
-            <main className="flex-1 flex flex-col h-screen">
-                {/* Header */}
-                <ChatHeader selectedUser={selectedRoom} />
-
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-[#F8F9FA] dark:bg-neutral-900 transition-colors">
-                    {messages.map((msg) => (
-                        <div
-                            key={msg._id.toString()}
-                            className={clsx(
-                                'max-w-[80%] sm:max-w-sm px-4 py-2 rounded-xl text-sm break-words transition-colors',
-                                msg.sender.toString() === session?.user.id
-                                    ? 'ml-auto bg-[#6C5CE7] text-white'
-                                    : 'mr-auto bg-white dark:bg-neutral-800 dark:border-neutral-700 border'
-                            )}
-                        >
-                            {msg.text}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Input */}
-                <div className="p-4 bg-white dark:bg-neutral-800 border-t dark:border-neutral-700 flex items-center gap-2 sticky bottom-0 transition-colors">
-                    <input
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        type="text"
-                        placeholder="Type your message..."
-                        className="flex-1 px-4 py-2 text-sm rounded-full border dark:border-neutral-600 bg-white dark:bg-neutral-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] transition-colors"
-                    />
-                    <button className="text-[#6C5CE7] p-2 hover:text-opacity-80 transition flex-shrink-0">
-                        <Send size={20} />
-                    </button>
-                </div>
-            </main>
-        </React.Fragment>
-    )
+        <ChatRoomClient
+            session={session}
+            receiver={receiver}
+            room={room}
+        />
+    );
 }
 
-export default Page
+export default Page;

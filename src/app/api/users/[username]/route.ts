@@ -1,9 +1,9 @@
 import { userAuth } from "@/lib/auth";
 import { getUserByUsername } from "@/lib/controllers/userController";
 import { handleApiError } from "@/lib/errors/errorResponse";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextResponse, context: { params: Promise<{ username: string }> }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ username: string }> }) {
     try {
         const { username } = await context.params;
 
@@ -11,7 +11,7 @@ export async function GET(req: NextResponse, context: { params: Promise<{ userna
 
         const user = await getUserByUsername(username);
 
-        let isOwner = false;
+        let isOwner: boolean = false;
 
         if (currUser.id === user._id.toString()) {
             isOwner = true;

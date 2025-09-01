@@ -115,7 +115,10 @@ function ProfileClient({ session, user, isOwner }: Props) {
                             ) : (
                                 posts.map((post, index) => (
                                     <React.Fragment key={post._id}>
-                                        <PostCard {...post} currentUserID={session?.user?.id as string} />
+                                        <PostCard 
+                                        {...post} 
+                                        currentUserID={session?.user?.id as string}
+                                        onOpenComments={() => {}} />
                                         {index !== posts.length - 1 && (
                                             <div className="border-t border-gray-200 dark:border-gray-700 my-4 transition-colors" />
                                         )}

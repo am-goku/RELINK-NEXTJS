@@ -7,6 +7,17 @@ import { Types } from "mongoose";
 import { sanitizeMessage } from "@/utils/sanitizer/message";
 
 
+export async function getConversationUser(user_id: string): Promise<IConversationPopulated["participants"][number]> {
+    await connectDB();
+
+    const user = await User.findById(new Types.ObjectId(user_id))
+        .select('_id username image name').lean<IConversationPopulated["participants"][number]>();
+
+    if (!user) throw new NotFoundError("No user found");
+
+    return user;
+}
+
 /**
  * Creates a new message between two users.
  * Ensures that both users exist, and a conversation between them exists.
@@ -62,7 +73,9 @@ export async function createMessage(c_user: string, receiver: string, message: s
     }
     await conversation.save();
 
-    return sanitizeMessage(newMessage);
+    await conversation.populate("participants", "name avatar");
+
+    return { messageData: sanitizeMessage(newMessage), conversation };
 }
 
 /**
@@ -193,12 +206,12 @@ export async function deleteMessage(userId: string, messageId: string, conversat
  * @param userId - The unique identifier of the user whose conversations to retrieve.
  * @returns An array of conversation objects, each with its `participants` field populated.
  */
-export async function getConversations(userId: string): Promise<IConversationPopulated[]> {
+export async function getConversations(userId: string) {
     await connectDB();
 
     const conversations = await Conversation.find({
         participants: new Types.ObjectId(userId),
-    }).populate("participants", "name avatar");
+    }).populate("participants", "name avatar").lean();
 
     return conversations || [];
 }
@@ -223,7 +236,7 @@ export async function getAConversation(
     const conversation = await Conversation.findOne({
         _id: new Types.ObjectId(id),                 // cast conversation ID
         participants: new Types.ObjectId(c_user)     // ensure user is a participant
-    }).populate("participants", "name avatar");
+    }).populate("participants", "name avatar").lean<IConversationPopulated>();
 
     return conversation || null;
 }

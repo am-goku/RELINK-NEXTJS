@@ -17,7 +17,7 @@ export interface IConversation {
 
 export interface IConversationPopulated extends Omit<IConversation, 'participants'> {
     participants: {
-        _id: Types.ObjectId;
+        _id: Types.ObjectId; // can be string when serialized
         username: string;
         name?: string;
         image?: string;

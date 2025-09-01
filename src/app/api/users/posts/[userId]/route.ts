@@ -4,10 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPostsByUserId } from "@/lib/controllers/postController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 
-export async function GET(req: NextRequest, { params }: { params: { userId: string } }) {
+export async function GET(_req: NextRequest, context: { params: Promise<{ userId: string }> }) {
     try {
         await connectDB();
-        const { userId } = params;
+        const { userId } = await context.params;
 
         const authUser = await userAuth();
         if (!authUser) {
