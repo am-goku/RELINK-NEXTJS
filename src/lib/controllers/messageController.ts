@@ -10,12 +10,12 @@ import { sanitizeMessage } from "@/utils/sanitizer/message";
 export async function getConversationUser(user_id: string): Promise<IConversationPopulated["participants"][number]> {
     await connectDB();
 
-    const user = await User.findById(new Types.ObjectId(user_id))
+    const receiver = await User.findById(new Types.ObjectId(user_id))
         .select('_id username image name').lean<IConversationPopulated["participants"][number]>();
 
-    if (!user) throw new NotFoundError("No user found");
+    if (!receiver) throw new NotFoundError("No user found");
 
-    return user;
+    return receiver;
 }
 
 /**
@@ -68,7 +68,7 @@ export async function createMessage(c_user: string, receiver: string, message: s
     // Optionally update last_message field in Conversation
     conversation.last_message = {
         text: message,
-        sender_id: new Types.ObjectId(c_user),
+        sender: new Types.ObjectId(c_user),
         created_at: new Date()
     }
     await conversation.save();

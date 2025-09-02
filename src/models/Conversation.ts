@@ -6,9 +6,9 @@ export interface IConversation {
     participants: Types.ObjectId[];
     group_name?: string;
     group_image?: string;
-    last_message: {
+    last_message?: {
         text: string,
-        sender_id: Types.ObjectId,
+        sender: Types.ObjectId,
         created_at: Date
     };
     created_at?: Date;
@@ -48,18 +48,12 @@ const ConversationSchema = new Schema<IConversationDocument>(
             required: false
         },
         last_message: {
-            text: {
-                type: String,
-                required: true
+            type: {
+                text: { type: String },
+                sender: { type: Schema.Types.ObjectId },
+                created_at: { type: Date },
             },
-            sender_id: {
-                type: Schema.Types.ObjectId,
-                required: true
-            },
-            created_at: {
-                type: Date,
-                required: true
-            }
+            required: false,
         }
     },
     {

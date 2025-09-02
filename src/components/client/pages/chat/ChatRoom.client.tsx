@@ -10,12 +10,12 @@ import { Session } from 'next-auth';
 import React, { useCallback, useEffect, useState } from 'react'
 
 type Props = {
-    session?: Session | null;
+    session: Session | null;
     room: IConversationPopulated | null;
     receiver: IConversationPopulated['participants'][0];
 }
 
-function ChatRoomClient({ room, receiver }: Props) {
+function ChatRoomClient({ room, receiver, session }: Props) {
     // Message States
     const [messages, setMessages] = useState<IMessage[]>([]);
 
@@ -32,7 +32,7 @@ function ChatRoomClient({ room, receiver }: Props) {
 
     return (
         <React.Fragment>
-            <main className="flex-1 flex flex-col h-screen">
+            <main className="flex flex-col h-full overflow-hidden">
                 {/* Header */}
                 <ChatHeader
                     room={room}
@@ -41,6 +41,7 @@ function ChatRoomClient({ room, receiver }: Props) {
                 {/* Messages */}
                 <MessageMapper
                     receiver={receiver}
+                    session={session}
                     messages={messages} />
 
                 {/* Input */}

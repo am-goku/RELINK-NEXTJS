@@ -2,10 +2,10 @@ import apiInstance from "@/lib/axios";
 import { IConversationPopulated } from "@/models/Conversation";
 import { IMessage } from "@/models/Message";
 
-export async function fetchReceiver(receiver_id:string) {
+export async function fetchReceiver(receiver_id: string, cookie?: string) {
     try {
-        const res = await apiInstance.get(`/api/chat/${receiver_id}`);
-        return res.data.receiver;
+        const res = await apiInstance.get(`/api/chat/${receiver_id}`, { headers: { cookie } });
+        return res?.data?.receiver;
     } catch (error) {
         console.error("Error fetching receiver:", error);
         throw error;
@@ -48,9 +48,9 @@ export async function fetchConversation(): Promise<IConversationPopulated[]> {
  * @returns {Promise<IConversationPopulated | null>} The selected conversation, or null if not found.
  * @throws {Error} If there is an error fetching the conversation.
  */
-export async function fetchSelectedConversation(id: string): Promise<IConversationPopulated | null> {
+export async function fetchSelectedConversation(id: string, cookie?: string): Promise<IConversationPopulated | null> {
     try {
-        const res = await apiInstance.get(`/api/chat/conversation/${id}`);
+        const res = await apiInstance.get(`/api/chat/conversation/${id}`, { headers: { cookie } });
         return res.data.conversation || null;
     } catch (error) {
         console.error("Error fetching conversation:", error);
@@ -66,7 +66,7 @@ export async function fetchSelectedConversation(id: string): Promise<IConversati
  */
 export async function fetchMessages(conversationId: string): Promise<IMessage[]> {
     try {
-        const res = await apiInstance.get(`/api/chat/${conversationId}/messages`);
+        const res = await apiInstance.get(`/api/chat/conversation/${conversationId}/message`);
         return res.data.messages || [];
     } catch (error) {
         console.error("Error fetching messages:", error);
@@ -83,7 +83,10 @@ export async function fetchMessages(conversationId: string): Promise<IMessage[]>
  */
 export async function sendMessage(conversationId: string, content: string): Promise<IMessage> {
     try {
-        const res = await apiInstance.post(`/api/chat/${conversationId}/messages`, { content });
+        if(!content.trim()) {
+            throw new Error("Message content cannot be empty");
+        }
+        const res = await apiInstance.post(`/api/chat/conversation/${conversationId}/message`, { content });
         return res.data.messageData;
     } catch (error) {
         console.error("Error sending message:", error);
@@ -100,6 +103,9 @@ export async function sendMessage(conversationId: string, content: string): Prom
  */
 export async function startMessage(receiver_id: string, content: string): Promise<{ message: IMessage; conversation: IConversationPopulated }> {
     try {
+        if(!content.trim()) {
+            throw new Error("Message content cannot be empty");
+        }
         const res = await apiInstance.post(`/api/chat/${receiver_id}`, { content });
         return { message: res.data.messageData, conversation: res.data.conversation };
     } catch (error) {

@@ -6,6 +6,7 @@ import { fetchConversations } from '@/services/api/chat-apis';
 import clsx from 'clsx';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import { Session } from 'next-auth';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react'
 
@@ -19,7 +20,7 @@ function ChatLayoutClient({ session, children }: Props) {
     const params = useParams();
     const router = useRouter();
 
-    
+
     // Conversation state
     const [conversations, setConversations] = useState<IConversationPopulated[]>([]);
     const [selectedRoom, setSelectedRoom] = useState<IConversationPopulated | null>(null);
@@ -87,32 +88,38 @@ function ChatLayoutClient({ session, children }: Props) {
                         {/* Conversation List */}
                         <div className="flex-1 overflow-y-auto">
                             {conversations.length > 0 ? (
-                                conversations.map((c) => (
-                                    <div
-                                        key={c._id.toString()}
-                                        className={clsx(
-                                            'flex items-center gap-3 p-4 cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-700',
-                                            selectedRoom?._id === c._id && 'bg-[#ECECFA] dark:bg-gray-700'
-                                        )}
-                                        onClick={() => {
-                                            setSelectedRoom(c);
-                                            router.push(`/chat/${c._id}`);
-                                        }}
-                                    >
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img
-                                            src={c.group_image}
-                                            alt={c.group_name}
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <div className="flex flex-col">
-                                            <p className="font-medium">{c.group_name}</p>
-                                            <p className="text-sm text-[#636E72] dark:text-gray-400 truncate max-w-[160px]">
-                                                {c.last_message?.text}
-                                            </p>
+                                conversations.map((c) => {
+                                    const receiver =
+                                        c.participants?.find(
+                                            (p) => p._id.toString() !== session?.user.id
+                                        )
+                                    return (
+                                        <div
+                                            key={c._id.toString()}
+                                            className={clsx(
+                                                'flex items-center gap-3 p-4 cursor-pointer transition hover:bg-gray-100 dark:hover:bg-gray-700',
+                                                selectedRoom?._id === c._id && 'bg-[#ECECFA] dark:bg-gray-700'
+                                            )}
+                                            onClick={() => {
+                                                setSelectedRoom(c);
+                                                router.push(`/chat/${c._id}`);
+                                            }}
+                                        >
+                                            <Image
+                                                src={c.group_image || receiver?.image || '/images/default-profile.png'}
+                                                alt={c.group_name || receiver?.name || receiver?.username || ""}
+                                                className="w-10 h-10 rounded-full object-cover"
+                                                height={32} width={32}
+                                            />
+                                            <div className="flex flex-col">
+                                                <p className="font-medium">{c.group_name || receiver?.name || receiver?.username}</p>
+                                                <p className="text-sm text-[#636E72] dark:text-gray-400 truncate max-w-[160px]">
+                                                    {c.last_message?.text}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))
+                                    )
+                                })
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
                                     <MessageCircle size={40} className="text-gray-400 dark:text-gray-500 mb-4" />
@@ -127,7 +134,6 @@ function ChatLayoutClient({ session, children }: Props) {
 
                     {/* Chat Area */}
                     <div className={clsx("flex-1 flex-col", isMobile && !selectedRoom ? 'hidden' : 'flex')}>
-
                         {children}
                     </div>
                 </div>

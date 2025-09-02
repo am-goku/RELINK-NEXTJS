@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth"
 import ChatRoomClient from "../../../components/client/pages/chat/ChatRoom.client"
 import { authOptions } from "@/lib/auth/authOptions"
-import NotFound from "@/app/[username]/not-found";
 import { redirect } from "next/navigation";
 import { IConversationPopulated } from "@/models/Conversation";
-import { getAConversation, getConversationUser } from "@/lib/controllers/messageController";
+import { fetchReceiver, fetchSelectedConversation } from "@/services/api/chat-apis";
+import UserNotFound from "@/components/error/userNotFound";
+import { cookies } from "next/headers";
 
 type Props = {
     params: Promise<{ roomId: string }>;
@@ -15,6 +16,8 @@ async function Page({ params, searchParams }: Props) {
     const session = await getServerSession(authOptions);
     if (!session) return redirect("/auth/login");
 
+    const cookie = await cookies();
+
     const { roomId } = await params;
     const { new: isNewChatParam } = await searchParams; // ✅ await it
     const isNewChat = isNewChatParam?.toLowerCase() === "true";
@@ -22,25 +25,23 @@ async function Page({ params, searchParams }: Props) {
     let room: IConversationPopulated | null = null;
     let receiver: IConversationPopulated['participants'][number] | null = null;
 
-    console.log("starting chat page fetch", { roomId, isNewChat });
-
     try {
         if (isNewChat) {
             // Case 1: chat/[roomId]?new=true
             // here roomId is actually the receiver's userId
-            receiver = await getConversationUser(roomId);
+            receiver = await fetchReceiver(roomId, cookie.toString());
 
             if (!receiver) {
                 console.warn("Receiver not found for new chat:", roomId);
-                return <NotFound />;
+                return <UserNotFound />;
             }
         } else {
             // Case 2: chat/[roomId]
-            room = await getAConversation(roomId, session.user.id);
+            room = await fetchSelectedConversation(roomId, cookie.toString());
 
             if (!room) {
                 console.warn("Room not found:", roomId);
-                return <NotFound />;
+                return <UserNotFound />;
             }
 
             // Validate that the current user is a participant
@@ -50,7 +51,7 @@ async function Page({ params, searchParams }: Props) {
 
             if (!isParticipant) {
                 console.warn("User not authorized for this room:", session.user.id);
-                return <NotFound />;
+                return <UserNotFound />;
             }
 
             // Set receiver (the other person in the chat)
@@ -61,16 +62,13 @@ async function Page({ params, searchParams }: Props) {
 
             if (!receiver) {
                 console.warn("No valid receiver found in room:", roomId);
-                return <NotFound />;
+                return <UserNotFound />;
             }
         }
     } catch (error) {
         console.error("Chat page error:", error);
-        return <NotFound />;
-    } finally {
-        console.log({ room, receiver });
+        return <UserNotFound />;
     }
-
     return (
         <ChatRoomClient
             session={session}
