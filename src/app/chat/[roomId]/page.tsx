@@ -73,7 +73,7 @@ async function Page({ params, searchParams }: Props) {
         <ChatRoomClient
             session={session}
             receiver={receiver}
-            room={room}
+            selectedRoom={room}
         />
     );
 }

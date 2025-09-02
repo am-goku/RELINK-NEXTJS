@@ -6,18 +6,26 @@ import ChatInput from '@/components/ui/fields/ChatInputs';
 import { IConversationPopulated } from '@/models/Conversation';
 import { IMessage } from '@/models/Message';
 import { fetchMessages } from '@/services/api/chat-apis';
+import { useChatStore } from '@/stores/chatStore';
 import { Session } from 'next-auth';
 import React, { useCallback, useEffect, useState } from 'react'
 
 type Props = {
     session: Session | null;
-    room: IConversationPopulated | null;
+    selectedRoom: IConversationPopulated | null;
     receiver: IConversationPopulated['participants'][0];
 }
 
-function ChatRoomClient({ room, receiver, session }: Props) {
+function ChatRoomClient({ selectedRoom, receiver, session }: Props) {
     // Message States
     const [messages, setMessages] = useState<IMessage[]>([]);
+
+    // ChatRoonStore States
+    const setSelectedRoom = useChatStore((state) => state.setSelectedRoom);
+    const room = useChatStore((state) => state.selectedRoom);
+    useEffect(() => {
+        if (selectedRoom) setSelectedRoom(selectedRoom);
+    }, [selectedRoom, setSelectedRoom]);
 
     // Fetch messages
     const getMessages = useCallback(async () => {
