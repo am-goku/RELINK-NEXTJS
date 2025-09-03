@@ -1,12 +1,22 @@
 import User from "@/models/User";
 import { connectDB } from "../db/mongoose";
 import { NotFoundError } from "../errors/ApiErrors";
-import Message from "@/models/Message";
+import Message, { IMessage } from "@/models/Message";
 import Conversation, { IConversationPopulated } from "@/models/Conversation";
 import { Types } from "mongoose";
-import { sanitizeMessage } from "@/utils/sanitizer/message";
 
 
+/**
+ * Retrieves a sanitized user object from the given user_id.
+ * 
+ * Connects to the database and fetches a user document based on the provided user_id.
+ * The user object is populated with the _id, username, image and name fields and sanitized
+ * before being returned.
+ * 
+ * @param {string} user_id - The ID of the user to be fetched.
+ * @returns {Promise<IConversationPopulated["participants"][number]>} A sanitized version of the user object, containing only the fields permitted by the user's role.
+ * @throws {NotFoundError} If the user is not found.
+ */
 export async function getConversationUser(user_id: string): Promise<IConversationPopulated["participants"][number]> {
     await connectDB();
 
@@ -75,7 +85,7 @@ export async function createMessage(c_user: string, receiver: string, message: s
 
     await conversation.populate("participants", "name avatar");
 
-    return { messageData: sanitizeMessage(newMessage), conversation };
+    return { messageData: newMessage, conversation };
 }
 
 /**
@@ -124,7 +134,7 @@ export async function createMessageInConversation(
     };
     await conversation.save();
 
-    return sanitizeMessage(newMessage);
+    return newMessage;
 }
 
 /**
@@ -156,16 +166,13 @@ export async function getMessages(c_user: string, conversationId: string, skip: 
     }
 
     // Fetch messages in that conversation
-    const rawMessages = await Message.find({
+    const messages = await Message.find({
         conversation_id: conversation._id,
     })
         .sort({ created_at: -1 }) // newest first
         .limit(20)
         .skip(skip)
-        .lean();
-
-    // Sanitize or mask deleted messages if needed
-    const messages = rawMessages.map(sanitizeMessage);
+        .lean<IMessage[]>();
 
     return messages;
 }
@@ -239,4 +246,16 @@ export async function getAConversation(
     }).populate("participants", "name avatar").lean<IConversationPopulated>();
 
     return conversation || null;
+}
+
+export async function markMessageAsSeen(messageId: string, conversationId: string, userId: string) {
+    await connectDB();
+
+    const message = await Message.findOneAndUpdate(
+        { _id: new Types.ObjectId(messageId), conversation_id: new Types.ObjectId(conversationId) },
+        { $addToSet: { read_by: new Types.ObjectId(userId) } },
+        { new: true }
+    ).lean<IMessage>();
+
+    return message;
 }

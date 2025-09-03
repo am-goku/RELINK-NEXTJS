@@ -6,7 +6,7 @@ export interface IMessage {
     sender: Types.ObjectId;
     text: string;
     message_type: 'text' | 'image' | 'video' | 'file';
-    ready_by: Types.ObjectId[];
+    read_by: Types.ObjectId[];
     deleted: boolean;
     created_at: Date;
     updated_at: Date;
@@ -35,11 +35,13 @@ const MessageSchema = new Schema<IMessageDocument>(
             enum: ['text', 'image', 'video', 'file'],
             default: 'text'
         },
-        ready_by: {
-            type: [Schema.Types.ObjectId],
-            ref: "User",
-            default: []
-        },
+        read_by: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "User",
+                default: []
+            },
+        ],
         deleted: {
             type: Boolean,
             default: false

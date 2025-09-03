@@ -1,14 +1,21 @@
 import apiInstance from "@/lib/axios";
+import { getErrorMessage } from "@/lib/errors/errorResponse";
 import { IConversationPopulated } from "@/models/Conversation";
 import { IMessage } from "@/models/Message";
 
+/**
+ * Fetches a user by their ID.
+ * @param {string} receiver_id The ID of the user to fetch.
+ * @param {string} [cookie] The cookie to send with the request.
+ * @returns {Promise<SanitizedUser | null>} The fetched user, or null if not found.
+ * @throws {Error} If there is an error fetching the user.
+ */
 export async function fetchReceiver(receiver_id: string, cookie?: string) {
     try {
         const res = await apiInstance.get(`/api/chat/${receiver_id}`, { headers: { cookie } });
         return res?.data?.receiver;
     } catch (error) {
-        console.error("Error fetching receiver:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -22,8 +29,7 @@ export async function fetchConversations(): Promise<IConversationPopulated[]> {
         const res = await apiInstance.get('/api/chat/conversation');
         return res.data.conversations;
     } catch (error) {
-        console.error("Error fetching conversations:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -37,8 +43,7 @@ export async function fetchConversation(): Promise<IConversationPopulated[]> {
         const res = await apiInstance.get('/api/chat/conversation');
         return res.data.conversation || [];
     } catch (error) {
-        console.error("Error fetching conversation:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -53,8 +58,7 @@ export async function fetchSelectedConversation(id: string, cookie?: string): Pr
         const res = await apiInstance.get(`/api/chat/conversation/${id}`, { headers: { cookie } });
         return res.data.conversation || null;
     } catch (error) {
-        console.error("Error fetching conversation:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -69,8 +73,7 @@ export async function fetchMessages(conversationId: string): Promise<IMessage[]>
         const res = await apiInstance.get(`/api/chat/conversation/${conversationId}/message`);
         return res.data.messages || [];
     } catch (error) {
-        console.error("Error fetching messages:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -83,14 +86,13 @@ export async function fetchMessages(conversationId: string): Promise<IMessage[]>
  */
 export async function sendMessage(conversationId: string, content: string): Promise<IMessage> {
     try {
-        if(!content.trim()) {
+        if (!content.trim()) {
             throw new Error("Message content cannot be empty");
         }
         const res = await apiInstance.post(`/api/chat/conversation/${conversationId}/message`, { content });
         return res.data.messageData;
     } catch (error) {
-        console.error("Error sending message:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
     }
 }
 
@@ -103,13 +105,29 @@ export async function sendMessage(conversationId: string, content: string): Prom
  */
 export async function startMessage(receiver_id: string, content: string): Promise<{ message: IMessage; conversation: IConversationPopulated }> {
     try {
-        if(!content.trim()) {
+        if (!content.trim()) {
             throw new Error("Message content cannot be empty");
         }
         const res = await apiInstance.post(`/api/chat/${receiver_id}`, { content });
         return { message: res.data.messageData, conversation: res.data.conversation };
     } catch (error) {
-        console.error("Error sending message:", error);
-        throw error;
+        throw new Error(getErrorMessage(error));
+    }
+}
+
+/**
+ * Marks a message as seen in a conversation.
+ * @param {string} conversation_id The ID of the conversation that contains the message to mark as seen.
+ * @param {string} message_id The ID of the message to mark as seen.
+ * @returns {Promise<IMessage>} The updated message document.
+ * @throws {Error} If there is an error marking the message as seen.
+ */
+export async function markSeen(conversation_id: string, message_id: string): Promise<IMessage> {
+    try {
+        const res = await apiInstance.patch(`/api/chat/conversation/${conversation_id}/message/${message_id}/seen`);
+        console.log("response from seen api - ", res.data)
+        return res.data.messageData;
+    } catch (error) {
+        throw new Error(getErrorMessage(error));
     }
 }

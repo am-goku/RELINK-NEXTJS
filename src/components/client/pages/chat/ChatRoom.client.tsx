@@ -50,6 +50,7 @@ function ChatRoomClient({ selectedRoom, receiver, session }: Props) {
                 <MessageMapper
                     receiver={receiver}
                     session={session}
+                    room={room}
                     messages={messages} />
 
                 {/* Input */}
