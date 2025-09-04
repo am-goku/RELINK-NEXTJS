@@ -18,7 +18,11 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
 
     const isOwner = session.user.id === user._id.toString();
 
-    return <ProfileClient session={session} user={user} isOwner={isOwner} />
+    return <ProfileClient
+        session={session}
+        user={user}
+        isOwner={isOwner} />
+
 }
 
 export default Page

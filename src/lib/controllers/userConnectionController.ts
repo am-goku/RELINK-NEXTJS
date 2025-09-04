@@ -1,7 +1,7 @@
 import User, { IUser } from "@/models/User";
 import { connectDB } from "../db/mongoose";
 import { BadRequestError, NotFoundError } from "../errors/ApiErrors";
-import mongoose, { Types } from "mongoose";
+import mongoose, { PipelineStage, Types } from "mongoose";
 import { normalizeToObjectId } from "@/utils/types/normalize";
 
 
@@ -113,19 +113,19 @@ export async function unfollowUser(c_user: string, f_user: string): Promise<{ su
 }
 
 
-    /**
-     * Retrieves a list of either followers or following of a user.
-     * 
-     * Connects to the database and fetches a user document based on the provided user ID.
-     * The user document is filtered to only include the specified type of connections.
-     * The connections field is populated with the _id, username, name, and image fields.
-     * 
-     * @param id - The unique identifier of the user whose connections are to be fetched.
-     * @param type - The type of connections to be fetched, either 'followers' or 'following'.
-     * @returns The populated connections field, containing an array of user objects.
-     * @throws {BadRequestError} If the user ID is not valid.
-     * @throws {NotFoundError} If the user is not found.
-     */
+/**
+ * Retrieves a list of either followers or following of a user.
+ * 
+ * Connects to the database and fetches a user document based on the provided user ID.
+ * The user document is filtered to only include the specified type of connections.
+ * The connections field is populated with the _id, username, name, and image fields.
+ * 
+ * @param id - The unique identifier of the user whose connections are to be fetched.
+ * @param type - The type of connections to be fetched, either 'followers' or 'following'.
+ * @returns The populated connections field, containing an array of user objects.
+ * @throws {BadRequestError} If the user ID is not valid.
+ * @throws {NotFoundError} If the user is not found.
+ */
 export async function getConnections(id: string, type: 'followers' | 'following') {
 
     await connectDB();
@@ -150,3 +150,64 @@ export async function getConnections(id: string, type: 'followers' | 'following'
     // return populated field only
     return user[type];
 }
+
+
+
+/**
+ * Retrieves a list of users who are both followers and following the user with the provided ID.
+ * 
+ * Connects to the database and uses MongoDB's aggregation pipeline to fetch a user document based on the provided user ID.
+ * The user document is filtered to only include the followers and following fields.
+ * The followers and following fields are then intersected to find the mutual connections.
+ * The connections field is populated with the _id, username, name, and image fields.
+ * 
+ * @param userID - The unique identifier of the user whose mutual connections are to be fetched.
+ * @returns An array of user objects, each with the _id, username, name, and image fields.
+ * @throws {NotFoundError} If the user is not found.
+ */
+export async function getMutualConnections(userID: string, searchKey?: string) {
+    const pipeline: PipelineStage[] = [
+        { $match: { _id: new Types.ObjectId(userID) } },
+        {
+            $project: {
+                connections: { $setIntersection: ["$followers", "$following"] }
+            }
+        },
+        {
+            $lookup: {
+                from: "users", // collection name
+                localField: "connections",
+                foreignField: "_id",
+                as: "connections"
+            }
+        },
+        {
+            $unwind: "$connections"
+        }
+    ];
+
+    // If searchKey exists, filter by username or name
+    if (searchKey) {
+        pipeline.push({
+            $match: {
+                $or: [
+                    { "connections.username": { $regex: searchKey, $options: "i" } },
+                    { "connections.name": { $regex: searchKey, $options: "i" } }
+                ]
+            }
+        });
+    }
+
+    pipeline.push({
+        $project: {
+            _id: "$connections._id",
+            name: "$connections.name",
+            username: "$connections.username",
+            image: "$connections.image"
+        }
+    });
+
+    const connection = await User.aggregate(pipeline);
+
+    return connection;
+};

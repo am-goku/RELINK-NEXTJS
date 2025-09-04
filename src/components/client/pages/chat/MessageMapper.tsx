@@ -4,6 +4,7 @@ import { Session } from 'next-auth';
 import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 import MessageItem from './MessageItem';
 import { markSeen } from '@/services/api/chat-apis';
+import EmptyChatState from '@/components/error/EmptyChatState';
 
 type Props = {
     messages: IMessage[];
@@ -43,22 +44,28 @@ function MessageMapper({ messages, receiver, session, room }: Props) {
         <div
             className="flex flex-col h-full overflow-auto px-4 py-6 space-y-4 bg-light-bg dark:bg-dark-bg transition-colors scrollbar-none"
         >
-            {orderedMessages.map((msg) => {
-                const isSender = msg.sender.toString() === session?.user?.id;
-                const senderName = isSender ? 'You' : receiver.username;
+            {
+                messages.length > 0 ? (
+                    orderedMessages.map((msg) => {
+                        const isSender = msg.sender.toString() === session?.user?.id;
+                        const senderName = isSender ? 'You' : receiver.username;
 
-                return (
-                    <MessageItem
-                        key={msg._id.toString()}
-                        msg={msg}
-                        isSender={isSender}
-                        senderName={senderName}
-                        receiverId={receiver._id}
-                        onSeen={handleSeen}
-                        session={session}
-                    />
-                );
-            })}
+                        return (
+                            <MessageItem
+                                key={msg._id.toString()}
+                                msg={msg}
+                                isSender={isSender}
+                                senderName={senderName}
+                                receiverId={receiver._id}
+                                onSeen={handleSeen}
+                                session={session}
+                            />
+                        );
+                    })
+                ) : (
+                    <EmptyChatState />
+                )
+            }
 
             {/* Scroll anchor */}
             <div ref={bottomRef} />

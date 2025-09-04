@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 type ChatStore = {
     selectedRoom: IConversationPopulated | null;
-    setSelectedRoom: (room: IConversationPopulated) => void;
+    setSelectedRoom: (room: IConversationPopulated | null) => void;
     clearSelectedRoom: () => void;
 
     chatRooms: IConversationPopulated[];
@@ -37,7 +37,7 @@ export const useChatStore = create<ChatStore>((set) => ({
 
     // Add a new chat room
     addChatRoom: (room) =>
-        set((state) => ({ chatRooms: [...state.chatRooms, room] })),
+        set((state) => ({ chatRooms: [room, ...state.chatRooms] })),
 
     // Move a room to the top when new messages arrive
     reorderChatRoom: (roomId: string) =>

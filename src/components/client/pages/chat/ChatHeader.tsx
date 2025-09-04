@@ -1,20 +1,25 @@
 import { IConversationPopulated } from '@/models/Conversation';
 import { ArrowLeft } from 'lucide-react';
-import { redirect } from 'next/navigation';
 import React from 'react'
 
 type Props = {
     room: IConversationPopulated | null;
     receiver: IConversationPopulated['participants'][0];
+    setSelectedRoom: (room: IConversationPopulated | null) => void
 }
 
-function ChatHeader({ room, receiver }: Props) {
+function ChatHeader({ room, receiver, setSelectedRoom }: Props) {
+
+    const goBack = () => {
+        setSelectedRoom(null);
+        window.history.back();
+    }
 
     return (
         <React.Fragment>
             <div className="p-4 flex items-center gap-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800">
                 <button
-                    onClick={() => redirect('/chat')}
+                    onClick={goBack}
                     className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition"
                 >
                     <ArrowLeft size={20} />

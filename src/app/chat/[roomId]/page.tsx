@@ -1,11 +1,11 @@
 import { getServerSession } from "next-auth"
 import ChatRoomClient from "../../../components/client/pages/chat/ChatRoom.client"
 import { authOptions } from "@/lib/auth/authOptions"
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { IConversationPopulated } from "@/models/Conversation";
 import { fetchReceiver, fetchSelectedConversation } from "@/services/api/chat-apis";
-import UserNotFound from "@/components/error/userNotFound";
 import { cookies } from "next/headers";
+
 
 type Props = {
     params: Promise<{ roomId: string }>;
@@ -33,15 +33,16 @@ async function Page({ params, searchParams }: Props) {
 
             if (!receiver) {
                 console.warn("Receiver not found for new chat:", roomId);
-                return <UserNotFound />;
+                return notFound();
             }
+
         } else {
             // Case 2: chat/[roomId]
             room = await fetchSelectedConversation(roomId, cookie.toString());
 
             if (!room) {
                 console.warn("Room not found:", roomId);
-                return <UserNotFound />;
+                return notFound();
             }
 
             // Validate that the current user is a participant
@@ -51,7 +52,7 @@ async function Page({ params, searchParams }: Props) {
 
             if (!isParticipant) {
                 console.warn("User not authorized for this room:", session.user.id);
-                return <UserNotFound />;
+                return notFound();
             }
 
             // Set receiver (the other person in the chat)
@@ -62,18 +63,19 @@ async function Page({ params, searchParams }: Props) {
 
             if (!receiver) {
                 console.warn("No valid receiver found in room:", roomId);
-                return <UserNotFound />;
+                return notFound();
             }
         }
     } catch (error) {
         console.error("Chat page error:", error);
-        return <UserNotFound />;
+        return notFound();
     }
     return (
         <ChatRoomClient
             session={session}
             receiver={receiver}
             selectedRoom={room}
+            newChat={isNewChat}
         />
     );
 }

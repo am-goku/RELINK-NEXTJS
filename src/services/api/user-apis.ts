@@ -320,3 +320,12 @@ export async function updateStatus({ onDone, doFun, setError }: {
         setError(getErrorMessage(error))
     }
 }
+
+export async function fecthMutualConnections(searchKey: string) {
+    try {
+        const res = (await apiInstance.get(`/api/users/connection?searchKey=${searchKey}`)).data;
+        return res.connection;
+    } catch (error) {
+        throw new Error(getErrorMessage(error))
+    }
+}

@@ -72,7 +72,7 @@ function ChatLayoutClient({ session, children }: Props) {
                                 transition={{ duration: 0.3 }}
                                 className="md:w-72 w-full md:flex flex-col border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-800 shadow-sm z-10"
                             >
-                                <ChatListheader />
+                                <ChatListheader conversations={chatRooms} />
                                 <RoomList
                                     chatRooms={chatRooms}
                                     selectedRoom={selectedRoom}

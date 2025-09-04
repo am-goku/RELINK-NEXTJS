@@ -18,9 +18,10 @@ type Prop = {
     room: IConversationPopulated | null;
     receiver: IConversationPopulated['participants'][0] | null;
     setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>;
+    newChat: boolean;
 }
 
-export default function ChatInput({ receiver, room, setMessages }: Prop) {
+export default function ChatInput({ receiver, room, setMessages, newChat }: Prop) {
     // Emoji Picker State Reference
     const emojiPickerRef = useRef<HTMLDivElement>(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -30,6 +31,8 @@ export default function ChatInput({ receiver, room, setMessages }: Prop) {
 
     //ChatRoonStore States
     const updateLastMessage = useChatStore((state) => state.updateChatRoomLastMessage);
+    const addChatRoom = useChatStore((state) => state.addChatRoom);
+    const setSelectedRoom = useChatStore((state) => state.setSelectedRoom);
 
     const onEmojiClick = (emojiObject: EmojiClickData) => {
         setContent((prev) => prev + emojiObject.emoji);
@@ -41,12 +44,14 @@ export default function ChatInput({ receiver, room, setMessages }: Prop) {
         try {
             let newMessage: IMessage | null = null;
 
-            if (room) {
+            if (room && !newChat) {
                 // send message to a conversation
                 newMessage = await sendMessage(room._id.toString(), content);
-            } else if (receiver) {
+            } else if (receiver && newChat) {
                 // Start a conversation with first message
-                const { message } = await startMessage(receiver._id.toString(), content);
+                const { message, conversation } = await startMessage(receiver._id.toString(), content);
+                addChatRoom(conversation);
+                setSelectedRoom(conversation);
                 newMessage = message;
             }
 
@@ -58,7 +63,7 @@ export default function ChatInput({ receiver, room, setMessages }: Prop) {
         } catch (err) {
             console.error("Failed to send message:", err);
         }
-    }, [content, room, receiver, setMessages, updateLastMessage]);
+    }, [content, room, newChat, receiver, addChatRoom, setSelectedRoom, setMessages, updateLastMessage]);
 
     // TODO: Handle file upload is not managed
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
