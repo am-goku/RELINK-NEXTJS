@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { Types } from "mongoose";
 import { Session } from "next-auth";
 import { useEffect, useRef } from "react";
+import { motion } from 'framer-motion';
 
 function formatTime(date: string | Date) {
     const d = new Date(date);
@@ -12,13 +13,13 @@ function formatTime(date: string | Date) {
 type Props = {
     msg: IMessage;
     isSender: boolean;
-    senderName: string;
+    senderName?: string;
     receiverId: Types.ObjectId;
     onSeen: (messageId: string) => void;
     session: Session | null;
 }
 
-function MessageItem({ msg, isSender, senderName, receiverId, session, onSeen }: Props) {
+function MessageItem({ msg, isSender, receiverId, session, onSeen }: Props) {
     const msgRef = useRef<HTMLDivElement>(null);
 
     // Run once per message
@@ -37,22 +38,15 @@ function MessageItem({ msg, isSender, senderName, receiverId, session, onSeen }:
     }, [msg._id, isSender, onSeen, msg.read_by, receiverId, session?.user.id]);
 
     return (
-        <div
+        <motion.div
             ref={msgRef}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             className={clsx(
                 'flex flex-col max-w-[85%] sm:max-w-[70%] md:max-w-[60%] group',
                 isSender ? 'items-end ml-auto' : 'items-start mr-auto'
             )}
         >
-            <span
-                className={clsx(
-                    'text-[11px] mb-1 font-medium text-gray-500 dark:text-gray-400',
-                    isSender ? 'text-right' : 'text-left'
-                )}
-            >
-                {senderName}
-            </span>
-
             <div
                 className={clsx(
                     'px-4 py-2 rounded-2xl text-sm shadow-md relative w-fit max-w-full',
@@ -63,22 +57,20 @@ function MessageItem({ msg, isSender, senderName, receiverId, session, onSeen }:
                 )}
             >
                 <p className="leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                <span
-                    className={clsx(
-                        'absolute -bottom-4 text-[10px] font-light text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity',
-                        isSender ? 'right-1' : 'left-1'
-                    )}
-                >
-                    {formatTime(msg.created_at)}
-                    {/* Seen indicator */}
-                    {isSender && msg.read_by?.includes(receiverId) && (
-                        <span className="text-xs text-black mt-1">Seen</span>
-                    )}
-                </span>
+
+                <div className={clsx(
+                    'text-[10px] mt-1 opacity-70 text-right select-none',
+                    isSender ? 'justify-end' : 'justify-start'
+                )}>
+                    {
+                        formatTime(msg.created_at)}
+                    {
+                        msg.sender.toString() === session?.user.id
+                        && (msg.read_by?.includes(receiverId) ? "✓✓" : "✓")
+                    }
+                </div>
             </div>
-
-
-        </div>
+        </motion.div>
     );
 }
 

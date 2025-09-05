@@ -243,7 +243,7 @@ export async function getAConversation(
     const conversation = await Conversation.findOne({
         _id: new Types.ObjectId(id),                 // cast conversation ID
         participants: new Types.ObjectId(c_user)     // ensure user is a participant
-    }).populate("participants", "name avatar").lean<IConversationPopulated>();
+    }).populate("participants", "name image username _id").lean<IConversationPopulated>();
 
     return conversation || null;
 }
