@@ -7,7 +7,7 @@ export default async function EditProfilePage() {
   
   const session = await getServerSession(authOptions);
 
-  if(!session) redirect('/auth/login');
+  if(!session) redirect('/connect');
 
   return <EditProfileClient session={session} />;
 }

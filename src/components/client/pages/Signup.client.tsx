@@ -31,7 +31,7 @@ function SignupClient() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        
         const { email, username, password, confirmPassword } = formData;
 
         if (!email || !username || !password || !confirmPassword) {
@@ -44,7 +44,7 @@ function SignupClient() {
 
         try {
             await authService.register({ email, username, password });
-            router.push("/auth/login"); // redirect to login
+            router.push("/connect"); // redirect to login
         } catch (err) {
             console.log(err)
             setError(getErrorMessage(err) || "Something went wrong. Please try again.");
@@ -121,7 +121,7 @@ function SignupClient() {
                         <section className="flex flex-col text-gray-700 dark:text-gray-300 text-center">
                             <span>
                                 {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                                Have an account? <a href="/auth/login" className="text-indigo-600 dark:text-indigo-400">Login.</a>
+                                Have an account? <a href="/connect" className="text-indigo-600 dark:text-indigo-400">Login.</a>
                             </span>
                         </section>
                     </form>

@@ -14,7 +14,7 @@ type Props = {
 
 async function Page({ params, searchParams }: Props) {
     const session = await getServerSession(authOptions);
-    if (!session) return redirect("/auth/login");
+    if (!session) return redirect("/connect");
 
     const cookie = await cookies();
 

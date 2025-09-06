@@ -6,7 +6,7 @@ export const authOptions: AuthOptions = {
     providers: [credentialsProvider],
 
     pages: {
-        signIn: "/auth/login",
+        signIn: "/connect",
     },
 
     session: {

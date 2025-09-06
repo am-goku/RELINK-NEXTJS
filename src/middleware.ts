@@ -12,13 +12,13 @@ export default withAuth(
         const { pathname } = req.nextUrl;
 
         // Public pages
-        const publicRoutes = ["/auth/login", "/auth/signup"];
+        const publicRoutes = ["/auth/login", "/auth/signup", "/connect"];
         const isPublicPage = publicRoutes.some((route) =>
           pathname.startsWith(route)
         );
 
         // Public APIs
-        const publicApis = ["/api/auth/signup", "/api/auth"];
+        const publicApis = ["/api/auth/signup", "/api/auth", "/api/users"];
         const isPublicApi = publicApis.some((route) =>
           pathname.startsWith(route)
         );
@@ -32,7 +32,7 @@ export default withAuth(
       },
     },
     pages: {
-      signIn: "/auth/login", // 👈 redirect here when not logged in
+      signIn: "/connect", // 👈 redirect here when not logged in
     },
   }
 );
@@ -43,7 +43,7 @@ export const config = {
     // 1. _next/static, favicon
     // 2. Public auth pages (login, signup)
     // 3. Public auth APIs
-    "/((?!_next|static|favicon.ico|icons|images|auth/login|auth/signup|api/auth/signup|api/auth).*)",
+    "/((?!_next|static|favicon.ico|icons|images|auth/login|auth/signup|connect|api/auth/signup|api/auth|/api/users).*)",
   ],
 };
 

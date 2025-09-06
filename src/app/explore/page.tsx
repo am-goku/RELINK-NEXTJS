@@ -8,9 +8,7 @@ export default async function ExplorePage() {
 
     const session = await getServerSession(authOptions);
 
-    if(!session) {
-        redirect("/auth/login");
-    }
+    if(!session) redirect("/connect");
 
     return <ExploreClient session={session} />
 }

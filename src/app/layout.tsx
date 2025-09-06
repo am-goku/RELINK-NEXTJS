@@ -4,7 +4,6 @@ import { Poppins } from 'next/font/google'
 import '@/styles/nprogress.css';
 import UserProvider from "../context/UserContext";
 import SessionProviderWrapper from "@/providers/SessionProviderWrapper";
-import ProtectedRoute from "@/providers/ProtectedRoute";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 import NProgressProvider from "@/providers/NProgressProvider";
@@ -31,13 +30,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <body className={poppins.className}>
         <SessionProviderWrapper session={session}>
           <UserProvider>
-            <ProtectedRoute>
               <ThemeProvider>
                 <NProgressProvider>
                   {children}
                 </NProgressProvider>
               </ThemeProvider>
-            </ProtectedRoute>
           </UserProvider>
         </SessionProviderWrapper>
       </body>

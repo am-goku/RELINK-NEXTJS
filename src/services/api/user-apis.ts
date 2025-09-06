@@ -12,12 +12,6 @@ type ProfileFormData = {
     links: string[]; // [website, instagram, linkedin]
 };
 
-type get_profile_Props = {
-    setFormData: React.Dispatch<React.SetStateAction<ProfileFormData>>;
-    setError: React.Dispatch<React.SetStateAction<string>>;
-    setOriginalData: React.Dispatch<React.SetStateAction<Partial<ProfileFormData>>>;
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
-};
 /**
  * Fetches the current user's profile data from the API and updates the UI state accordingly.
  * @param {get_profile_Props} props - The props to update the UI state.
@@ -28,7 +22,12 @@ type get_profile_Props = {
  * @prop {React.Dispatch<React.SetStateAction<string>>} setCoverPic - The function to update the cover picture URL state.
  * @prop {React.Dispatch<React.SetStateAction<boolean>>} setIsLoading - The function to update the isLoading state.
  */
-export async function getProfileData({ setFormData, setError, setOriginalData, setIsLoading }: get_profile_Props) {
+export async function getProfileData({ setFormData, setError, setOriginalData, setIsLoading }: {
+    setFormData: React.Dispatch<React.SetStateAction<ProfileFormData>>;
+    setError: React.Dispatch<React.SetStateAction<string>>;
+    setOriginalData: React.Dispatch<React.SetStateAction<Partial<ProfileFormData>>>;
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+}) {
     try {
         setIsLoading(true);
         const res = (await apiInstance.get('/api/users')).data.user;
@@ -49,14 +48,6 @@ export async function getProfileData({ setFormData, setError, setOriginalData, s
     }
 }
 
-
-type update_profile_Props = {
-    updateUser: (user: SanitizedUser) => void;
-    formData: ProfileFormData;
-    originalData: Partial<ProfileFormData>;
-    setError: React.Dispatch<React.SetStateAction<string>>;
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-}
 /**
  * Updates the user's profile with the provided data.
  * @param {update_profile_Props} props - The props to update the user profile.
@@ -66,7 +57,13 @@ type update_profile_Props = {
  * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
  * @prop {React.Dispatch<React.SetStateAction<boolean>>} setIsLoading - The function to update the isLoading state.
  */
-export async function updateUserProfile({ updateUser, formData, originalData, setError, setIsLoading }: update_profile_Props) {
+export async function updateUserProfile({ updateUser, formData, originalData, setError, setIsLoading }: {
+    updateUser: (user: SanitizedUser) => void;
+    formData: ProfileFormData;
+    originalData: Partial<ProfileFormData>;
+    setError: React.Dispatch<React.SetStateAction<string>>;
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
     try {
         setIsLoading(true);
 
@@ -293,6 +290,13 @@ export async function updateUserProfilePic({ file, onDone, setError }: {
     }
 }
 
+/**
+ * Updates the type of the currently logged in user.
+ * @param {{ onDone: ((data: unknown) => void) | undefined, doFun: (() => void) | undefined, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the type.
+ * @prop {((data: unknown) => void) | undefined} onDone - The function to call when the update is successful.
+ * @prop {(() => void) | undefined} doFun - The function to call when the update is successful.
+ * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to call when there is an error.
+ */
 export async function updateType({ onDone, doFun, setError }: {
     onDone?: (data: unknown) => void
     doFun?: () => void;
@@ -307,6 +311,14 @@ export async function updateType({ onDone, doFun, setError }: {
     }
 }
 
+
+/**
+ * Updates the status of the currently logged in user.
+ * @param {{ onDone: ((data: unknown) => void) | undefined, doFun: (() => void) | undefined, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the status.
+ * @prop {((data: unknown) => void) | undefined} onDone - The function to call when the update is successful.
+ * @prop {(() => void) | undefined} doFun - The function to call when the update is successful.
+ * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to call when there is an error.
+ */
 export async function updateStatus({ onDone, doFun, setError }: {
     onDone?: (data: unknown) => void
     doFun?: () => void;
@@ -321,6 +333,12 @@ export async function updateStatus({ onDone, doFun, setError }: {
     }
 }
 
+/**
+ * Fetches the mutual connections of the currently logged in user.
+ * @param {string} searchKey - The search key to filter the mutual connections by.
+ * @returns {Promise<SanitizedUser[]>} - The mutual connections of the currently logged in user.
+ * @throws {Error} - If there is an error fetching the mutual connections.
+ */
 export async function fecthMutualConnections(searchKey: string) {
     try {
         const res = (await apiInstance.get(`/api/users/connection?searchKey=${searchKey}`)).data;
@@ -328,4 +346,14 @@ export async function fecthMutualConnections(searchKey: string) {
     } catch (error) {
         throw new Error(getErrorMessage(error))
     }
+}
+
+/**
+ * Checks if a given username is available.
+ * @param {string} username - The username to check for availability.
+ * @returns {Promise<boolean>} - A promise that resolves to true if the username is available, false otherwise.
+ */
+export async function checkUsernameAvailability(username: string) {
+    const res = await apiInstance.get(`/api/users/validate/username?username=${username}`);
+    return res.data.available
 }

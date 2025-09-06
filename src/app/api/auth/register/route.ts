@@ -43,5 +43,3 @@ export async function POST(req: Request) {
         return handleApiError(error);
     }
 }
-
-//$2b$10$MXURO2kn8Ruzepv2vzoHUecoN0H06nDnJObAKzsgC48UXjsMVlCpy

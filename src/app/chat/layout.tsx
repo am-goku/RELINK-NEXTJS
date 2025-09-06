@@ -9,9 +9,7 @@ export default async function Layout({ children }: Props) {
 
     const session = await getServerSession(authOptions);
 
-    if (!session) {
-        redirect("/auth/login");
-    }
+    if (!session) redirect("/connect");
 
     return (
         <ChatLayoutClient session={session}>

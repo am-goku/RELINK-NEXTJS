@@ -1,0 +1,92 @@
+import { Compass, Home, MessageCircle, Plus, User } from 'lucide-react'
+import React from 'react'
+import RelinkLogo from '../icons/RelinkLogo';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+
+type Props = {
+    page: "connect" | "dashboard";
+    doFun?: () => void;
+}
+
+function Header({ page, doFun }: Props) {
+
+    const { data: session } = useSession();
+
+    const router = useRouter();
+
+    return (
+        <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5">
+            <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-light-bg/90 dark:bg-dark-bg/90 shadow-sm">
+                    <RelinkLogo height={32} width={32} />
+                </div>
+                <div className='hidden md:block'>
+                    <p className="text-lg font-bold">ReLink</p>
+                    {page !== "connect" && <p className="text-xs opacity-70 capitalize">{page}</p>}
+                    {page === "connect" && <p className="text-xs opacity-70">Connect • Share • Grow</p>}
+                </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+
+                {/* Common Navigations */}
+                {
+                    page !== "connect" && (
+                        <React.Fragment>
+                            <button
+                                onClick={() => router.push('/dashboard')}
+                                className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                            >
+                                <Home className="h-4 w-4" />
+                            </button>
+
+                            <button
+                                onClick={() => router.push('/explore')}
+                                className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                            >
+                                <Compass className="h-4 w-4" />
+                            </button>
+
+                            <button
+                                onClick={() => router.push('/chat')}
+                                className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                            >
+                                <MessageCircle className="h-4 w-4" />
+                            </button>
+
+                            <button
+                                onClick={() => router.push(`/${session?.user.username}`)}
+                                className="flex items-center gap-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                            >
+                                <User className="h-4 w-4" />
+                            </button>
+                        </React.Fragment>
+                    )
+                }
+
+
+                {/* Dashboard Specified Button */}
+                {
+                    page === "dashboard" && (
+                        <button
+                            onClick={doFun}
+                            className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                        >
+                            <Plus className="h-4 w-4" /> New post
+                        </button>
+                    )
+                }
+
+                {/* Connect Specified Section */}
+                {
+                    page === "connect" && (
+                        <div className="hidden md:block text-sm opacity-80">Welcome to your social hub</div>
+                    )
+                }
+            </div>
+        </header>
+    )
+}
+
+export default Header

@@ -74,3 +74,8 @@ export async function getPostsByUsername({ username, setResponse, setError, setL
         setLoading?.(false);
     }
 }
+
+export async function fetchDashboardPosts(): Promise<IPublicPost[]> {
+    const res = await apiInstance.get("/api/posts");
+    return res.data.posts || [];
+}

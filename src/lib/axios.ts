@@ -19,7 +19,7 @@ apiInstance.interceptors.response.use(
 
     // Example: Auto-logout on unauthorized
     if (status === 401) {
-      signOut({ callbackUrl: "/auth/login" });
+      signOut({ callbackUrl: "/connect" });
     }
 
     return Promise.reject(error);

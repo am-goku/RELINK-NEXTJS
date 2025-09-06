@@ -4,17 +4,66 @@ import { NotFoundError } from "../errors/ApiErrors";
 import { connectDB } from "../db/mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
 import { sendEmail } from "@/services/mail/mailer";
+import { AppError, SignupErrorCode } from "../errors/error.types";
+import { hashPassword } from "../hash";
 
 type IOtpFor = 'password' | 'email' | 'login' | 'verification';
 
-/**
- * Generates a one-time password (OTP) for the given user.
- * 
- * @param email - The email of the user to generate an OTP for.
- * @param otpFor - The purpose for which the OTP is being generated. Defaults to 'verification'.
- * 
- * @throws {NotFoundError} If the user is not found.
- */
+export async function createUser(data: {
+    username: string;
+    password: string;
+    email: string;
+}) {
+    const { email, username, password } = data;
+
+    if (!username || !email || !password) {
+        const missing: string[] = [];
+        if (!email) missing.push("email");
+        if (!username) missing.push("username");
+        if (!password) missing.push("password");
+
+        const err: AppError = Object.assign(
+            new Error(`Missing fields: ${missing.join(", ")}`),
+            {
+                code: "MISSING_FIELDS" as SignupErrorCode,
+                status: 400,
+            }
+        );
+        throw err;
+    }
+
+    await connectDB();
+
+    const emailExist = await User.findOne({ email });
+    if (emailExist) {
+        const err: AppError = Object.assign(new Error("Email already exists"), {
+            code: "EMAIL_TAKEN" as SignupErrorCode,
+            status: 400,
+        });
+        throw err;
+    }
+
+    const usernameExist = await User.findOne({ username });
+    if (usernameExist) {
+        const err: AppError = Object.assign(new Error("Username already exists"), {
+            code: "USERNAME_TAKEN" as SignupErrorCode,
+            status: 400,
+        });
+        throw err;
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const newUser = await User.create({
+        username,
+        email,
+        password: hashedPassword,
+    });
+
+    return sanitizeUser(newUser, "user");
+}
+
+
 export async function generateOTP(email: string, otpFor: IOtpFor = 'verification') {
     await connectDB();
 
@@ -32,17 +81,7 @@ export async function generateOTP(email: string, otpFor: IOtpFor = 'verification
     await sendEmail(email, user.username, rawOtp, otpFor);
 }
 
-/**
- * Verifies a one-time password (OTP) for the given user.
- * 
- * @param email - The email of the user to verify the OTP for.
- * @param enteredOtp - The OTP entered by the user.
- * 
- * @throws {NotFoundError} If the user is not found.
- * @throws {Error} If the OTP is invalid or expired.
- * 
- * @returns A sanitized user object if the OTP is valid.
- */
+
 export async function verifyOTP(email: string, enteredOtp: string) {
     await connectDB();
 

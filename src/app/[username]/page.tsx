@@ -9,7 +9,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
     const { username } = await params;
     const session = await getServerSession(authOptions);
 
-    if (!session) redirect("/auth/login");
+    if (!session) redirect("/connect");
 
     const cookie = await cookies()
 

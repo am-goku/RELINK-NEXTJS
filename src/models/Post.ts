@@ -5,6 +5,7 @@ export interface IPostBase {
     _id: Types.ObjectId;
     content?: string;
     image?: string;
+    imageRatio?: "landscape" | "portrait" | "square";
     likes: Types.ObjectId[];
     comments: Types.ObjectId[];
     share_count: number;
@@ -34,6 +35,10 @@ const PostSchema = new Schema<IPostDocument>(
         image: {
             type: String,
             trim: true
+        },
+        imageRatio: {
+            type: String,
+            enum: ["landscape", "portrait", "square"]
         },
         likes: [{
             type: Schema.Types.ObjectId,

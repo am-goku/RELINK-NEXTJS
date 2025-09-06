@@ -9,7 +9,7 @@ async function Layout({ children }: { children: React.ReactNode }) {
 
     const session = await getServerSession(authOptions);
 
-    if (!session) redirect('/auth/login');
+    if (!session) redirect('/connect');
 
     return (
         <React.Fragment>

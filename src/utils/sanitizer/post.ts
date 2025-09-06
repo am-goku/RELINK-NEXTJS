@@ -6,6 +6,7 @@ export interface IPublicPost {
     _id: string;
     content?: string;
     image?: string;
+    imageRatio?: "landscape" | "portrait" | "square";
     likes_count: number;
     comments_count: number;
     share_count: number;
@@ -31,6 +32,7 @@ export function sanitizePost(post: PopulatedPost) {
         _id: post._id.toString(),
         content: post.content,
         image: post.image,
+        imageRatio: post.imageRatio,
         hashtags: Array.isArray(post.hashtags) ? post.hashtags.join(", ") : "",
         likes_count: post.likes?.length || 0,
         comments_count: post.comments?.length || 0,
