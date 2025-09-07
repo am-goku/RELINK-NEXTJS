@@ -3,21 +3,16 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Heart,
-  MessageSquare,
-  Share2,
-  MoreHorizontal,
   Image as ImageIcon,
   User,
-  Loader2,
   AlertCircle,
-  Plus,
 } from "lucide-react";
 import Header from "@/components/nav/header";
 import PostCard from "@/components/ui/cards/postCard";
 import { fetchDashboardPosts } from "@/services/api/post-apis";
 import { IPublicPost } from "@/utils/sanitizer/post";
 import SuggesionsDashboard from "./suggesions.client";
+import PrimaryCreateButton from "@/components/ui/buttons/PrimaryCreateButton";
 
 // Theme helper classes used across components:
 // text: {text-[#2D3436] dark:text-gray-200}
@@ -32,6 +27,7 @@ type UserType = {
 
 
 // --- Components ---
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function Avatar({ user, size = 10 }: { user: UserType; size?: number }) {
   return (
     <div className={`h-${size} w-${size} overflow-hidden rounded-full bg-gray-200`}>
@@ -232,10 +228,4 @@ export default function DashboardPage() {
   );
 }
 
-function PrimaryCreateButton({ loading, children, onClick }: { loading?: boolean; children: React.ReactNode; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} disabled={loading} className={`rounded-2xl px-4 py-2 font-semibold ${loading ? "bg-gray-400 text-white" : "bg-[#2D3436] text-white hover:brightness-110"}`}> 
-      {loading ? <Loader2 className="inline-block h-4 w-4 animate-spin" /> : children}
-    </button>
-  );
-}
+
