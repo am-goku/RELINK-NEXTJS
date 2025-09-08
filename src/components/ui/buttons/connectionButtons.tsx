@@ -1,93 +1,51 @@
 import { followUser, unfollowUser } from '@/services/api/user-apis'
+import { MessageSquare, UserMinus, UserPlus } from 'lucide-react';
 import { Types } from 'mongoose'
 import React, { useCallback } from 'react'
 
-const updateConnection = ({
-    setFollowers,
-    type,
-    setConnection,
-}: {
-    setFollowers: React.Dispatch<React.SetStateAction<number>>;
-    type: "add" | "remove";
-    setConnection: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
-    setFollowers((prev) => {
-        if (type === "add") return prev + 1;
-        if (type === "remove") return Math.max(prev - 1, 0);
-        return prev;
-    });
 
-    setConnection(type === "add"); // ✅ set explicitly
-};
-
-export function FollowButton({ id, setFollowers, setIsFollowing, setError }: {
+export function FollowButton({ id, setIsFollowing }: {
     id: Types.ObjectId | undefined;
-    setFollowers: React.Dispatch<React.SetStateAction<number>>;
     setIsFollowing: React.Dispatch<React.SetStateAction<boolean>>;
-    setError: React.Dispatch<React.SetStateAction<string>>;
 }) {
 
-    const handleClick = useCallback(() => {
+    const handleClick = useCallback(async () => {
         if (id) {
-            updateConnection({ setFollowers, type: "add", setConnection: setIsFollowing });
-            followUser({
-                id,
-                setError,
-                setFollowers,
-                updateConn: updateConnection,
-                setConnection: setIsFollowing
-            })
+            await followUser({ id });
+            setIsFollowing(true);
         }
-    }, [id, setFollowers, setIsFollowing, setError])
+    }, [id, setIsFollowing])
 
     return (
-        <button
-            onClick={handleClick}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors text-sm md:text-base shadow"
-        >
-            Follow
+        <button onClick={handleClick} className="px-4 py-1 rounded-full flex items-center gap-1 bg-[#2D3436] text-white hover:brightness-110 dark:bg-gray-200 dark:text-neutral-900">
+            <UserPlus size={16} /> Follow
         </button>
     )
 }
 
-
-export function UnfollowButton({ id, setFollowers, setIsFollowing, setError }: {
+export function UnfollowButton({ id, setIsFollowing }: {
     id: Types.ObjectId | undefined;
-    setFollowers: React.Dispatch<React.SetStateAction<number>>;
     setIsFollowing: React.Dispatch<React.SetStateAction<boolean>>;
-    setError: React.Dispatch<React.SetStateAction<string>>;
 }) {
 
-    const handleClick = useCallback(() => {
+    const handleClick = useCallback(async () => {
         if (id) {
-            updateConnection({ setFollowers, type: "remove", setConnection: setIsFollowing });
-            unfollowUser({
-                id,
-                setError,
-                setFollowers,
-                updateConn: updateConnection,
-                setConnection: setIsFollowing
-            })
+            await unfollowUser({ id });
+            setIsFollowing(false);
         }
-    }, [id, setFollowers, setIsFollowing, setError])
+    }, [id, setIsFollowing])
 
     return (
-        <button
-            onClick={handleClick}
-            className="px-4 py-2 bg-slate-500 text-white rounded-lg hover:bg-blue-700 dark:bg-gray-600 dark:hover:bg-blue-500 transition-colors text-sm md:text-base shadow"
-        >
-            Following
+        <button onClick={handleClick} className="px-4 py-1 rounded-full flex items-center gap-1 bg-[#2D3436] text-white hover:brightness-110 dark:bg-gray-200 dark:text-neutral-900">
+            <UserMinus size={16} /> Remove
         </button>
     )
 }
-
 
 export function MessageButton() {
     return (
-        <button
-            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 dark:bg-neutral-700 dark:text-gray-200 dark:hover:bg-neutral-600 transition-colors text-sm md:text-base shadow"
-        >
-            Message
+        <button className="bg-gray-300 dark:bg-gray-700 px-4 py-1 rounded-full flex items-center gap-1">
+            <MessageSquare size={16} /> Message
         </button>
     )
 }

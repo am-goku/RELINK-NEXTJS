@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 type Props = {
-    page: "connect" | "dashboard";
+    page: "connect" | "dashboard" | "chat" | "profile";
     doFun?: () => void;
 }
 

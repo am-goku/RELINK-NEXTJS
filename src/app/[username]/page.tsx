@@ -1,9 +1,9 @@
-import ProfileClient from "../../components/client/pages/Profile.client"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth/authOptions"
 import { notFound, redirect } from "next/navigation";
 import { getUserProfileData } from "@/services/api/user-apis";
 import { cookies } from "next/headers";
+import ProfilePage from "@/components/client/profile/profile.client";
 
 async function Page({ params }: { params: Promise<{ username: string }> }) {
     const { username } = await params;
@@ -18,10 +18,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
 
     const isOwner = session.user.id === user._id.toString();
 
-    return <ProfileClient
-        session={session}
-        user={user}
-        isOwner={isOwner} />
+    return <ProfilePage session={session} user={user} isOwner={isOwner} />
 
 }
 

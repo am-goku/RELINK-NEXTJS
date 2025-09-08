@@ -1,31 +1,69 @@
+import Avatar from '@/components/ui/avatar';
+import { SanitizedUser } from '@/utils/sanitizer/user';
+import { Types } from 'mongoose';
 import React from 'react'
 
-type UserType = {
-    id: string;
-    name: string;
-    username: string;
-    avatar?: string;
-};
-
 // --- Mock data / API ---
-const dummyUsers: UserType[] = [
+const dummyUsers: SanitizedUser[] = [
     {
-        id: "u1",
+        _id: new Types.ObjectId(),
         name: "Asha Menon",
         username: "asham",
-        avatar: "https://i.pravatar.cc/80?img=32",
+        image: "https://i.pravatar.cc/80?img=32",
+        role: 'admin',
+        bio: undefined,
+        gender: undefined,
+        cover: undefined,
+        links: undefined,
+        accountType: 'public',
+        messageFrom: 'none',
+        onlineStatus: false,
+        created_at: undefined,
+        updated_at: undefined,
+        followers: [],
+        following: [],
+        followersCount: 0,
+        followingCount: 0
     },
     {
-        id: "u2",
+        _id: new Types.ObjectId(),
         name: "Ravi Kumar",
         username: "ravik",
-        avatar: "https://i.pravatar.cc/80?img=12",
+        image: "https://i.pravatar.cc/80?img=12",
+        role: 'admin',
+        bio: undefined,
+        gender: undefined,
+        cover: undefined,
+        links: undefined,
+        accountType: 'public',
+        messageFrom: 'none',
+        onlineStatus: false,
+        created_at: undefined,
+        updated_at: undefined,
+        followers: [],
+        following: [],
+        followersCount: 0,
+        followingCount: 0
     },
     {
-        id: "u3",
+        _id: new Types.ObjectId(),
         name: "Neha Singh",
         username: "nehasingh",
-        avatar: "https://i.pravatar.cc/80?img=5",
+        image: "https://i.pravatar.cc/80?img=5",
+        role: 'user',
+        bio: undefined,
+        gender: undefined,
+        cover: undefined,
+        links: undefined,
+        accountType: 'public',
+        messageFrom: 'none',
+        onlineStatus: false,
+        created_at: undefined,
+        updated_at: undefined,
+        followers: [],
+        following: [],
+        followersCount: 0,
+        followingCount: 0
     },
 ];
 
@@ -37,11 +75,10 @@ function SuggesionsDashboard() {
                     <p className="text-sm font-semibold">Who to follow</p>
                     <div className="mt-3 flex flex-col gap-3">
                         {dummyUsers.map((u) => (
-                            <div key={u.id} className="flex items-center justify-between gap-3">
+                            <div key={u._id.toString()} className="flex items-center justify-between gap-3">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 overflow-hidden rounded-full">
-                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                        <img src={u.avatar} alt={u.name} className="h-full w-full object-cover" />
+                                        <Avatar user={u} size={10} key={u._id.toString()} />
                                     </div>
                                     <div>
                                         <p className="text-sm font-medium">{u.name}</p>

@@ -1,6 +1,6 @@
 import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
-import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
+import { SanitizedUser } from "@/utils/sanitizer/user";
 import { Types } from "mongoose";
 import React, { Dispatch, SetStateAction } from "react";
 
@@ -102,63 +102,27 @@ export async function updateUserProfile({ updateUser, formData, originalData, se
     }
 }
 
-/**
- * Follows the user with the provided username.
- * @param {{ username: string, setResponse: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>, setError: React.Dispatch<React.SetStateAction<string>> }} props - The props to follow the user.
- * @prop {string} username - The username of the user to follow.
- * @prop {React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>} setResponse - The function to update the response state.
- * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
- */
-export async function followUser({ id, setResponse, setFollowers, setError, updateConn, setConnection }: {
+
+export async function followUser({ id }: {
     id: Types.ObjectId,
-    setResponse?: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>,
-    setFollowers: React.Dispatch<React.SetStateAction<number>>,
-    setError: React.Dispatch<React.SetStateAction<string>>;
-    setConnection: React.Dispatch<React.SetStateAction<boolean>>;
-    updateConn?: ({ setFollowers, setConnection, type }:
-        {
-            setFollowers: React.Dispatch<React.SetStateAction<number>>;
-            type: "add" | "remove";
-            setConnection: React.Dispatch<React.SetStateAction<boolean>>
-        }) => void
 }) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/follow`)).data;
-        setResponse?.(res);
+        return res
     } catch (error) {
-        console.log(id, error)
-        updateConn?.({ setFollowers, type: "remove", setConnection }); // now sets false explicitly
-        setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+        throw (getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
 
-/**
- * Unfollows the user with the provided username.
- * @param {{ username: string, setResponse: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>, setError: React.Dispatch<React.SetStateAction<string>> }} props - The props to unfollow the user.
- * @prop {string} username - The username of the user to unfollow.
- * @prop {React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>} setResponse - The function to update the response state.
- * @prop {React.Dispatch<React.SetStateAction<string>>} setError - The function to update the error state.
- */
-export async function unfollowUser({ id, setResponse, setFollowers, setError, setConnection, updateConn }: {
-    id: Types.ObjectId,
-    setResponse?: React.Dispatch<React.SetStateAction<{ action: string, success: boolean }>>,
-    setFollowers: React.Dispatch<React.SetStateAction<number>>,
-    setError: React.Dispatch<React.SetStateAction<string>>;
-    setConnection: React.Dispatch<React.SetStateAction<boolean>>;
-    updateConn?: ({ setFollowers, setConnection, type }:
-        {
-            setFollowers: React.Dispatch<React.SetStateAction<number>>;
-            type: "add" | "remove";
-            setConnection: React.Dispatch<React.SetStateAction<boolean>>
-        }) => void
+
+export async function unfollowUser({ id }: {
+    id: Types.ObjectId
 }) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/unfollow`)).data;
-        setResponse?.(res);
+        return res;
     } catch (error) {
-        console.log(error)
-        updateConn?.({ setFollowers: setFollowers, type: "add", setConnection: setConnection });
-        setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+        throw (getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
 
@@ -198,22 +162,15 @@ export async function getUserProfileData({ username, setProfileData, setIsOwner,
  * @prop {"followers" | "following"} type - The type of connection list to be fetched.
  * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to update the error state.
  */
-export async function getUserConnectionList({ id, setUsers, type, setError, setLoading }: {
+export async function getUserConnectionList({ id, type }: {
     id: Types.ObjectId,
-    setUsers: React.Dispatch<React.SetStateAction<ShortUser[]>>,
     type: "followers" | "following",
-    setError?: React.Dispatch<React.SetStateAction<string | null>>,
-    setLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     try {
-        setLoading?.(true);
         const res = (await apiInstance.get(`/api/users/connection/${id}/${type}`)).data;
-        setUsers(res.users);
-        console.log(res)
+        return res.users
     } catch (error) {
-        setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
-    } finally {
-        setLoading?.(false);
+        throw (getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
 
@@ -264,19 +221,8 @@ export async function updateUserCover({ file, onDone, setError }: {
     }
 }
 
-/**
- * Updates the profile picture of the currently logged in user.
- * @param {{ file: Blob, onDone: (data: any) => void, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the profile picture.
- * @prop {Blob} file - The file to update the profile picture with.
- * @prop {(data: any) => void} onDone - The function to call when the update is successful.
- * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to call when there is an error.
- */
-export async function updateUserProfilePic({ file, onDone, setError }: {
-    file: Blob,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onDone: (data: any) => void
-    setError: React.Dispatch<React.SetStateAction<string | null>>
-}) {
+
+export async function updateUserProfilePic({ file }: { file: Blob }) {
     try {
         if (!file) throw new Error("No file provided");
 
@@ -284,9 +230,9 @@ export async function updateUserProfilePic({ file, onDone, setError }: {
         formData.append("file", file);
 
         const response = await apiInstance.put(`/api/users/update/profile_pic`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-        onDone(response.data);
+        return response.data;
     } catch (error) {
-        setError(getErrorMessage(error) || "Something went wrong. Please try again.");
+        throw (getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }
 

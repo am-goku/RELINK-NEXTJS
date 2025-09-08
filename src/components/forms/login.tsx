@@ -50,7 +50,7 @@ function LoginForm({ submitting, setGlobalError, setGlobalSuccess, setSubmitting
             })
             if(!res?.ok) throw new Error(res?.error || undefined)
             setGlobalSuccess("Logged in successfully.");
-            router.push('/');
+            router.push("/dashboard");
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             setGlobalError(err?.message || "Login failed. Please try again.");

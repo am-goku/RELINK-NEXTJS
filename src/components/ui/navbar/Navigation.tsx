@@ -30,7 +30,7 @@ const Navigation = ({ session }: { session: Session }) => {
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center gap-2">
           <Link
-            href="/"
+            href="/dashboard"
             className="px-3 py-2 rounded hover:bg-primary dark:hover:bg-primary-dark transition-colors"
           >
             Home
@@ -117,7 +117,7 @@ const Navigation = ({ session }: { session: Session }) => {
       {mobileMenu && (
         <div className="absolute top-20 left-0 w-full bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 shadow-md md:hidden z-40">
           <Link
-            href="/"
+            href="/dashboard"
             className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <Home className="w-5 h-5" /> Home

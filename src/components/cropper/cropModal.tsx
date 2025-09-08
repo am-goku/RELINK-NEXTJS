@@ -1,5 +1,6 @@
 'use client';
 
+import { IPublicPost } from "@/utils/sanitizer/post";
 import { useCallback, useMemo, useState } from "react";
 import Cropper from "react-easy-crop";
 
@@ -126,7 +127,7 @@ interface CropModalProps {
     /** Called when the user cancels/closes the modal */
     onClose: () => void;
     /** Receives the cropped File and a temporary object URL */
-    onSave: (croppedFile: File, croppedUrl: string) => void;
+    onSave: (croppedFile: File, croppedUrl: string, imageRatio: IPublicPost['imageRatio']) => void;
 }
 
 const ControlButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ className = "", children, ...rest }) => (
@@ -179,7 +180,31 @@ const CropModal: React.FC<CropModalProps> = ({ isOpen, imageSrc, ratio, onClose,
         try {
             setLoading(true);
             const { file, url } = await getCroppedImg(imageSrc, croppedAreaPixels, rotation);
-            onSave(file, url);
+            let imageRatio: IPublicPost['imageRatio'] = 'square';
+            switch (aspect) {
+                case 1/1:
+                    imageRatio = 'square';
+                    break;
+                case 4/3:
+                    imageRatio = 'landscape';
+                    break;
+                case 3/4:
+                    imageRatio = 'portrait';
+                    break;
+                case 16/9:
+                    imageRatio = 'landscape';
+                    break;
+                case 9/16:
+                    imageRatio = 'portrait';
+                    break;
+                case 3 / 2:
+                    imageRatio = 'landscape';
+                    break;
+                default:
+                    imageRatio = 'square';
+            }
+            console.log(imageRatio)
+            onSave(file, url, imageRatio);
             onClose();
         } catch (e) {
             console.error(e);
@@ -187,7 +212,7 @@ const CropModal: React.FC<CropModalProps> = ({ isOpen, imageSrc, ratio, onClose,
         } finally {
             setLoading(false);
         }
-    }, [croppedAreaPixels, rotation, imageSrc, onSave, onClose]);
+    }, [croppedAreaPixels, imageSrc, rotation, aspect, onSave, onClose]);
 
     if (!isOpen || !imageSrc) return null;
 
@@ -257,6 +282,8 @@ const CropModal: React.FC<CropModalProps> = ({ isOpen, imageSrc, ratio, onClose,
                                     aria-label="Aspect ratio"
                                 >
                                     <option value="free">Free</option>
+                                    <option value={9/16}>9:16</option>
+                                    <option value={3 / 4}>3:4</option>
                                     <option value={1 / 1}>1:1</option>
                                     <option value={4 / 3}>4:3</option>
                                     <option value={3 / 2}>3:2</option>

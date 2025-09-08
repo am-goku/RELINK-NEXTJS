@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import LoginForm from "@/components/forms/login";
 import SignupForm from "@/components/forms/signup";
+import Footer from "@/components/nav/footer";
 
 
 export default function AuthPage() {
@@ -169,9 +170,7 @@ export default function AuthPage() {
             </main>
 
             {/* Footer */}
-            <footer className="mx-auto w-full max-w-6xl px-4 pb-8 text-center text-xs opacity-70">
-                © {new Date().getFullYear()} ReLink. All rights reserved.
-            </footer>
+            <Footer />
         </div>
     );
 }
