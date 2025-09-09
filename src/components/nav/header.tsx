@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
 type Props = {
-    page: "connect" | "dashboard" | "chat" | "profile";
+    page: "connect" | "dashboard" | "chat" | "profile" | "explore";
     doFun?: () => void;
 }
 
@@ -36,6 +36,7 @@ function Header({ page, doFun }: Props) {
                         <React.Fragment>
                             <button
                                 onClick={() => router.push('/dashboard')}
+                                style={{ border: page === "dashboard" ? "2px solid #1DA1F2" : "none" }}
                                 className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
                             >
                                 <Home className="h-4 w-4" />
@@ -43,6 +44,7 @@ function Header({ page, doFun }: Props) {
 
                             <button
                                 onClick={() => router.push('/explore')}
+                                style={{ border: page === "explore" ? "2px solid #1DA1F2" : "none" }}
                                 className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
                             >
                                 <Compass className="h-4 w-4" />
@@ -50,6 +52,7 @@ function Header({ page, doFun }: Props) {
 
                             <button
                                 onClick={() => router.push('/chat')}
+                                style={{ border: page === "chat" ? "2px solid #1DA1F2" : "none" }}
                                 className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
                             >
                                 <MessageCircle className="h-4 w-4" />
@@ -57,6 +60,7 @@ function Header({ page, doFun }: Props) {
 
                             <button
                                 onClick={() => router.push(`/${session?.user.username}`)}
+                                style={{ border: page === "profile" ? "2px solid #1DA1F2" : "none" }}
                                 className="flex items-center gap-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
                             >
                                 <User className="h-4 w-4" />
