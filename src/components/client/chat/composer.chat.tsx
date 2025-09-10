@@ -1,80 +1,91 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { IMessage } from '@/models/Message';
+import { sendMessage, startMessage } from '@/services/api/chat-apis';
+import { useChatStore } from '@/stores/chatStore';
+import { EmojiClickData, Theme } from 'emoji-picker-react';
 import { Paperclip, Send, Smile } from 'lucide-react';
+import { Session } from 'next-auth';
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react'
 
-type Message = {
-    id: string;
-    from: string;
-    text?: string;
-    image?: string;
-    timestamp: string;
-    read?: boolean;
-};
-
-type Room = {
-    id: string;
-    participants: string[];
-    lastMessage?: string;
-    updatedAt?: string;
-    unread?: number;
-};
+// Dynamically import emoji picker so it only loads on client
+const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false });
 
 type Props = {
-    activeRoomId: string | null;
-    setMessagesByRoom: React.Dispatch<React.SetStateAction<Record<string, Message[]>>>;
-    setRooms: React.Dispatch<React.SetStateAction<Room[]>>
+    newChat?: boolean;
+    session: Session;
+    setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>;
+    setNewChat: (x: boolean) => void;
 }
 
-function ChatComposer({ activeRoomId, setMessagesByRoom, setRooms }: Props) {
+function ChatComposer({ newChat, session, setMessages, setNewChat }: Props) {
 
-const [input, setInput] = useState("");
-    const [showImageInput, setShowImageInput] = useState(false);
-    const [imageUrl, setImageUrl] = useState("");
+    const activeRoom = useChatStore(state => state.selectedRoom);
+    const addChatRoom = useChatStore(state => state.addChatRoom);
+    const setSelectedRoom = useChatStore(state => state.setSelectedRoom);
+    const updateLastMessage = useChatStore(state => state.updateChatRoomLastMessage);
+
+    const reorderRooms = useChatStore(state => state.reorderChatRoom);
+
+
+    const [input, setInput] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-    function sendMessage() {
-        if (!activeRoomId) return;
-        if (!input.trim() && !imageUrl.trim()) return;
+    async function handleSendMessage() {
+        if (!activeRoom) return;
+        if (!input.trim()) return;
 
-        const newMsg: Message = {
-            id: `m-${Date.now()}`,
-            from: "me",
-            text: input.trim() || undefined,
-            image: imageUrl.trim() || undefined,
-            timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            read: false,
-        };
+        try {
+            let newMessage: IMessage | null = null;
 
-        setMessagesByRoom((prev) => ({ ...prev, [activeRoomId]: [...(prev[activeRoomId] || []), newMsg] }));
+            if (activeRoom && !newChat) {
+                // send message to a conversation
+                newMessage = await sendMessage(activeRoom._id.toString(), input.trim());
+            } else if (activeRoom && newChat) {
 
-        setRooms((prev) => prev.map((r) => (r.id === activeRoomId ? { ...r, lastMessage: newMsg.text || (newMsg.image ? "Sent an image" : ""), updatedAt: new Date().toISOString() } : r)));
+                const receiver = activeRoom?.participants.find(participant => participant._id.toString() !== session.user.id);
+
+                if (!receiver) throw new Error("Receiver is undefined.");
+
+                // Start a conversation with first message
+                const { message, conversation } = await startMessage(receiver._id.toString(), input.trim());
+                addChatRoom(conversation);
+                setSelectedRoom(conversation);
+                setNewChat(false);
+                newMessage = message;
+            }
+
+            if (newMessage) {
+                setMessages((prev) => [newMessage, ...prev]);
+                updateLastMessage(activeRoom?._id.toString() as string, newMessage);
+                setInput('');
+
+                reorderRooms(activeRoom._id.toString());
+            }
+        } catch (err) {
+            console.error("Failed to send message:", err);
+        }
 
         setInput("");
-        setImageUrl("");
-        setShowImageInput(false);
         setShowEmojiPicker(false);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    function insertEmoji(emoji: string) {
-        setInput((s) => s + emoji);
-    }
+    const onEmojiClick = (emojiObject: EmojiClickData) => {
+        setInput((prev) => prev + emojiObject.emoji);
+    };
+
 
     return (
         <div className="p-3 border-t bg-white/80 dark:bg-neutral-800/80">
             <div className="max-w-3xl mx-auto flex items-center gap-2">
-                <button onClick={() => setShowImageInput((s) => !s)} className="p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5"><Paperclip /></button>
+                <button onClick={() => { }} className="p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5"><Paperclip /></button>
 
                 <div className="flex-1">
-                    <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Write a message..." className="w-full rounded-full border px-4 py-2 text-sm outline-none" />
-                    <AnimatePresence>
-                        {showImageInput && (
-                            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="mt-2 flex gap-2">
-                                <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="Image URL (optional)" className="flex-1 rounded-xl border px-3 py-2 text-sm outline-none" />
-                                <button onClick={() => sendMessage()} className="px-4 rounded-xl bg-[#2D3436] text-white">Attach</button>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    <input
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Write a message..."
+                        className="w-full rounded-full border px-4 py-2 text-sm outline-none" />
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -84,11 +95,11 @@ const [input, setInput] = useState("");
                         </button>
                         {showEmojiPicker && (
                             <div className="absolute bottom-12 left-0 z-50 shadow-lg rounded-xl">
-                                {/* <Picker lazyLoadEmojis={true} theme={Theme.DARK} /> */}
+                                <Picker lazyLoadEmojis={true} theme={Theme.AUTO} onEmojiClick={(data) => onEmojiClick(data)} />
                             </div>
                         )}
                     </div>
-                    <button onClick={() => sendMessage()} className="p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5"><Send /></button>
+                    <button onClick={() => handleSendMessage()} className="p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5"><Send /></button>
                 </div>
             </div>
         </div>

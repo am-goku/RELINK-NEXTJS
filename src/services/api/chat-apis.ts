@@ -111,6 +111,7 @@ export async function startMessage(receiver_id: string, content: string): Promis
         const res = await apiInstance.post(`/api/chat/${receiver_id}`, { content });
         return { message: res.data.messageData, conversation: res.data.conversation };
     } catch (error) {
+        console.log(error)
         throw new Error(getErrorMessage(error));
     }
 }
