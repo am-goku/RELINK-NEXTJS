@@ -42,16 +42,17 @@ type Props = {
     query: string;
     sidebarOpen: boolean | null;
     activeRoomId: string | null;
+    minScreen: boolean;
     setActiveRoomId: (id: string) => void;
     setQuery: (query: string) => void;
     setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
-    setSidebarOpen: React.Dispatch<React.SetStateAction<boolean | null>>;
+    setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setMessagesByRoom: React.Dispatch<React.SetStateAction<Record<string, Message[]>>>;
     setSearchResults: React.Dispatch<React.SetStateAction<User[]>>
 }
 
 function ChatSidebar({
-    searchResults, rooms, query, activeRoomId, sidebarOpen,
+    searchResults, rooms, query, activeRoomId, sidebarOpen, minScreen,
     setActiveRoomId, setQuery, setRooms,
     setMessagesByRoom, setSidebarOpen, setSearchResults
 }: Props) {
@@ -82,7 +83,7 @@ function ChatSidebar({
 
     return (
         <React.Fragment>
-            <aside className={`flex-shrink-0 w-full md:w-80 border-r border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-neutral-800/70 transition-transform ${sidebarOpen === true ? "translate-x-0 block h-screen" : sidebarOpen === false ? "-translate-x-full md:translate-x-0 hidden" : ""}`}>
+            <aside className={`flex-shrink-0 w-full md:w-80 border-r border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-neutral-800/70 transition-transform ${(sidebarOpen) ? "translate-x-0 block h-full" : (!sidebarOpen && minScreen) ? "-translate-x-full md:translate-x-0 hidden" : ""}`}>
                 <div className="p-3">
                     <div className="relative">
                         <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users or rooms" className="w-full rounded-xl border px-3 py-2 text-sm outline-none" />

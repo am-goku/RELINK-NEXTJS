@@ -4,7 +4,7 @@ import React from 'react'
 type Props = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     participantUser: any;
-    setSidebarOpen: React.Dispatch<React.SetStateAction<boolean | null>>;
+    setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function ChatHeader({ participantUser, setSidebarOpen }: Props) {

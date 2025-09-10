@@ -70,8 +70,11 @@ export default function ChatRoomsPage() {
     const [messagesByRoom, setMessagesByRoom] = useState<Record<string, Message[]>>(MOCK_MESSAGES);
     const [query, setQuery] = useState("");
     const [searchResults, setSearchResults] = useState<User[]>([]);
-    const [sidebarOpen, setSidebarOpen] = useState<boolean | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+    // UI States
+    const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+    const [minScreen, setMinScreen] = useState<boolean>(false);
 
     useEffect(() => {
         if (!query) return setSearchResults([]);
@@ -80,7 +83,29 @@ export default function ChatRoomsPage() {
         setSearchResults(results);
     }, [query]);
 
+    // Scroll to bottom
     useEffect(() => scrollToBottom(), [activeRoomId, messagesByRoom]);
+
+    // UI Logic
+    useEffect(() => {
+        function handleResize() {
+            if (window.innerWidth < 768) {
+                setMinScreen(true);
+                if (activeRoomId) setSidebarOpen(false);
+            } else {
+                setMinScreen(false);
+                setSidebarOpen(true);
+            }
+        }
+
+        // Run once on mount
+        handleResize();
+
+        // Listen for resize
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [activeRoomId]);
+
 
     function scrollToBottom() {
         if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -88,16 +113,17 @@ export default function ChatRoomsPage() {
 
 
     return (
-        <div className="h-screen flex flex-col">
+        <div className="flex flex-col h-screen bg-[#F0F2F5] dark:bg-neutral-900">
             {/* Page Header */}
             <Header page="chat" />
 
 
 
-            <div className="flex flex-col md:flex-row flex-1 bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200">
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200">
 
                 {/* Sidebar */}
                 <ChatSidebar
+                    minScreen={minScreen}
                     searchResults={searchResults}
                     setActiveRoomId={setActiveRoomId}
                     activeRoomId={activeRoomId}
@@ -114,6 +140,7 @@ export default function ChatRoomsPage() {
                 <MessageArea
                     activeRoomId={activeRoomId}
                     messagesByRoom={messagesByRoom}
+                    minScreen={minScreen}
                     rooms={rooms}
                     sidebarOpen={sidebarOpen}
                     setMessagesByRoom={setMessagesByRoom}

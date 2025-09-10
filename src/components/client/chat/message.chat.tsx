@@ -8,11 +8,12 @@ import ChatComposer from './composer.chat';
 type Props = {
     activeRoomId: string | null;
     rooms: Room[];
+    minScreen: boolean;
     setRooms: React.Dispatch<React.SetStateAction<Room[]>>;
     messagesByRoom: Record<string, Message[]>;
     setMessagesByRoom: React.Dispatch<React.SetStateAction<Record<string, Message[]>>>;
     sidebarOpen: boolean | null;
-    setSidebarOpen: React.Dispatch<React.SetStateAction<boolean | null>>;
+    setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 type User = {
@@ -50,7 +51,7 @@ const MOCK_USERS: Record<string, User> = {
 
 
 function MessageArea({
-    activeRoomId, messagesByRoom, rooms, sidebarOpen,
+    activeRoomId, messagesByRoom, rooms, sidebarOpen, minScreen,
     setMessagesByRoom, setRooms, setSidebarOpen
 }: Props) {
 
@@ -63,12 +64,12 @@ function MessageArea({
 
     return (
         <React.Fragment>
-            <main className={`flex-1 flex flex-col ${sidebarOpen === true && "hidden"}`}>
+            <main className={`flex-1 flex overflow-hidden flex-col ${(sidebarOpen && minScreen) && "hidden"}`}>
                 {/* Chat Header */}
                 <ChatHeader participantUser={participantUser} setSidebarOpen={setSidebarOpen} />
 
                 {/* Messages */}
-                <div className="flex-1 overflow-auto p-4 bg-[#F8F9FB] dark:bg-neutral-900/50">
+                <div className="flex-1 overflow-y-auto px-2 bg-[#F8F9FB] dark:bg-neutral-900/50">
                     <AnimatePresence mode="wait">
                         {activeRoomId ? (
                             <motion.div key={activeRoomId} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="space-y-4 max-w-3xl mx-auto">
