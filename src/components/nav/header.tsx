@@ -3,6 +3,7 @@ import React from 'react'
 import RelinkLogo from '../icons/RelinkLogo';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { useUnreadStore } from '@/stores/unreadStore';
 
 type Props = {
     page: "connect" | "dashboard" | "chat" | "profile" | "explore";
@@ -14,6 +15,9 @@ function Header({ page, doFun }: Props) {
     const { data: session } = useSession();
 
     const router = useRouter();
+
+    const unreadMap = useUnreadStore((s) => s.map);
+    const totalUnread = Object.keys(unreadMap).filter((k) => unreadMap[k] > 0).length;
 
     return (
         <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5">
@@ -50,12 +54,28 @@ function Header({ page, doFun }: Props) {
                                 <Compass className="h-4 w-4" />
                             </button>
 
-                            <button
+                            {/* <button
                                 onClick={() => router.push('/chat')}
                                 style={{ border: page === "chat" ? "2px solid #1DA1F2" : "none" }}
                                 className="flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
                             >
                                 <MessageCircle className="h-4 w-4" />
+                            </button> */}
+
+                            <button
+                                onClick={() => router.push("/chat")}
+                                style={{
+                                    border: page === "chat" ? "2px solid #1DA1F2" : "none",
+                                }}
+                                className="relative flex items-center gap-2 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                            >
+                                <MessageCircle className="h-4 w-4" />
+
+                                {totalUnread > 0 && (
+                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-md">
+                                        {totalUnread > 9 ? "9+" : totalUnread}
+                                    </span>
+                                )}
                             </button>
 
                             <button
