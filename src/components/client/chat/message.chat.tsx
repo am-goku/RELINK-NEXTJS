@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 import ChatHeader from './header.chat';
 import ChatComposer from './composer.chat';
 import { IMessage } from '@/models/Message';
@@ -7,11 +7,10 @@ import { Session } from 'next-auth';
 import { useChatStore } from '@/stores/chatStore';
 import { fetchMessages } from '@/services/api/chat-apis';
 import MessageSkeleton from '@/components/ui/skeletons/MessageLoading';
+import MessageText from './text.chat';
+import apiInstance from '@/lib/axios';
+import { useUnreadStore } from '@/stores/unreadStore';
 
-function formatTime(date: string | Date) {
-    const d = new Date(date);
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
 
 type Props = {
     session: Session;
@@ -34,26 +33,41 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
     const activeRoom = useChatStore(state => state.selectedRoom);
     const receiver = activeRoom?.participants.find(participant => participant._id.toString() !== session.user.id);
 
+    const clearUnread = useUnreadStore((s) => s.clear);
+
     const [messages, setMessages] = React.useState<IMessage[]>([]);
     const [loading, setLoading] = React.useState<boolean>(false);
 
     // Fetch messages
-    const getMessages = useCallback(async () => {
-        if (activeRoom && !newChat) {
-            setLoading(true);
-            const messages = await fetchMessages(activeRoom?._id.toString());
-            setMessages(messages);
-        }
-        setLoading(false);
-    }, [activeRoom, newChat]);
     useEffect(() => {
+        const getMessages = async () => {
+            if (activeRoom && !newChat) {
+                setLoading(true);
+                const messages = await fetchMessages(activeRoom?._id.toString());
+                setMessages(messages);
+            }
+            setLoading(false);
+        };
+
         getMessages();
-    }, [getMessages]);
+    }, [activeRoom, newChat]);
 
     const orderedMessages = useMemo(
         () => [...messages].reverse(),
         [messages]
     );
+
+    // Mark messages as unread
+    useEffect(() => {
+        const unread = async () => {
+            if (activeRoom) {
+                clearUnread(activeRoom._id.toString());
+                await apiInstance.patch(`/api/conversations/${activeRoom._id.toString()}/mark-read`);
+            }
+        }
+
+        unread();
+    }, [activeRoom, clearUnread]);
 
     // Scroll to bottom when messages update
     useEffect(() => {
@@ -88,14 +102,11 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
                                                 {orderedMessages.map((msg) => {
                                                     const isMe = msg.sender.toString() === session.user.id;
                                                     return (
-                                                        <div key={msg._id.toString()} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
-                                                            <div className={`rounded-2xl p-3 shadow-sm max-w-[82%] ${isMe ? "bg-[#2D3436] text-white" : "bg-white dark:bg-neutral-800 text-[#2D3436]"}`}>
-                                                                {msg.text && <div className="whitespace-pre-wrap">{msg.text}</div>}
-                                                                {/* TODO: Attach image */}
-                                                                {/* {msg.image && <img src={msg.image} alt="attached" className="mt-2 rounded-md object-cover max-h-72" />} */}
-                                                                <div className="text-[11px] mt-2 opacity-60 text-right">{formatTime(msg.created_at)}</div>
-                                                            </div>
-                                                        </div>
+                                                        <MessageText
+                                                            key={msg._id.toString()}
+                                                            message={msg}
+                                                            isMe={isMe}
+                                                        />
                                                     );
                                                 })}
                                                 <div ref={messagesEndRef} />

@@ -1,8 +1,8 @@
-import Avatar from '@/components/ui/avatar';
 import { useChatStore } from '@/stores/chatStore';
 import { Session } from 'next-auth';
 import React, { useEffect } from 'react'
 import ChatSearchBar from './search.chat';
+import RoomItem from './room.chat';
 
 type Props = {
     session: Session;
@@ -37,25 +37,12 @@ function ChatSidebar({ session, sidebarOpen, minScreen, setNewChat }: Props) {
                         {rooms.map((room) => {
                             const user = room.participants.find(p => p._id.toString() !== session.user.id);
                             return (
-                                <li key={room._id.toString()}>
-                                    <button
-                                        onClick={() => setActiveRoom(room)}
-                                        className={`w-full text-left rounded-xl p-2 flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 ${activeRoom?._id.toString() === room._id.toString() ? "bg-light-bg/90 dark:bg-dark-bg/90" : ""}`}
-                                    >
-                                        <div className="relative">
-                                            {user && <Avatar user={user} key={user?._id.toString()} size={10} />}
-                                            {/* TODO: Have to manage online status */}
-                                            {/* <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${user?.online ? "bg-green-500" : "bg-gray-400"}`} /> */}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <div className="font-medium text-sm">{user?.name || user?.username}</div>
-                                                {room.last_message ? <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-[11px]">{2}</span> : null}
-                                            </div>
-                                            <div className="text-xs opacity-70 truncate">{room.last_message?.text}</div>
-                                        </div>
-                                    </button>
-                                </li>
+                                <RoomItem key={user?._id.toString()}
+                                    room={room}
+                                    user={user}
+                                    activeRoom={activeRoom}
+                                    setActiveRoom={setActiveRoom}
+                                />
                             );
                         })}
                     </ul>

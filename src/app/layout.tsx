@@ -8,6 +8,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
 import NProgressProvider from "@/providers/NProgressProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { UnreadInitializer } from "@/components/initializers/UnreadInitializer";
 
 
 const poppins = Poppins({
@@ -32,6 +33,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
           <UserProvider>
               <ThemeProvider>
                 <NProgressProvider>
+                  <UnreadInitializer session={session} />
                   {children}
                 </NProgressProvider>
               </ThemeProvider>
