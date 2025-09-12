@@ -31,12 +31,12 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <body className={poppins.className}>
         <SessionProviderWrapper session={session}>
           <UserProvider>
-              <ThemeProvider>
-                <NProgressProvider>
-                  <UnreadInitializer session={session} />
-                  {children}
-                </NProgressProvider>
-              </ThemeProvider>
+            <ThemeProvider>
+              <NProgressProvider>
+                <UnreadInitializer />
+                {children}
+              </NProgressProvider>
+            </ThemeProvider>
           </UserProvider>
         </SessionProviderWrapper>
       </body>

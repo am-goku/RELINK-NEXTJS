@@ -6,6 +6,7 @@ type UnreadState = {
   increment: (convId: string) => void;
   reduce: (convId: string) => void;
   clear: (convId: string) => void;
+  clearState: () => void;
   total: () => number;
 };
 
@@ -31,6 +32,8 @@ export const useUnreadStore = create<UnreadState>((set, get) => ({
       updated[convId] = 0;
       return { map: updated };
     }),
+
+  clearState: () => set(() => ({ map: {} })),
 
   total: () => {
     return Object.values(get().map).reduce((a, b) => a + b, 0);

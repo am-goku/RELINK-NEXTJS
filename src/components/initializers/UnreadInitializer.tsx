@@ -2,15 +2,18 @@
 
 import apiInstance from "@/lib/axios";
 import { useUnreadStore } from "@/stores/unreadStore";
-import { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
-export function UnreadInitializer({ session }: { session: Session | null }) {
+export function UnreadInitializer() {
+
+    const { data: session, status } = useSession();
 
     const setUnread = useUnreadStore((s) => s.setUnread);
+    const clearUnreadStore = useUnreadStore((s) => s.clearState);
 
     useEffect(() => {
-        if (session) {
+        if (status === "authenticated") {
             async function loadUnread() {
                 const res = await apiInstance.get("/api/conversations/unread");
                 if (!res.data) return;
@@ -20,8 +23,10 @@ export function UnreadInitializer({ session }: { session: Session | null }) {
                 });
             }
             loadUnread();
+        } else if (status === "unauthenticated") {
+            clearUnreadStore();
         }
-    }, [setUnread, session]);
+    }, [setUnread, session, status, clearUnreadStore]);
 
     return null; // nothing to render, just initializes
 }
