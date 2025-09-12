@@ -34,7 +34,6 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ postId
         return NextResponse.json({ message: "Comments fetched successfully", comments }, { status: 200 });
 
     } catch (error) {
-        console.log(error)
         return handleApiError(error);
     }
 }

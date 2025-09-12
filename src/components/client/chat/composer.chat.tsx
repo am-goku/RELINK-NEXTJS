@@ -1,3 +1,4 @@
+import socket from '@/lib/socket/socket';
 import { IMessage } from '@/models/Message';
 import { sendMessage, startMessage } from '@/services/api/chat-apis';
 import { useChatStore } from '@/stores/chatStore';
@@ -5,7 +6,7 @@ import { EmojiClickData, Theme } from 'emoji-picker-react';
 import { Paperclip, Send, Smile } from 'lucide-react';
 import { Session } from 'next-auth';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 // Dynamically import emoji picker so it only loads on client
 const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false });
@@ -13,22 +14,21 @@ const Picker = dynamic(() => import('emoji-picker-react'), { ssr: false });
 type Props = {
     newChat?: boolean;
     session: Session;
-    setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>;
     setNewChat: (x: boolean) => void;
 }
 
-function ChatComposer({ newChat, session, setMessages, setNewChat }: Props) {
+function ChatComposer({ newChat, session, setNewChat }: Props) {
 
     const activeRoom = useChatStore(state => state.selectedRoom);
     const addChatRoom = useChatStore(state => state.addChatRoom);
     const setSelectedRoom = useChatStore(state => state.setSelectedRoom);
-    const updateLastMessage = useChatStore(state => state.updateChatRoomLastMessage);
-
-    const reorderRooms = useChatStore(state => state.reorderChatRoom);
-
 
     const [input, setInput] = useState("");
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+    const sendTyping = () => {
+        socket.emit("typing", {roomId: activeRoom?._id.toString()});
+    }
 
     async function handleSendMessage() {
         if (!activeRoom) return;
@@ -55,11 +55,8 @@ function ChatComposer({ newChat, session, setMessages, setNewChat }: Props) {
             }
 
             if (newMessage) {
-                setMessages((prev) => [newMessage, ...prev]);
-                updateLastMessage(activeRoom?._id.toString() as string, newMessage);
                 setInput('');
-
-                reorderRooms(activeRoom._id.toString());
+                socket.emit("send-message", {roomId: activeRoom._id.toString(), message: newMessage});
             }
         } catch (err) {
             console.error("Failed to send message:", err);
@@ -73,6 +70,12 @@ function ChatComposer({ newChat, session, setMessages, setNewChat }: Props) {
         setInput((prev) => prev + emojiObject.emoji);
     };
 
+    useEffect(() => {
+        return () => {
+            setShowEmojiPicker(false);
+            setInput("");
+        }
+    }, [activeRoom])
 
     return (
         <div className="p-3 border-t bg-white/80 dark:bg-neutral-800/80">
@@ -81,7 +84,17 @@ function ChatComposer({ newChat, session, setMessages, setNewChat }: Props) {
 
                 <div className="flex-1">
                     <input
-                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                                handleSendMessage();
+                            }
+
+                            if (e.key === "Escape") {
+                                setShowEmojiPicker(false);
+                            }
+
+                            sendTyping();
+                        }}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Write a message..."

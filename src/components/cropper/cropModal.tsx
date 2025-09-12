@@ -203,7 +203,6 @@ const CropModal: React.FC<CropModalProps> = ({ isOpen, imageSrc, ratio, onClose,
                 default:
                     imageRatio = 'square';
             }
-            console.log(imageRatio)
             onSave(file, url, imageRatio);
             onClose();
         } catch (e) {

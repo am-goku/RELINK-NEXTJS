@@ -10,7 +10,8 @@ import MessageSkeleton from '@/components/ui/skeletons/MessageLoading';
 import MessageText from './text.chat';
 import apiInstance from '@/lib/axios';
 import { useUnreadStore } from '@/stores/unreadStore';
-
+import socket from '@/lib/socket/socket';
+import TypingLoader from '@/components/ui/loaders/TypingLoader';
 
 type Props = {
     session: Session;
@@ -23,7 +24,6 @@ type Props = {
     setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
 function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen, setNewChat }: Props) {
 
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -31,12 +31,36 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
 
     // Chat room states
     const activeRoom = useChatStore(state => state.selectedRoom);
-    const receiver = activeRoom?.participants.find(participant => participant._id.toString() !== session.user.id);
-
+    const updateLastMessage = useChatStore(state => state.updateChatRoomLastMessage);
+    const reorderRooms = useChatStore(state => state.reorderChatRoom);
     const clearUnread = useUnreadStore((s) => s.clear);
 
+    const receiver = activeRoom?.participants.find(participant => participant._id.toString() !== session.user.id);
+
+    // Message states
     const [messages, setMessages] = React.useState<IMessage[]>([]);
+
+    // UI States
     const [loading, setLoading] = React.useState<boolean>(false);
+    const [typing, setTyping] = React.useState<boolean>(false);
+
+    // Sort messages
+    const orderedMessages = useMemo(
+        () => [...messages].reverse(),
+        [messages]
+    );
+
+    useEffect(() => {
+        socket.on("receive-message", ({ roomId, message }) => {
+            if (activeRoom?._id.toString() === roomId) {
+                setMessages((prev) => [message, ...prev]);
+            }
+        });
+
+        return () => {
+            socket.off("receive-message");
+        }
+    }, [activeRoom, reorderRooms, updateLastMessage]) // listen for new messages
 
     // Fetch messages
     useEffect(() => {
@@ -51,11 +75,6 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
 
         getMessages();
     }, [activeRoom, newChat]);
-
-    const orderedMessages = useMemo(
-        () => [...messages].reverse(),
-        [messages]
-    );
 
     // Mark messages as unread
     useEffect(() => {
@@ -74,13 +93,23 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [orderedMessages]);
 
+    // Handle typing
+    useEffect(() => {
+        socket.on("typing", ({roomId}) => {
+            if(activeRoom?._id.toString() === roomId) {
+                setTyping(true);
+                setTimeout(() => {
+                    setTyping(false);
+                }, 3000);
+            }
+        });
+    }, [activeRoom?._id])
 
     return (
         <React.Fragment>
             <main className={`flex-1 flex overflow-hidden flex-col ${(sidebarOpen && minScreen) && "hidden"}`}>
                 {
                     activeRoom ? (
-
                         <React.Fragment>
                             {/* Chat Header */}
                             {receiver && (
@@ -109,6 +138,7 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
                                                         />
                                                     );
                                                 })}
+                                                {typing && <TypingLoader />}
                                                 <div ref={messagesEndRef} />
                                             </motion.div>
                                         </AnimatePresence>
@@ -123,7 +153,6 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
                                 newChat={newChat}
                                 session={session}
                                 setNewChat={setNewChat}
-                                setMessages={setMessages}
                             />
 
                         </React.Fragment>

@@ -1,5 +1,6 @@
 import { IMessage } from '@/models/Message'
-import React, { useRef } from 'react'
+import { markSeen } from '@/services/api/chat-apis';
+import React, { useEffect, useRef } from 'react'
 
 
 function formatTime(date: string | Date) {
@@ -16,9 +17,44 @@ function MessageText({ message, isMe }: Props) {
 
     const msgRef = useRef<HTMLDivElement | null>(null);
 
+    const markRead = React.useCallback(async () => {
+        await markSeen(message.conversation_id.toString(), message._id.toString());
+    }, [message.conversation_id, message._id]);
+
+    useEffect(() => {
+        if (!msgRef.current || isMe) return; // usually we don't "read" our own messages
+
+        const node = msgRef.current;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        // Trigger event once exposed
+                        markRead();
+
+                        // stop observing after first trigger
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.6 } // 👈 60% visible
+        );
+
+        if (node) {
+            observer.observe(node);
+        }
+
+        return () => {
+            if (node) {
+                observer.unobserve(node);
+            }
+        };
+    }, [message, isMe, markRead]);
+
     return (
         <React.Fragment>
-            <div ref={msgRef} key={message._id.toString()} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+            <div ref={msgRef} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
                 <div className={`rounded-2xl p-3 shadow-sm max-w-[82%] ${isMe ? "bg-[#2D3436] text-white" : "bg-white dark:bg-neutral-800 text-[#2D3436]"}`}>
                     {message.text && <div className="whitespace-pre-wrap">{message.text}</div>}
                     {/* TODO: Attach image */}

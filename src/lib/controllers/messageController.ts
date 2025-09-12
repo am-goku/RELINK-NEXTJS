@@ -218,7 +218,9 @@ export async function getConversations(userId: string) {
 
     const conversations = await Conversation.find({
         participants: new Types.ObjectId(userId),
-    }).populate("participants", "name avatar").lean();
+    }).sort('-last_message.created_at')
+        .populate("participants", "name avatar")
+        .lean();
 
     return conversations || [];
 }

@@ -15,7 +15,6 @@ function UserResults({ query }: Props) {
 
     useEffect(() => {
         searchService.searchUsers(query, 1, false).then((res) => {
-            console.log(res.data);
             setUsers(res.data.users);
         }).catch((err) => {
             console.log(err);

@@ -19,8 +19,6 @@ export async function createComment(postId: string, text: string, userId: string
     const comment = await newComment.save();
     await comment.populate('author', 'username image');
 
-    console.log("Created Comment:", sanitizeComment(comment));
-
     return sanitizeComment(comment);
 }
 

@@ -146,7 +146,6 @@ export async function getUserProfileData({ username, setProfileData, setIsOwner,
         const res = (await apiInstance.get(`/api/users/${username}`, { headers })).data;
         setProfileData?.(res.user);
         setIsOwner?.(res.isOwner);
-        console.log("Response::::", res)
         return res.user;
     } catch (error) {
         setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
@@ -190,7 +189,6 @@ export async function updateUserLinks({ links, setError, updateUser }: {
         const res = (await apiInstance.put(`/api/users/update/links`, { links })).data;
         updateUser?.(res.user)
     } catch (error) {
-        console.log(error)
         setError?.(getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }

@@ -1,8 +1,9 @@
 import Avatar from '@/components/ui/avatar'
+import socket from '@/lib/socket/socket';
 import { IConversationPopulated } from '@/models/Conversation'
 import { useUnreadStore } from '@/stores/unreadStore';
 import { Types } from 'mongoose';
-import React from 'react'
+import React, { useEffect } from 'react'
 
 type Props = {
     room: IConversationPopulated;
@@ -19,11 +20,16 @@ type Props = {
 function RoomItem({ room, user, activeRoom, setActiveRoom }: Props) {
 
     const unread = useUnreadStore((s) => s.map[room._id.toString()]);
+    const [online, setOnline] = React.useState<boolean>(false);
 
-    console.log(useUnreadStore((s) => s.map))
+    useEffect(() => {
+        socket.emit("check-online", user?._id.toString(), (isOnline: boolean) => {
+            setOnline(isOnline);
+        });
+    }, [user?._id])
 
     return (
-        <li key={room._id.toString()}>
+        <li>
             <button
                 onClick={() => setActiveRoom(room)}
                 className={`w-full text-left rounded-xl p-2 flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 ${activeRoom?._id.toString() === room._id.toString() ? "bg-light-bg/90 dark:bg-dark-bg/90" : ""}`}
@@ -31,7 +37,7 @@ function RoomItem({ room, user, activeRoom, setActiveRoom }: Props) {
                 <div className="relative">
                     {user && <Avatar user={user} key={user?._id.toString()} size={10} />}
                     {/* TODO: Have to manage online status */}
-                    {/* <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${user?.online ? "bg-green-500" : "bg-gray-400"}`} /> */}
+                    <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${online ? "bg-green-500" : "bg-gray-400"}`} />
                 </div>
                 <div className="flex-1">
                     <div className="flex items-center justify-between">

@@ -111,7 +111,6 @@ export async function startMessage(receiver_id: string, content: string): Promis
         const res = await apiInstance.post(`/api/chat/${receiver_id}`, { content });
         return { message: res.data.messageData, conversation: res.data.conversation };
     } catch (error) {
-        console.log(error)
         throw new Error(getErrorMessage(error));
     }
 }
@@ -126,7 +125,6 @@ export async function startMessage(receiver_id: string, content: string): Promis
 export async function markSeen(conversation_id: string, message_id: string): Promise<IMessage> {
     try {
         const res = await apiInstance.patch(`/api/chat/conversation/${conversation_id}/message/${message_id}/seen`);
-        console.log("response from seen api - ", res.data)
         return res.data.messageData;
     } catch (error) {
         throw new Error(getErrorMessage(error));

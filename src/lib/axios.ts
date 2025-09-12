@@ -15,8 +15,6 @@ apiInstance.interceptors.response.use(
   error => {
     const status = error.response?.status;
 
-    console.log("Here is the status", status)
-
     // Example: Auto-logout on unauthorized
     if (status === 401) {
       signOut({ callbackUrl: "/connect" });

@@ -9,6 +9,8 @@ import { authOptions } from "@/lib/auth/authOptions";
 import NProgressProvider from "@/providers/NProgressProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { UnreadInitializer } from "@/components/initializers/UnreadInitializer";
+import SocketInitializer from "@/components/initializers/SocketInitializer";
+import ChatInitializer from "@/components/initializers/ChatInitializer";
 
 
 const poppins = Poppins({
@@ -33,7 +35,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
           <UserProvider>
             <ThemeProvider>
               <NProgressProvider>
+                <SocketInitializer />
                 <UnreadInitializer />
+                <ChatInitializer />
                 {children}
               </NProgressProvider>
             </ThemeProvider>

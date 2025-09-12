@@ -17,6 +17,7 @@ function ChatSidebar({ session, sidebarOpen, minScreen, setNewChat }: Props) {
     const activeRoom = useChatStore(state => state.selectedRoom);
     const setActiveRoom = useChatStore(state => state.setSelectedRoom);
 
+    
     useEffect(() => {
         return () => setActiveRoom(null)
     }, [setActiveRoom])

@@ -113,7 +113,6 @@ function SignupForm({ setGlobalError, setGlobalSuccess, setSubmitting, submittin
         if (!suUsername || !usernameRegex.test(suUsername)) return;
         setUsernameStatus("checking");
         const unique = await checkUsernameAvailability(suUsername);
-        console.log(unique)
         setUsernameStatus(unique ? "available" : "taken");
         if (!unique) setSignupErrors((s) => ({ ...s, username: "Username already taken." }));
     }
