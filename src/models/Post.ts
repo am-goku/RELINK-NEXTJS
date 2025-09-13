@@ -6,12 +6,16 @@ export interface IPostBase {
     content?: string;
     image?: string;
     imageRatio?: "landscape" | "portrait" | "square";
-    likes: Types.ObjectId[];
     comments: Types.ObjectId[];
-    share_count: number;
-    views: number;
     hashtags: string[];
     user: Types.ObjectId;
+    
+    // Interactions
+    likes: Types.ObjectId[];
+    saves: Types.ObjectId[];
+    views: Types.ObjectId[];
+    share_count: number;
+
 
     // Admin fields
     is_blocked: boolean;
@@ -45,6 +49,11 @@ const PostSchema = new Schema<IPostDocument>(
             ref: "User",
             default: []
         }],
+        saves: [{
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            default: []
+        }],
         comments: [{
             type: Schema.Types.ObjectId,
             ref: "Comment",
@@ -54,10 +63,11 @@ const PostSchema = new Schema<IPostDocument>(
             type: Number,
             default: 0
         },
-        views: {
-            type: Number,
-            default: 0
-        },
+        views: [{
+            type: Schema.Types.ObjectId,
+            ref: "User",
+            default: []
+        }],
         hashtags: [{
             type: String,
             trim: true

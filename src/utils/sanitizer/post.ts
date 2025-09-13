@@ -7,11 +7,16 @@ export interface IPublicPost {
     content?: string;
     image?: string;
     imageRatio?: "landscape" | "portrait" | "square";
-    likes_count: number;
-    comments_count: number;
-    share_count: number;
-    views: number;
     hashtags: string;
+    
+    // Interactions
+    likes: string[];
+    saves: string[];
+    views: string[];
+    comments_count: number;
+    likes_count: number;
+    share_count: number;
+
     user: {
         _id: string;
         name: string;
@@ -27,24 +32,31 @@ type PopulatedPost = Omit<IPostDocument, "user"> & {
     user: PopulatedUser;
 };
 
-export function sanitizePost(post: PopulatedPost) {
+export function sanitizePost(post: PopulatedPost): IPublicPost {
     return {
         _id: post._id.toString(),
         content: post.content,
         image: post.image,
         imageRatio: post.imageRatio,
         hashtags: Array.isArray(post.hashtags) ? post.hashtags.join(", ") : "",
-        likes_count: post.likes?.length || 0,
+        
+        // Interactions
+        views: Array.isArray(post.views) ? post.views.map(v => v.toString()) : [],
+        likes: Array.isArray(post.likes) ? post.likes.map(v => v.toString()) : [],
+        saves: Array.isArray(post.saves) ? post.saves.map(v => v.toString()) : [],
+        
+        // count
         comments_count: post.comments?.length || 0,
+        likes_count: post.likes?.length || 0,
         share_count: post.share_count ?? 0,
-        views: post.views ?? 0,
-        created_at: post.created_at,
-        updated_at: post.updated_at,
+
+
+        created_at: post.created_at ?? new Date(),
         user: {
             _id: post.user._id.toString(),
-            name: post.user.name,
+            name: post.user.name ?? "",
             username: post.user.username,
-            image: post.user.image,
+            image: post.user.image ?? "",
         },
     };
 }

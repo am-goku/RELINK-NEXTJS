@@ -1,10 +1,14 @@
-import { ICommentDocument } from "@/models/Comment";
+import { ICommentDocument, IReplyDocument } from "@/models/Comment";
 import { IUserDocument } from "@/models/User";
 import { Types } from "mongoose";
 
 type PopulatedUser = Pick<IUserDocument, "_id" | "name" | "username" | "image">;
 
 type PopulatedComment = Omit<ICommentDocument, "user"> & {
+    author: PopulatedUser;
+};
+
+type PopulatedReply = Omit<IReplyDocument, "author"> & {
     author: PopulatedUser;
 };
 
@@ -24,6 +28,7 @@ export type SanitizedComment = {
 }
 
 export type SanitizedReply = {
+    [x: string]: Date | undefined;
     _id: string;
     content: string;
     author: {
@@ -51,4 +56,24 @@ export function sanitizeComment(comment: PopulatedComment): SanitizedComment {
         created_at: comment.created_at,
         updated_at: comment.updated_at,
     };
+}
+
+export function sanitizeReply(replies: PopulatedReply[]): SanitizedReply[] {
+    
+    const sanitized = replies.map((reply) => {
+        return {
+            _id: reply._id.toString(),
+            content: reply.content,
+            author: {
+                _id: reply.author._id.toString(),
+                name: reply.author.name,
+                username: reply.author.username,
+                image: reply.author.image,
+            },
+            created_at: reply.created_at,
+            updated_at: reply.updated_at,
+        }
+    })
+    
+    return sanitized
 }

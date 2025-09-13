@@ -12,12 +12,25 @@ export interface IComment {
 
 export type ICommentDocument = IComment & Document;
 
-const ReplySchema = new mongoose.Schema(
+export type IReplyDocument = {
+    _id: Types.ObjectId;
+    content: string;
+    author: Types.ObjectId;
+    created_at?: Date;
+    updated_at?: Date;
+} & Document;
+
+const ReplySchema = new mongoose.Schema<IReplyDocument>(
     {
         content: { type: String, required: true },
         author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     },
-    { timestamps: true }
+    {
+        timestamps: {
+            createdAt: "created_at",
+            updatedAt: "updated_at"
+        },
+    }
 );
 
 const CommentSchema = new Schema<ICommentDocument>(

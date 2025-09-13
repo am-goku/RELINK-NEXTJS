@@ -2,6 +2,7 @@ import Post from "@/models/Post";
 import { userAuth } from "@/lib/auth";
 import { connectDB } from "@/lib/db/mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import { sanitizePost } from "@/utils/sanitizer/post";
 
 
 export async function GET(_req: NextRequest, context: { params: Promise<{ postId: string }> }) {
@@ -14,13 +15,15 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ postId
             _id: postId,
             is_blocked: { $ne: true },
             is_archived: { $ne: true },
-        });
+        }).populate('user');
 
         if (!post) {
             return NextResponse.json({ error: 'Post not found' }, { status: 404 });
         }
 
-        return NextResponse.json({ message: "Post fetched successfully", post }, { status: 200 });
+        const sanitizedPost = sanitizePost(post);
+
+        return NextResponse.json({ message: "Post fetched successfully", post: sanitizedPost }, { status: 200 });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
