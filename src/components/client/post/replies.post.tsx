@@ -42,7 +42,7 @@ export default function CommentRelies({ p_id, c_id, replyingTo, setReplyingTo, r
             {replies.map((r, i) => (
                 <div key={i.toString()} className="bg-gray-50 dark:bg-neutral-900 p-2 rounded-md">
                     <div className="text-sm font-medium">{r.author.username}</div>
-                    <div className="text-xs opacity-70">{new Date(r.created_at || r.createdAt || '').toLocaleString(navigator.language)}</div>
+                    <div className="text-xs opacity-70">{new Date(r.created_at || '').toLocaleString(navigator.language)}</div>
                     <p className="mt-1 text-sm">{r.content}</p>
                 </div>
             ))}

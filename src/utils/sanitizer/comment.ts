@@ -28,7 +28,6 @@ export type SanitizedComment = {
 }
 
 export type SanitizedReply = {
-    [x: string]: Date | undefined;
     _id: string;
     content: string;
     author: {
