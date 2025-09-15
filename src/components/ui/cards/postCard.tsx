@@ -4,8 +4,11 @@ import { Types } from "mongoose";
 import { IPublicPost } from "@/utils/sanitizer/post";
 import { Heart, MessageSquare, MoreHorizontal, Share2 } from "lucide-react";
 import PostOptionsModal from "@/components/modal/postOptions";
+import { useRouter } from "next/navigation";
 
 function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) => void }) {
+
+  const router = useRouter();
 
   const [postOptions, setPostOptions] = React.useState<boolean>(false);
 
@@ -18,8 +21,8 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
               <Avatar user={{ ...post.user, _id: new Types.ObjectId(post.user._id) }} size={10} />
             </div>
-            <div>
-              <p className="text-sm font-semibold">{post.user.name}</p>
+            <div onClick={() => {router.push(`/${post.user.username}`)}}>
+              <p className="text-sm font-semibold cursor-pointer">{post.user.name}</p>
               <p className="text-xs opacity-70">@{post.user.username} • just now</p>
             </div>
           </div>
@@ -61,7 +64,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
               <span className="text-xs">{post.likes_count}</span>
             </button>
 
-            <button className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5" aria-label="comment">
+            <button onClick={() => {router.push(`/post/${post._id}`)}} className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5" aria-label="comment">
               <MessageSquare className="h-4 w-4" />
               <span className="text-xs">{post.comments_count}</span>
             </button>
@@ -74,13 +77,18 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
               <span className="text-xs">{post.share_count}</span>
             </button>
           </div>
-          <div className="text-xs opacity-60">View details</div>
+          <div className="text-xs opacity-60 cursor-pointer">View details</div>
         </div>
       </article>
 
       {/* PostOptionsModal */}
       {postOptions && (
-        <PostOptionsModal key={post._id} open={postOptions} onClose={() => setPostOptions(false)} />
+        <PostOptionsModal
+          key={post._id}
+          open={postOptions}
+          onClose={() => setPostOptions(false)}
+          onGoToPost={() => router.push(`/post/${post._id}`)}
+        />
       )}
 
     </React.Fragment>

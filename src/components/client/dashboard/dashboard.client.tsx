@@ -46,7 +46,7 @@ export default function DashboardPage() {
 
   // optimistic like toggle (simplified)
   const handleLike = (id: string) => {
-    setPosts((p) => p.map((post) => (post._id === id ? { ...post, likes: post.likes_count + 1 } : post)));
+    setPosts((p) => p.map((post) => (post._id === id ? { ...post, likes_count: post.likes_count + 1 } : post)));
     // simulate server call
     setTimeout(() => {
       // nothing - in real app you'd confirm or rollback on failure
