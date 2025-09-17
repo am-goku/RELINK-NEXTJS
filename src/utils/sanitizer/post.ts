@@ -28,7 +28,7 @@ export interface IPublicPost {
 
 type PopulatedUser = Pick<IUserDocument, "_id" | "name" | "username" | "image">;
 
-type PopulatedPost = Omit<IPostDocument, "user"> & {
+export type PopulatedPost = Omit<IPostDocument, "user"> & {
     user: PopulatedUser;
 };
 

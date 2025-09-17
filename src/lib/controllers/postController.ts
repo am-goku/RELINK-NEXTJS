@@ -166,3 +166,16 @@ export async function getPostById(id: string): Promise<IPublicPost> {
 
     return sanitizedPost;
 }
+
+export async function getSuggesions() {
+    await connectDB();
+
+    const posts = await Post.aggregate([
+        { $match: { image: { $exists: true, $ne: "" }, is_blocked: { $ne: true }, is_archived: { $ne: true } } },
+        { $sample: { size: 9 } },
+        { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
+        { $unwind: "$user" }
+    ]);
+
+    return posts.map(sanitizePost) || [];
+}
