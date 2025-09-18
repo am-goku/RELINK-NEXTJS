@@ -1,43 +1,28 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import SuggestedPosts from "@/components/client/explore/suggested.explore";
 import PostTab from "@/components/client/explore/postTab.explore";
 import UserTab from "@/components/client/explore/userTab.explore";
 import TagsTab from "@/components/client/explore/tagsTab.explore";
 import ExploreModal from "@/components/modal/exploreModal";
-import SearchResults from "./results.explore";
 import ExploreSearchBar from "./search.explore";
 import { IPublicPost } from "@/utils/sanitizer/post";
-
-type UserType = { id: string; name: string; username: string; avatar?: string };
-type PostType = { id: string; author: UserType; text?: string; image?: string; tags?: string[] };
-
-// Mock data
-const MOCK_USERS: UserType[] = [
-    { id: "u1", name: "Asha Menon", username: "asham", avatar: "https://i.pravatar.cc/80?img=32" },
-    { id: "u2", name: "Ravi Kumar", username: "ravik", avatar: "https://i.pravatar.cc/80?img=12" },
-    { id: "u3", name: "Neha Singh", username: "nehasingh", avatar: "https://i.pravatar.cc/80?img=5" },
-    { id: "u4", name: "Priya Nair", username: "priyanair", avatar: "https://i.pravatar.cc/80?img=40" },
-];
-
-const MOCK_POSTS: PostType[] = Array.from({ length: 12 }).map((_, i) => ({
-    id: `p${i + 1}`,
-    author: MOCK_USERS[i % MOCK_USERS.length],
-    text: Math.random() > 0.4 ? `A short caption about image ${i + 1}` : undefined,
-    image: `https://picsum.photos/800/9${i + 1}?random=${i + 10}`,
-    tags: ["travel", i % 2 ? "design" : "photo"],
-}));
+import { SanitizedUser } from "@/utils/sanitizer/user";
+import Header from "@/components/nav/header";
 
 export default function ExplorePage() {
     const [query, setQuery] = useState("");
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [activeTab, setActiveTab] = useState<"posts" | "users" | "tags">("posts");
+    const [activeTab, setActiveTab] = useState<"posts" | "users" | "tags">("users");
     const [modalOpen, setModalOpen] = useState(false);
     const [modalIndex, setModalIndex] = useState(0);
 
     const [imagePosts, setImagePosts] = useState<IPublicPost[]>([]);
+
+    const [resultPosts, setResultPosts] = useState<IPublicPost[]>([]);
+    const [resultUsers, setResultUsers] = useState<SanitizedUser[]>([]);
+    const [resultTags, setResultTags] = useState<string[]>([]);
 
     useEffect(() => {
         function onKey(e: KeyboardEvent) {
@@ -51,44 +36,43 @@ export default function ExplorePage() {
     }, [imagePosts.length, modalOpen]);
 
 
-    const searchPosts = useMemo(() => {
-        if (!query) return [] as PostType[];
-        const q = query.toLowerCase();
-        return MOCK_POSTS.filter((p) => (p.text || "").toLowerCase().includes(q) || p.tags?.some((t) => t.includes(q)));
-    }, [query]);
-
     function openModalAt(index: number) {
         setModalIndex(index);
         setModalOpen(true);
         document.body.style.overflow = "hidden";
     }
 
+    useEffect(() => {
+        console.log(
+            "🚀 ~ file: explore.client.tsx:96 ~ useEffect ~: \n",
+            resultPosts, "\n",
+            resultUsers, "\n",
+            resultTags, "\n"
+        )
+    }, [resultPosts, resultUsers, resultTags])
+
     return (
         <div className="min-h-screen bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 pb-8">
+            <Header page="explore" />
             {/* Page header */}
             <header className="sticky top-0 z-10 bg-[#F0F2F5] dark:bg-neutral-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex items-center gap-4">
                     {/* <h2 className="text-lg font-semibold">Explore</h2> */}
 
                     <div className="relative flex-1 max-w-xl">
-                        <ExploreSearchBar query={query} setActiveTab={setActiveTab} setQuery={setQuery} setShowSuggestions={setShowSuggestions} />
-
-                        <AnimatePresence>
-                            {showSuggestions && query && (
-                                <SearchResults
-                                    query={query}
-                                    setActiveTab={setActiveTab}
-                                    setQuery={setQuery}
-                                    setImagePosts={setImagePosts}
-                                />
-                            )}
-                        </AnimatePresence>
+                        <ExploreSearchBar
+                            activeTab={activeTab}
+                            setQuery={setQuery}
+                            setResultPosts={setResultPosts}
+                            setResultUsers={setResultUsers}
+                            setResultTags={setResultTags}
+                        />
                     </div>
 
                     {
                         query && (
                             <div className="ml-auto flex items-center gap-2">
-                                <button onClick={() => setActiveTab("posts")} className={`px-3 py-2 rounded-md ${activeTab === "posts" ? "bg-[#2D3436] text-white" : "bg-white dark:bg-neutral-800"}`}>All</button>
+                                <button onClick={() => setActiveTab("posts")} className={`px-3 py-2 rounded-md ${activeTab === "posts" ? "bg-[#2D3436] text-white" : "bg-white dark:bg-neutral-800"}`}>Posts</button>
                                 <button onClick={() => setActiveTab("users")} className={`px-3 py-2 rounded-md ${activeTab === "users" ? "bg-[#2D3436] text-white" : "bg-white dark:bg-neutral-800"}`}>Users</button>
                                 <button onClick={() => setActiveTab("tags")} className={`px-3 py-2 rounded-md ${activeTab === "tags" ? "bg-[#2D3436] text-white" : "bg-white dark:bg-neutral-800"}`}>Tags</button>
                             </div>
@@ -101,7 +85,7 @@ export default function ExplorePage() {
             <main className="max-w-6xl mx-auto px-4 mt-6">
                 {/* Suggested posts grid (only image posts) */}
                 {
-                    (!query || !searchPosts.length) ? (
+                    (!query && (resultPosts.length === 0 && resultUsers.length === 0 && resultTags.length === 0)) ? (
                         <SuggestedPosts openModalAt={openModalAt} setImagePosts={setImagePosts} />
                     ) : (
                         <section className="mt-8">
@@ -112,15 +96,15 @@ export default function ExplorePage() {
 
                             <div>
                                 {activeTab === "posts" && (
-                                    <PostTab query={query} openModalAt={openModalAt} />
+                                    <PostTab resultPosts={resultPosts} openModalAt={openModalAt} />
                                 )}
 
                                 {activeTab === "users" && (
-                                    <UserTab query={query} />
+                                    <UserTab resultUsers={resultUsers} />
                                 )}
 
                                 {activeTab === "tags" && (
-                                    <TagsTab query={query} setQuery={setQuery} setActiveTab={setActiveTab} />
+                                    <TagsTab resultTags={resultTags} setQuery={setQuery} setActiveTab={setActiveTab} />
                                 )}
                             </div>
                         </section>
@@ -130,7 +114,7 @@ export default function ExplorePage() {
 
             {/* Reel modal - full screen */}
             <AnimatePresence>
-                {modalOpen && (
+                {(modalOpen && imagePosts.length > 0) && (
                     <ExploreModal
                         modalIndex={modalIndex}
                         imagePosts={imagePosts}

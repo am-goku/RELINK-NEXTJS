@@ -1,14 +1,14 @@
 import React from 'react';
-import ExploreClient from '../../components/client/pages/Explore.client';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth/authOptions';
+import ExplorePage from '@/components/client/explore/explore.client';
 
-export default async function ExplorePage() {
+export default async function Page() {
 
     const session = await getServerSession(authOptions);
 
     if(!session) redirect("/connect");
 
-    return <ExploreClient session={session} />
+    return <ExplorePage />
 }

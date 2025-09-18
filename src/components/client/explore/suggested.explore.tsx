@@ -28,7 +28,7 @@ function SuggestedPosts({ openModalAt, setImagePosts }: Props) {
         return () => {
             setSuggested([]);
         }
-    }, [])
+    }, [setImagePosts])
 
     return (
         <section>
