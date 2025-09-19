@@ -34,12 +34,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <SessionProviderWrapper session={session}>
           <UserProvider>
             <ThemeProvider>
-              <NProgressProvider>
-                <SocketInitializer />
-                <UnreadInitializer />
-                <ChatInitializer />
-                {children}
-              </NProgressProvider>
+              <NProgressProvider /> {/**  NProgress Provider */}
+              <SocketInitializer /> {/**  Socket Initializer */}
+              <UnreadInitializer /> {/**  Unread Initializer */}
+              <ChatInitializer /> {/**  Chat Initializer */}
+              {children}
             </ThemeProvider>
           </UserProvider>
         </SessionProviderWrapper>

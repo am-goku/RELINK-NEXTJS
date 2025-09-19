@@ -8,7 +8,7 @@ import 'nprogress/nprogress.css';
 // Optional: configure once
 NProgress.configure({ showSpinner: false, speed: 400, minimum: 0.25 });
 
-export default function NProgressProvider({ children }: { children: React.ReactNode }) {
+export default function NProgressProvider() {
     const pathname = usePathname();
 
     useEffect(() => {
@@ -25,5 +25,5 @@ export default function NProgressProvider({ children }: { children: React.ReactN
         };
     }, [pathname]);
 
-    return <>{children}</>;
+    return null; // No need to render anything, NProgress handles the rendering
 }
