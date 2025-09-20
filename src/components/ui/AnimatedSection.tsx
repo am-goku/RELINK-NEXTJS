@@ -13,7 +13,7 @@ export default function AnimatedSection({ title, icon: Icon, children }: Animate
 
     return (
         <React.Fragment>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 mb-6 transition-colors">
+            <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-md p-4 mb-6 transition-colors">
                 <div
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => setOpen(!open)}

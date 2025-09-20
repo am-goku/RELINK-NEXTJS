@@ -1,46 +1,15 @@
-'use client';
-
-import React from 'react';
-import {
-    Bell,
-    User,
-    Eye,
-    Shield,
-    SlidersHorizontal,
-} from 'lucide-react';
-import { useUser } from '@/context/UserContext';
+import AnimatedSection from '@/components/ui/AnimatedSection'
 import { useTheme } from '@/context/ThemeContext';
-import AnimatedSection from '@/components/ui/AnimatedSection';
-import { Session } from 'next-auth';
+import { Bell, Eye, Shield, SlidersHorizontal } from 'lucide-react'
+import React from 'react'
 
-type Props = {
-    session: Session | null;
-}
+function InterfaceSection() {
 
-function SettingsClient({ session }: Props) {
-
-    const { user } = useUser();
     const { theme, toggleTheme } = useTheme();
-
 
     return (
         <React.Fragment>
-            <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-gray-800 dark:text-gray-200">
-                {/* Account Section */}
-                {user && (
-                    <AnimatedSection title="Account" icon={User}>
-                        <div className="space-y-2">
-                            <div className="flex flex-col gap-3">
-                                <div className="flex flex-col gap-1">
-                                    <span className="font-bold text-lg">{user?.name}</span>
-                                    <span className="text-xs italic">@{user?.username}</span>
-                                </div>
-                                <span className="font-semibold">{session?.user?.email}</span>
-                            </div>
-                        </div>
-                    </AnimatedSection>
-                )}
-
+            <div className="rounded-2xl p-6 space-y-4">
                 {/* Notification Section */}
                 <AnimatedSection title="Notifications" icon={Bell}>
                     <div className="flex items-center justify-between">
@@ -128,4 +97,4 @@ function SettingsClient({ session }: Props) {
     )
 }
 
-export default SettingsClient
+export default InterfaceSection

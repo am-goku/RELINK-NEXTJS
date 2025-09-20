@@ -1,6 +1,6 @@
+import SettingsClient from "@/components/client/settings/settings.client";
 import { authOptions } from "@/lib/auth/authOptions";
 import { getServerSession } from "next-auth";
-import SettingsClient from "../../components/client/pages/settings/Settings.client";
 import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {

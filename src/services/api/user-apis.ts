@@ -26,10 +26,10 @@ export async function getProfileData({ setFormData, setError, setOriginalData, s
     setFormData: React.Dispatch<React.SetStateAction<ProfileFormData>>;
     setError: React.Dispatch<React.SetStateAction<string>>;
     setOriginalData: React.Dispatch<React.SetStateAction<Partial<ProfileFormData>>>;
-    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
+    setIsLoading?: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     try {
-        setIsLoading(true);
+        setIsLoading?.(true);
         const res = (await apiInstance.get('/api/users')).data.user;
         const data: ProfileFormData = {
             name: res.name || '',
@@ -44,7 +44,7 @@ export async function getProfileData({ setFormData, setError, setOriginalData, s
     } catch (error) {
         setError(getErrorMessage(error) || "Something went wrong. Please try again.");
     } finally {
-        setIsLoading(false);
+        setIsLoading?.(false);
     }
 }
 

@@ -1,33 +1,20 @@
-'use client';
-
-import React, { useState } from 'react';
-import {
-    Shield,
-    Mail,
-    Lock,
-    MessageCircle,
-    UserX,
-} from 'lucide-react';
-import LoadingContent from '@/components/ui/loaders/LoadingContent';
 import AnimatedSection from '@/components/ui/AnimatedSection';
-import { useUser } from '@/context/UserContext';
-import PrivacySection from '@/components/settings/PrivacySection';
+import { Lock, Mail, MessageCircle, UserX } from 'lucide-react';
 import { Session } from 'next-auth';
+import React, { useState } from 'react';
 
 type Props = {
-    session: Session | null;
+    session: Session;
 }
 
-function AccountClient({  }: Props) {
-    const { user, setUser } = useUser(); // setUser function from user context
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function AccountSection({ session }: Props) {
 
     const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     // Util states
     const [loading, setLoading] = useState<boolean>(false);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [pageLoading, setPageLoading] = useState<boolean>(false);
 
     const handleDeactivate = async () => {
         setLoading(true);
@@ -56,14 +43,10 @@ function AccountClient({  }: Props) {
             setShowDeleteConfirm(false);
         }
     };
-    return (
-        <LoadingContent isLoading={pageLoading}>
-            <div className="max-w-2xl mx-auto py-10 px-4 md:px-0 text-[#2D3436] dark:text-gray-200">
-                {/* Account Privacy Section */}
-                <AnimatedSection title="Privacy" icon={Shield}>
-                    <PrivacySection accountType={user?.accountType} onlineStatus={user?.onlineStatus} setUser={setUser} />
-                </AnimatedSection>
 
+    return (
+        <React.Fragment>
+            <div className="space-y-6 px-2 md:px-0">
                 {/* Who Can Message Section */}
                 <AnimatedSection title="Who Can Message You" icon={MessageCircle}>
                     <div>
@@ -118,7 +101,7 @@ function AccountClient({  }: Props) {
                         <button
                             onClick={() => setShowDeactivateConfirm(true)}
                             disabled={loading}
-                            className="px-5 py-2 rounded-xl border border-[#6C5CE7] text-[#6C5CE7] hover:bg-[#6C5CE7] hover:text-white dark:border-[#5A4BD3] dark:text-[#5A4BD3] dark:hover:bg-[#5A4BD3] dark:hover:text-white transition"
+                            className="px-5 py-2 rounded-xl border border-red-600 text-red-600 hover:bg-red-500x` hover:text-white dark:border-red-600 dark:text-red-600 dark:hover:bg-red-500 dark:hover:text-white transition"
                         >
                             Deactivate Account
                         </button>
@@ -158,39 +141,39 @@ function AccountClient({  }: Props) {
                             </div>
                         </div>
                     )}
-
-                    {/* Delete Confirmation Modal */}
-                    {showDeleteConfirm && (
-                        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-96 max-w-full text-[#2D3436] dark:text-gray-200">
-                                <h4 className="text-lg font-semibold mb-4">Confirm Deletion</h4>
-                                <p className="text-[#636E72] dark:text-gray-400 mb-6">
-                                    Deleting your account is permanent and cannot be undone. All your data will be lost. Are you absolutely sure?
-                                </p>
-                                <div className="flex justify-end gap-4">
-                                    <button
-                                        onClick={() => setShowDeleteConfirm(false)}
-                                        className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600"
-                                        disabled={loading}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleDelete}
-                                        className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
-                                        disabled={loading}
-                                    >
-                                        {loading ? "Processing..." : "Delete"}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
                 </AnimatedSection>
             </div>
 
-        </LoadingContent>
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-96 max-w-full text-[#2D3436] dark:text-gray-200">
+                        <h4 className="text-lg font-semibold mb-4">Confirm Deletion</h4>
+                        <p className="text-[#636E72] dark:text-gray-400 mb-6">
+                            Deleting your account is permanent and cannot be undone. All your data will be lost. Are you absolutely sure?
+                        </p>
+                        <div className="flex justify-end gap-4">
+                            <button
+                                onClick={() => setShowDeleteConfirm(false)}
+                                className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600"
+                                disabled={loading}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800"
+                                disabled={loading}
+                            >
+                                {loading ? "Processing..." : "Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </React.Fragment>
     )
 }
 
-export default AccountClient
+export default AccountSection

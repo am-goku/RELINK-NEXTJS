@@ -86,6 +86,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
         <PostOptionsModal
           key={post._id}
           open={postOptions}
+          author_id={post.user._id}
           onClose={() => setPostOptions(false)}
           onGoToPost={() => router.push(`/post/${post._id}`)}
         />

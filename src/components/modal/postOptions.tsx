@@ -2,11 +2,14 @@
 
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useSession } from 'next-auth/react';
 
 interface Props {
     open: boolean;
+    author_id: string;
     onClose: () => void;
     onDelete?: () => void;
+    onReport?: () => void;
     onUnfollow?: () => void;
     onGoToPost?: () => void;
     onShare?: () => void;
@@ -18,8 +21,8 @@ const OptionButton: React.FC<{ label: string; onClick: () => void; danger?: bool
     <button
         onClick={onClick}
         className={`w-full py-3 text-center text-sm font-medium transition border-b last:border-none dark:border-neutral-700 ${danger
-                ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-950'
-                : 'text-gray-800 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-neutral-800'
+            ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-950'
+            : 'text-gray-800 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-neutral-800'
             }`}
     >
         {label}
@@ -28,14 +31,19 @@ const OptionButton: React.FC<{ label: string; onClick: () => void; danger?: bool
 
 export default function PostOptionsModal({
     open,
+    author_id,
     onClose,
     onDelete,
+    onReport,
     onUnfollow,
     onGoToPost,
     onShare,
     onCopyLink,
     onViewAccount,
 }: Props) {
+
+    const { data: session } = useSession();
+
     return (
         <AnimatePresence>
             {open && (
@@ -54,7 +62,15 @@ export default function PostOptionsModal({
                         exit={{ y: 40 }}
                     >
                         <div className="divide-y divide-gray-200 dark:divide-neutral-700">
-                            <OptionButton label="Delete Post" onClick={onDelete ?? (() => { })} danger />
+
+                            {
+                                session?.user.id === author_id ? (
+                                    <OptionButton label="Delete Post" onClick={onDelete ?? (() => { })} danger />
+                                ) : (
+                                    <OptionButton label="Report" onClick={onReport ?? (() => { })} danger />
+                                )
+                            }
+
                             <OptionButton label="Unfollow User" onClick={onUnfollow ?? (() => { })} danger />
                             <OptionButton label="View Post" onClick={onGoToPost ?? (() => { })} />
                             <OptionButton label="Share" onClick={onShare ?? (() => { })} />

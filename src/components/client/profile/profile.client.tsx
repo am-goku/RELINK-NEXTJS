@@ -68,7 +68,7 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
     return (
         <div className="min-h-screen bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 relative">
             {/* Header Section */}
-            <Header page="profile" />
+            <Header page="profile" profile_id={user._id.toString()} />
 
             {/* Cover Section */}
             <ProfileCover isOwner={isOwner} user={user} />

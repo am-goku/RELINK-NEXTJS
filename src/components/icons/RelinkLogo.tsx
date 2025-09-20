@@ -12,6 +12,7 @@ function RelinkLogo({ width, height, onClick }: Props) {
         width={width}
         height={height}
         onClick={onClick}
+        priority
         className='cursor-pointer rounded-full' />
     </>
   )
