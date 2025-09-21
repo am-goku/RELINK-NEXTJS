@@ -1,6 +1,6 @@
+import apiInstance from '@/lib/axios';
 import socket from '@/lib/socket/socket';
 import { IMessage } from '@/models/Message';
-import { sendMessage, startMessage } from '@/services/api/chat-apis';
 import { useChatStore } from '@/stores/chatStore';
 import { EmojiClickData, Theme } from 'emoji-picker-react';
 import { Paperclip, Send, Smile } from 'lucide-react';
@@ -27,7 +27,7 @@ function ChatComposer({ newChat, session, setNewChat }: Props) {
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
     const sendTyping = () => {
-        socket.emit("typing", {roomId: activeRoom?._id.toString()});
+        socket.emit("typing", { roomId: activeRoom?._id.toString() });
     }
 
     async function handleSendMessage() {
@@ -39,7 +39,8 @@ function ChatComposer({ newChat, session, setNewChat }: Props) {
 
             if (activeRoom && !newChat) {
                 // send message to a conversation
-                newMessage = await sendMessage(activeRoom._id.toString(), input.trim());
+                newMessage = (await apiInstance.post(`/api/chat/conversation/${activeRoom._id.toString()}/message`, { content: input.trim() })).data.messageData;
+
             } else if (activeRoom && newChat) {
 
                 const receiver = activeRoom?.participants.find(participant => participant._id.toString() !== session.user.id);
@@ -47,7 +48,7 @@ function ChatComposer({ newChat, session, setNewChat }: Props) {
                 if (!receiver) throw new Error("Receiver is undefined.");
 
                 // Start a conversation with first message
-                const { message, conversation } = await startMessage(receiver._id.toString(), input.trim());
+                const { messageData: message, conversation } = (await apiInstance.post(`/api/chat/${receiver._id.toString()}`, { content: input.trim() })).data;
                 addChatRoom(conversation);
                 setSelectedRoom(conversation);
                 setNewChat(false);
@@ -56,7 +57,7 @@ function ChatComposer({ newChat, session, setNewChat }: Props) {
 
             if (newMessage) {
                 setInput('');
-                socket.emit("send-message", {roomId: activeRoom._id.toString(), message: newMessage});
+                socket.emit("send-message", { roomId: activeRoom._id.toString(), message: newMessage });
             }
         } catch (err) {
             console.error("Failed to send message:", err);

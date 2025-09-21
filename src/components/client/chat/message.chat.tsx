@@ -5,7 +5,6 @@ import ChatComposer from './composer.chat';
 import { IMessage } from '@/models/Message';
 import { Session } from 'next-auth';
 import { useChatStore } from '@/stores/chatStore';
-import { fetchMessages } from '@/services/api/chat-apis';
 import MessageSkeleton from '@/components/ui/skeletons/MessageLoading';
 import MessageText from './text.chat';
 import apiInstance from '@/lib/axios';
@@ -67,7 +66,7 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
         const getMessages = async () => {
             if (activeRoom && !newChat) {
                 setLoading(true);
-                const messages = await fetchMessages(activeRoom?._id.toString());
+                const messages = (await apiInstance.get(`/api/chat/conversation/${activeRoom._id.toString()}/message`)).data.messages || [];
                 setMessages(messages);
             }
             setLoading(false);

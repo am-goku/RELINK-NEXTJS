@@ -6,7 +6,7 @@ import ChatSidebar from "@/components/client/chat/sidebar.chat";
 import Header from "@/components/nav/header";
 import { Session } from "next-auth";
 import { useChatStore } from "@/stores/chatStore";
-import { fetchConversations } from "@/services/api/chat-apis";
+import apiInstance from "@/lib/axios";
 
 export default function ChatRoomsPage({ session }: { session: Session }) {
     // Chat Room State
@@ -43,7 +43,7 @@ export default function ChatRoomsPage({ session }: { session: Session }) {
     const fetchRooms = useCallback(async () => {
         if (session) {
             // setRoomsLoading(true);
-            const chatRooms = await fetchConversations();
+            const chatRooms = (await apiInstance.get('/api/chat/conversation')).data.conversations;
             setRooms(chatRooms);
             // setRoomsLoading(false);
         }

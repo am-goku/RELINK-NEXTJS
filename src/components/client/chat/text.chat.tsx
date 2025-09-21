@@ -1,5 +1,5 @@
+import apiInstance from '@/lib/axios';
 import { IMessage } from '@/models/Message'
-import { markSeen } from '@/services/api/chat-apis';
 import React, { useEffect, useRef } from 'react'
 
 
@@ -18,7 +18,7 @@ function MessageText({ message, isMe }: Props) {
     const msgRef = useRef<HTMLDivElement | null>(null);
 
     const markRead = React.useCallback(async () => {
-        await markSeen(message.conversation_id.toString(), message._id.toString());
+        await apiInstance.patch(`/api/chat/conversation/${message.conversation_id}/message/${message._id}/seen`);
     }, [message.conversation_id, message._id]);
 
     useEffect(() => {

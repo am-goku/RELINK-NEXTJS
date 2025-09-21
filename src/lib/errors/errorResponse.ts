@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { ApiError } from './ApiErrors';
+import { AxiosError } from 'axios';
 
 export function handleApiError(error: unknown) {
     if (error instanceof ApiError) {
@@ -23,6 +24,11 @@ export function handleApiError(error: unknown) {
 }
 
 export function getErrorMessage(error: unknown): string {
+
+    if(error instanceof AxiosError) {
+        return error.response?.data.message;
+    }
+
     if (error instanceof Error) {
         // Standard JS Error object
         return error.message;

@@ -1,7 +1,8 @@
 "use client";
 
+import apiInstance from "@/lib/axios";
 import socket from "@/lib/socket/socket";
-import { fetchConversations } from "@/services/api/chat-apis";
+import { IConversationPopulated } from "@/models/Conversation";
 import { useChatStore } from "@/stores/chatStore";
 import { useUnreadStore } from "@/stores/unreadStore";
 import { useSession } from "next-auth/react";
@@ -24,13 +25,13 @@ function ChatInitializer() {
             if (status === "authenticated" && !initializedRef.current) {
                 initializedRef.current = true;
 
-                const chatRooms = await fetchConversations();
+                const chatRooms = (await apiInstance.get('/api/chat/conversation')).data.conversations || [];
                 setRooms(chatRooms);
 
                 // batch join
                 socket.emit(
                     "join-rooms",
-                    chatRooms.map((r) => r._id.toString())
+                    chatRooms.map((r: IConversationPopulated) => r._id.toString())
                 );
             }
         };

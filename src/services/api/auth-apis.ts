@@ -1,4 +1,5 @@
 import apiInstance from "@/lib/axios";
+import { getErrorMessage } from "@/lib/errors/errorResponse";
 
 export const register_user = async (data: { email: string, username: string, password: string }) => {
     try {
@@ -8,8 +9,7 @@ export const register_user = async (data: { email: string, username: string, pas
             message: res.data.message,
             user: res.data.user
         }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-        throw (error?.response?.data);
+    } catch (error) {
+        throw (getErrorMessage(error) || "Something went wrong. Please try again.");
     }
 }

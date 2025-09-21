@@ -1,7 +1,7 @@
 'use client';
 
 import LoaderScreen from "@/components/ui/loaders/LoaderScreen";
-import { authService } from "@/services/api/apiServices";
+import apiInstance from "@/lib/axios";
 import { SanitizedUser } from "@/utils/sanitizer/user";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useCallback, useContext, createContext, useState } from "react";
@@ -23,7 +23,7 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     const fetchUser = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await authService.getAuthenticatedUser();
+            const res = await apiInstance.get('/api/auth/user');
             setUser(res?.data?.user);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
