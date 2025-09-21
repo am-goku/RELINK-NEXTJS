@@ -4,11 +4,10 @@ import { getUserByUsername } from "./userController";
 import { connectDB } from "../db/mongoose";
 import cloudinary from "../cloudinary/cloudinary";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
-import { SessionUser } from "@/types/instance";
 import { IPublicPost, sanitizePost } from "@/utils/sanitizer/post";
 import { Types } from "mongoose";
 
-export async function createPost(formData: FormData, user: SessionUser) {
+export async function createPost(formData: FormData, user_id: string) {
 
     await connectDB();
 
@@ -48,16 +47,17 @@ export async function createPost(formData: FormData, user: SessionUser) {
         ? hashtagsRaw.split(",").map(tag => tag.trim()).filter(Boolean)
         : [];
 
-    const post = await Post.create({
+    const post = new Post({
         content,
         image: image_url,
-        user: user.id,
+        user: new Types.ObjectId(user_id),
         hashtags,
-        likes: [],
-        comments: [],
-        share_count: 0,
-        views: 0,
     });
+
+    await post.save();
+
+    // populate directly on the instance
+    await post.populate("user", "name username image");
 
     // Sanitizing post into a safe public format
     return sanitizePost(post);

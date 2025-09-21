@@ -1,4 +1,4 @@
-import Avatar from '@/components/ui/avatar';
+import Avatar from '@/components/template/avatar';
 import { hasParticipantInNonGroup } from '@/helpers/chat-helper';
 import { IConversationPopulated } from '@/models/Conversation';
 import { fecthMutualConnections } from '@/services/api/user-apis';

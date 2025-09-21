@@ -1,6 +1,6 @@
 'use client';
 
-import AnimatedSection from '@/components/ui/AnimatedSection';
+import AnimatedSection from '@/components/ui/container/AnimatedSection';
 import { User } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { getErrorMessage } from '@/lib/errors/errorResponse';

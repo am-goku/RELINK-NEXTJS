@@ -1,69 +1,46 @@
+'use client';
+
+import Avatar from "@/components/template/avatar";
 import { getUserConnectionList } from "@/services/api/user-apis";
 import { ShortUser } from "@/utils/sanitizer/user";
 import { Types } from "mongoose";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export const FollowersTab = ({ user_id }: { user_id: Types.ObjectId }) => {
-    const [followers, setFollowers] = useState<ShortUser[]>([]);
-    useEffect(() => {
-        const fetchConnections = async () => {
-            const res = await getUserConnectionList({ id: user_id, type: 'followers' });
-            setFollowers(res);
-        }
+type ConnectionsTabProps = {
+    user_id: Types.ObjectId;
+    type: "followers" | "following";
+};
 
-        if (user_id) fetchConnections();
+const ConnectionsTab = ({ user_id, type }: ConnectionsTabProps) => {
 
-    }, [user_id])
-    return (
-        <div className="space-y-3">
-            {followers?.map((f) => (
-                <div
-                    key={f._id}
-                    className="bg-white dark:bg-dark-bg/90 p-4 rounded-2xl shadow flex items-center gap-3"
-                >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src={f.image || '/images/default-profile.png'}
-                        className="w-12 h-12 rounded-full object-cover"
-                        alt={f.username}
-                    />
-                    <span className="font-medium">{f.name || f.username}</span>
-                </div>
-            ))}
-        </div>
-    )
-}
+    const router = useRouter();
 
-export const FollowingTab = ({ user_id }: { user_id: Types.ObjectId }) => {
-
-    const [following, setFollowing] = useState<ShortUser[]>([]);
+    const [connections, setConnections] = useState<ShortUser[]>([]);
 
     useEffect(() => {
         const fetchConnections = async () => {
-            const res = await getUserConnectionList({ id: user_id, type: 'following' });
-            setFollowing(res);
-        }
+            const res = await getUserConnectionList({ id: user_id, type });
+            setConnections(res);
+        };
 
         if (user_id) fetchConnections();
-
-    }, [user_id])
+    }, [user_id, type]);
 
     return (
         <div className="space-y-3">
-            {following?.map((f) => (
+            {connections?.map((c) => (
                 <div
-                    key={f._id}
-                    className="bg-white dark:bg-dark-bg/90 p-4 rounded-2xl shadow flex items-center gap-3"
+                    key={c._id.toString()}
+                    onClick={() => router.push(`/${c.username}`)}
+                    className="bg-white dark:bg-dark-bg/90 p-4 rounded-2xl shadow flex items-center gap-3 cursor-pointer"
                 >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                        src={f.image || '/images/default-profile.png'}
-                        className="w-12 h-12 rounded-full object-cover"
-                        alt="Following"
-                    />
-                    <span className="font-medium">{f.name || f.username}</span>
+                    <Avatar user={c} size={12} key={c._id.toString() + "avatar"} />
+                    <span className="font-medium">{c.name || c.username}</span>
                 </div>
             ))}
         </div>
-    )
-}
+    );
+};
+
+export default ConnectionsTab;

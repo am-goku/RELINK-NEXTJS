@@ -1,4 +1,4 @@
-import Avatar from '@/components/ui/avatar'
+import Avatar from '@/components/template/avatar'
 import socket from '@/lib/socket/socket';
 import { IConversationPopulated } from '@/models/Conversation'
 import { useUnreadStore } from '@/stores/unreadStore';

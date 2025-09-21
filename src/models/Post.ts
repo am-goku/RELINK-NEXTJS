@@ -70,7 +70,8 @@ const PostSchema = new Schema<IPostDocument>(
         }],
         hashtags: [{
             type: String,
-            trim: true
+            trim: true,
+            default: []
         }],
         user: {
             type: Schema.Types.ObjectId,

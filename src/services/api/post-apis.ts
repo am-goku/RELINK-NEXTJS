@@ -3,7 +3,7 @@ import { getErrorMessage } from "@/lib/errors/errorResponse";
 import { IPublicPost } from "@/utils/sanitizer/post";
 
 
-export async function createNewPost({ content, file }: { content?: string; file?: Blob | null }): Promise<void> {
+export async function createNewPost({ content, file }: { content?: string; file?: Blob | null }) {
     try {
         // Throw an error if no content or image is provided
         if ((!content || !content?.trim()) && !file) throw new Error("No content or image provided");
@@ -22,6 +22,7 @@ export async function createNewPost({ content, file }: { content?: string; file?
 
         return res.post;
     } catch (error) {
+        console.log(error)
         throw getErrorMessage(error) || "Something went wrong. Please try again.";
     }
 }

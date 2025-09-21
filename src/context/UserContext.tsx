@@ -1,6 +1,6 @@
 'use client';
 
-import LoaderScreen from "@/components/ui/loaders/LoaderScreen";
+import LoaderScreen from "@/components/ui/loader/LoaderScreen";
 import apiInstance from "@/lib/axios";
 import { SanitizedUser } from "@/utils/sanitizer/user";
 import { useSession, signOut } from "next-auth/react";

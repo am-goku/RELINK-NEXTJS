@@ -1,5 +1,5 @@
 import React from "react";
-import Avatar from "../avatar";
+import Avatar from "../../template/avatar";
 import { Types } from "mongoose";
 import { IPublicPost } from "@/utils/sanitizer/post";
 import { Heart, MessageSquare, MoreHorizontal, Share2 } from "lucide-react";

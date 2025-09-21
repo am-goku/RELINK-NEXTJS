@@ -4,17 +4,18 @@ import React, { useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PhotoIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import CropModal from '../cropper/cropModal';
-import PrimaryButton from '../ui/buttons/PrimaryButton';
-import PrimaryCreateButton from '../ui/buttons/PrimaryCreateButton';
+import PrimaryButton from '../template/primary-button';
 import { createNewPost } from '@/services/api/post-apis';
+import { IPublicPost } from '@/utils/sanitizer/post';
 
 
 interface Props {
     open: boolean;
     onClose: () => void;
+    updatePostList?: React.Dispatch<React.SetStateAction<IPublicPost[]>>
 }
 
-export default function CreatePostModal({ open, onClose }: Props) {
+export default function CreatePostModal({ open, onClose, updatePostList }: Props) {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
     const [step, setStep] = useState<'choose' | 'content' | 'image' | 'editor'>('choose');
@@ -44,11 +45,13 @@ export default function CreatePostModal({ open, onClose }: Props) {
     };
 
     const handleCreateSubmit = async () => {
-        await createNewPost({
+        const post = await createNewPost({
             content: text.trim() || undefined,
             file: croppedImage,
             // TODO: Add hashtags and mentions here
         })
+
+        updatePostList?.((list) => [post, ...list]);
     };
 
     const handleSubmit = async () => {
@@ -107,7 +110,7 @@ export default function CreatePostModal({ open, onClose }: Props) {
                                     className="w-full rounded-xl border px-4 py-3 text-sm outline-none min-h-[120px] resize-none bg-transparent"
                                 />
                                 <div className="flex justify-end">
-                                    <PrimaryCreateButton onClick={handleSubmit} loading={loading}>Post</PrimaryCreateButton>
+                                    <PrimaryButton onClick={handleSubmit} loading={loading} disabled={!text || !text.trim()}>Post</PrimaryButton>
                                 </div>
                             </div>
                         )}
@@ -147,7 +150,8 @@ export default function CreatePostModal({ open, onClose }: Props) {
                                         className="w-full rounded-xl border px-4 py-2 text-sm outline-none"
                                     />
                                     <div className="flex justify-end">
-                                        <PrimaryCreateButton onClick={handleSubmit} loading={loading}>Post</PrimaryCreateButton>
+                                        {/* <PrimaryCreateButton onClick={handleSubmit} loading={loading}>Post</PrimaryCreateButton> */}
+                                        <PrimaryButton onClick={handleSubmit} loading={loading} disabled={!croppedImage}>Post</PrimaryButton>
                                     </div>
                                 </div>
                             </div>

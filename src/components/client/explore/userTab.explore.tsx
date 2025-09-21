@@ -1,4 +1,4 @@
-import Avatar from '@/components/ui/avatar';
+import Avatar from '@/components/template/avatar';
 import { SanitizedUser } from '@/utils/sanitizer/user';
 import React from 'react'
 

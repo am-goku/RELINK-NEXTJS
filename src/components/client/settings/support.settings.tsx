@@ -1,4 +1,4 @@
-import AnimatedSection from '@/components/ui/AnimatedSection'
+import AnimatedSection from '@/components/ui/container/AnimatedSection'
 import React from 'react'
 
 function HelpSupport() {

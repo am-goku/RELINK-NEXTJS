@@ -1,4 +1,4 @@
-import AnimatedSection from '@/components/ui/AnimatedSection';
+import AnimatedSection from '@/components/ui/container/AnimatedSection';
 import { Lock, Mail, MessageCircle, UserX } from 'lucide-react';
 import { Session } from 'next-auth';
 import React, { useState } from 'react';

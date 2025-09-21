@@ -32,24 +32,10 @@ type AdminSanitizedUser = BaseSanitizedUser & {
 export type SanitizedUser<R extends IUser['role'] = 'user'> =
   R extends 'admin' | 'super-admin' ? AdminSanitizedUser : BaseSanitizedUser;
 
-export type ShortUser = {
-  _id: string;
-  username: string;
-  name?: string;
-  image?: string;
-};
+export type ShortUser = Pick<BaseSanitizedUser, "_id" | "username"> &
+  Partial<Pick<BaseSanitizedUser, "name" | "image">>;
 
 type TConnection = string | ShortUser;
-
-/**
- * Sanitizes a user object by selecting specific fields based on the user's role.
- *
- * @param user - The user document to be sanitized.
- * @param role - The role of the user, which determines the fields to be included.
- * @returns A sanitized user object containing common fields for all users.
- *          If the role is 'admin' or 'super-admin', additional fields such as
- *          email, blocked status, deleted status, and otp are included.
- */
 
 export function sanitizeUser(
   user: IUserDocument | IUser,

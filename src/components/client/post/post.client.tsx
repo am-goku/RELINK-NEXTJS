@@ -4,9 +4,9 @@ import Header from '@/components/nav/header';
 import { Session } from 'next-auth';
 import React, { useState } from 'react';
 import PostHeader from './header.post';
-import PostCard from './card.post';
 import Comments from './comments.post';
 import { IPublicPost } from '@/utils/sanitizer/post';
+import PostPageCard from './card.post';
 
 type Props = {
     session: Session;
@@ -41,7 +41,7 @@ function PostClient({post, isOwner, session}: Props) {
                 <PostHeader session={session} post_id={post._id} />
 
                 {/* Post Card */}
-                <PostCard
+                <PostPageCard
                     session={session}
                     busy={busy}
                     post={post}

@@ -1,4 +1,4 @@
-import AnimatedSection from '@/components/ui/AnimatedSection'
+import AnimatedSection from '@/components/ui/container/AnimatedSection'
 import { useTheme } from '@/context/ThemeContext';
 import { Bell, Eye, Shield, SlidersHorizontal } from 'lucide-react'
 import React from 'react'

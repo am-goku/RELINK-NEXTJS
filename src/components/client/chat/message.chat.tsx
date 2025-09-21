@@ -5,12 +5,12 @@ import ChatComposer from './composer.chat';
 import { IMessage } from '@/models/Message';
 import { Session } from 'next-auth';
 import { useChatStore } from '@/stores/chatStore';
-import MessageSkeleton from '@/components/ui/skeletons/MessageLoading';
+import MessageSkeleton from '@/components/ui/skeleton/MessageLoading';
 import MessageText from './text.chat';
 import apiInstance from '@/lib/axios';
 import { useUnreadStore } from '@/stores/unreadStore';
 import socket from '@/lib/socket/socket';
-import TypingLoader from '@/components/ui/loaders/TypingLoader';
+import TypingLoader from '@/components/ui/loader/TypingLoader';
 
 type Props = {
     session: Session;

@@ -1,20 +1,23 @@
 'use client'
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { MessageSquare, Plus, UserMinus, UserPlus } from "lucide-react";
 import Header from "@/components/nav/header";
 import { Session } from "next-auth";
 import { hasConnection } from "@/utils/connections/user-connection";
 import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
 import { IPublicPost } from "@/utils/sanitizer/post";
-import SkeletonPostCard from "@/components/ui/skeletons/SkeletonPostCard";
+import SkeletonPostCard from "@/components/ui/skeleton/SkeletonPostCard";
 import { getPostsByUsername } from "@/services/api/post-apis";
 import PostCard from "@/components/ui/cards/postCard";
-import { FollowButton, MessageButton, UnfollowButton } from "@/components/ui/buttons/connectionButtons";
-import { FollowersTab, FollowingTab } from "./tabs.profile";
 import ProfileCover from "./cover.profile";
 import ProfilePic from "./image.Profile";
+import CreatePostModal from "@/components/modal/createPost";
+import { followUser, unfollowUser } from "@/services/api/user-apis";
+import { ActionButton } from "@/components/template/action-button";
+import ConnectionsTab from "./tabs.profile";
+import { AboutCard } from "./about.profile";
 
 type Props = {
     session: Session | null;
@@ -31,6 +34,9 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
     const [error, setError] = useState<string>('');
     const [posts, setPosts] = useState<IPublicPost[] | []>([])
     const [loadingPosts, setLoadingPosts] = useState(true);
+
+    //Create post states
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     // connection states
     const [isFollowing, setIsFollowing] = useState<boolean>(true);
@@ -65,6 +71,21 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
         }
     }, [error])
 
+    // Connection management: follow
+    const doFollow = useCallback(async () => {
+        if (user._id) {
+            await followUser({ id: user._id });
+            setIsFollowing(true);
+        }
+    }, [user._id])
+    // Connection management: unfollow
+    const doUnfollow = useCallback(async () => {
+        if (user._id) {
+            await unfollowUser({ id: user._id });
+            setIsFollowing(false);
+        }
+    }, [user._id])
+
     return (
         <div className="min-h-screen bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 relative">
             {/* Header Section */}
@@ -85,13 +106,19 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
                                 <div className="flex gap-2 mt-2">
                                     {
                                         isFollowing ? (
-                                            <UnfollowButton id={user?._id} setIsFollowing={setIsFollowing} />
+                                            <ActionButton onAction={doUnfollow}>
+                                                <UserMinus size={16} /> Remove
+                                            </ActionButton>
                                         ) : (
-                                            <FollowButton id={user?._id} setIsFollowing={setIsFollowing} />
+                                            <ActionButton onAction={doFollow}>
+                                                <UserPlus size={16} /> Follow
+                                            </ActionButton>
                                         )
 
                                     }
-                                    <MessageButton />
+                                    <ActionButton onAction={async () => {}}>
+                                        <MessageSquare size={16} /> Message
+                                    </ActionButton>
                                 </div>
                             )
                         }
@@ -148,28 +175,38 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
                 )}
 
                 {activeTab === "about" && (
-                    <div className="bg-white dark:bg-dark-bg/90 p-4 rounded-2xl shadow">
-                        <h3 className="font-semibold text-lg mb-2">About John Doe</h3>
-                        <p className="text-gray-700 dark:text-gray-300">
-                            Passionate developer, loves building web apps with Next.js and
-                            Tailwind.
-                        </p>
-                    </div>
+                    <AboutCard user={user} />
                 )}
 
                 {activeTab === "followers" && (
-                    <FollowersTab user_id={user?._id} />
+                    <ConnectionsTab user_id={user?._id} type="followers" />
                 )}
 
                 {activeTab === "following" && (
-                    <FollowingTab user_id={user?._id} />
+                    <ConnectionsTab user_id={user?._id} type="following" />
                 )}
             </motion.div>
 
             {/* Floating Create Post Button */}
-            <button className="fixed bottom-6 right-6 p-4 rounded-full shadow-lg bg-[#2D3436] text-white hover:brightness-110 dark:bg-gray-200 dark:text-neutral-900 transition">
-                <Plus size={24} />
-            </button>
+            {
+                isOwner && (
+                    <React.Fragment>
+
+                        <button onClick={() => setShowCreateModal(true)} className="fixed bottom-6 right-6 p-4 rounded-full shadow-lg bg-[#2D3436] text-white hover:brightness-110 dark:bg-gray-200 dark:text-neutral-900 transition">
+                            <Plus size={24} />
+                        </button>
+
+                        {/* Create modal (placeholder) */}
+                        {showCreateModal && (
+                            <CreatePostModal
+                                open={showCreateModal}
+                                onClose={() => setShowCreateModal(false)}
+                                updatePostList={setPosts}
+                            />
+                        )}
+                    </React.Fragment>
+                )
+            }
         </div>
     );
 }

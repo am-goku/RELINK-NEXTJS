@@ -1,4 +1,4 @@
-import Avatar from '@/components/ui/avatar';
+import Avatar from '@/components/template/avatar';
 import { IPublicPost } from '@/utils/sanitizer/post';
 import { Bookmark, Heart, MessageSquare, Share2 } from 'lucide-react'
 import { Types } from 'mongoose';
@@ -16,7 +16,7 @@ type Props = {
     setBusy: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function PostCard({ session, busy, post, liked, saved, setLikes, setSaves, setBusy }: Props) {
+function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, setBusy }: Props) {
 
     async function toggleLike() {
         if (!post) return;
@@ -101,4 +101,4 @@ function PostCard({ session, busy, post, liked, saved, setLikes, setSaves, setBu
     )
 }
 
-export default PostCard
+export default PostPageCard

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import PrimaryButton from '../ui/buttons/PrimaryButton';
+import PrimaryButton from '../template/primary-button';
 import { emailRegex, passwordRegex, usernameRegex } from '@/utils/validators';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
 import FieldLabel from '../ui/label/ConnectLablel';

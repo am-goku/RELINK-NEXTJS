@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { connectDB } from '@/lib/db/mongoose';
 import { userAuth } from '@/lib/auth';
 import { handleApiError } from '@/lib/errors/errorResponse';
 import { createPost, getPosts } from '@/lib/controllers/postController';
-import { SessionUser } from '@/types/instance';
 
 export const config = {
     api: {
@@ -13,19 +11,19 @@ export const config = {
 
 export async function POST(req: NextRequest) {
     try {
-        await connectDB();
-
         const formData = await req.formData();
 
-        const user: SessionUser = await userAuth();
+        const user = await userAuth();
+
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const post = await createPost(formData, user)
+        const post = await createPost(formData, user.id);
 
         return NextResponse.json({ message: "Post created successfully", post }, { status: 201 });
     } catch (error) {
+        console.log(error)
         return handleApiError(error);
     }
 }

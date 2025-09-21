@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { emailRegex } from '@/utils/validators';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
-import PrimaryButton from '../ui/buttons/PrimaryButton';
+import PrimaryButton from '../template/primary-button';
 import FieldLabel from '../ui/label/ConnectLablel';
 import { TextInput } from '../ui/fields/connectFields';
 import { signIn } from 'next-auth/react';
