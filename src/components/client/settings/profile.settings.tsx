@@ -29,18 +29,18 @@ function ProfileSection() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await apiInstance.get('/api/auth/user'); // your API endpoint
+                const res = (await apiInstance.get('/api/auth/user')).data; // your API endpoint
                 setFormData({
-                    bio: res.data.user.bio || '',
-                    gender: res.data.user.gender || '',
-                    name: res.data.user.name || '',
-                    username: res.data.user.username || ''
+                    bio: res.bio || '',
+                    gender: res.gender || '',
+                    name: res.name || '',
+                    username: res.username || ''
                 });
                 setOriginalData({
-                    bio: res.data.user.bio || '',
-                    gender: res.data.user.gender || '',
-                    name: res.data.user.name || '',
-                    username: res.data.user.username || ''
+                    bio: res.bio || '',
+                    gender: res.gender || '',
+                    name: res.name || '',
+                    username: res.username || ''
                 });
             } catch (err) {
                 setError(getErrorMessage(err) || 'Failed to fetch profile');

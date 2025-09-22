@@ -235,28 +235,6 @@ export async function updateUserProfilePic({ file }: { file: Blob }) {
 }
 
 /**
- * Updates the type of the currently logged in user.
- * @param {{ onDone: ((data: unknown) => void) | undefined, doFun: (() => void) | undefined, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the type.
- * @prop {((data: unknown) => void) | undefined} onDone - The function to call when the update is successful.
- * @prop {(() => void) | undefined} doFun - The function to call when the update is successful.
- * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to call when there is an error.
- */
-export async function updateType({ onDone, doFun, setError }: {
-    onDone?: (data: unknown) => void
-    doFun?: () => void;
-    setError: Dispatch<SetStateAction<string | null>>;
-}) {
-    try {
-        const res = (await apiInstance.patch(`/api/users/update/account/type`)).data;
-        onDone?.(res);
-        doFun?.();
-    } catch (error) {
-        setError(getErrorMessage(error))
-    }
-}
-
-
-/**
  * Updates the status of the currently logged in user.
  * @param {{ onDone: ((data: unknown) => void) | undefined, doFun: (() => void) | undefined, setError: React.Dispatch<React.SetStateAction<string | null>> }} props - The props to update the status.
  * @prop {((data: unknown) => void) | undefined} onDone - The function to call when the update is successful.

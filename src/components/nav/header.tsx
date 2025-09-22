@@ -1,4 +1,4 @@
-import { Compass, Home, MessageCircle, MoreVertical, Plus, User } from 'lucide-react'
+import { Compass, Home, Menu, MessageCircle, Plus, User } from 'lucide-react'
 import React from 'react'
 import RelinkLogo from '../icons/RelinkLogo';
 import { useRouter } from 'next/navigation';
@@ -7,7 +7,7 @@ import { useUnreadStore } from '@/stores/unreadStore';
 import ProfileOptionsModal from '../modal/profileOptions';
 
 type Props = {
-    page: "connect" | "dashboard" | "chat" | "profile" | "explore" | "setting";
+    page: "connect" | "dashboard" | "chat" | "profile" | "explore" | "settings";
     doFun?: () => void;
     profile_id?: string;
 }
@@ -75,22 +75,22 @@ function Header({ page, profile_id, doFun }: Props) {
                                     )}
                                 </button>
 
+                                <button
+                                    onClick={() => router.push(`/${session?.user.username}`)}
+                                    style={{ border: page === "profile" ? "2px solid #1DA1F2" : "none" }}
+                                    className="flex items-center gap-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
+                                >
+                                    <User className="h-4 w-4" />
+                                </button>
+
                                 {
-                                    (page === "profile" && session?.user.id === profile_id) ? (
+                                    (page === "profile" || page === "settings") && (
                                         <button
                                             onClick={() => setOptionsModal(true)}
-                                            // style={{ border: page === "setting" ? "2px solid #1DA1F2" : "none" }}
+                                            style={{ border: page === "settings" ? "2px solid #1DA1F2" : "none" }}
                                             className="flex items-center gap-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
                                         >
-                                            <MoreVertical className="h-4 w-4" />
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => router.push(`/${session?.user.username}`)}
-                                            style={{ border: page === "profile" ? "2px solid #1DA1F2" : "none" }}
-                                            className="flex items-center gap-3 rounded-2xl bg-white/80 px-3 py-2 text-sm font-medium shadow-sm ring-1 ring-black/5 hover:brightness-105 dark:bg-neutral-800/70 dark:ring-white/10"
-                                        >
-                                            <User className="h-4 w-4" />
+                                            <Menu className="h-4 w-4" />
                                         </button>
                                     )
                                 }

@@ -18,7 +18,7 @@ export async function GET() {
 
         if(!user) throw new UnauthorizedError('Unauthorized');
 
-        return NextResponse.json({ user: sanitizeUser(user) });
+        return NextResponse.json(sanitizeUser(user), { status: 200 });
     } catch (error) {
         return handleApiError(new UnauthorizedError(getErrorMessage(error) || 'Unauthorized'));
     }

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Poppins } from 'next/font/google'
 import '@/styles/nprogress.css';
-import UserProvider from "../context/UserContext";
 import SessionProviderWrapper from "@/providers/SessionProviderWrapper";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth/authOptions";
@@ -11,6 +10,7 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { UnreadInitializer } from "@/components/initializers/UnreadInitializer";
 import SocketInitializer from "@/components/initializers/SocketInitializer";
 import ChatInitializer from "@/components/initializers/ChatInitializer";
+import UserInitializer from "@/components/initializers/UserInitializer";
 
 
 const poppins = Poppins({
@@ -32,15 +32,14 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <html lang="en">
       <body className={poppins.className}>
         <SessionProviderWrapper session={session}>
-          <UserProvider>
             <ThemeProvider>
               <NProgressProvider /> {/**  NProgress Provider */}
+              <UserInitializer /> {/**  User Initializer */}
               <SocketInitializer /> {/**  Socket Initializer */}
               <UnreadInitializer /> {/**  Unread Initializer */}
               <ChatInitializer /> {/**  Chat Initializer */}
               {children}
             </ThemeProvider>
-          </UserProvider>
         </SessionProviderWrapper>
       </body>
     </html>

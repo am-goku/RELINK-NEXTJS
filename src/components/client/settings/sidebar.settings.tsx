@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { User, Settings, Shield, HelpCircle, Monitor } from 'lucide-react';
 
 
-const tabs = [
+const tabs: { id: Tab, label: string, icon: React.ElementType }[] = [
     { id: 'edit-profile', label: 'Edit Profile', icon: User },
     { id: 'account', label: 'Account', icon: Settings },
     { id: 'interface', label: 'Interface', icon: Monitor },
@@ -11,12 +11,14 @@ const tabs = [
     { id: 'help-support', label: 'Help & Support', icon: HelpCircle },
 ];
 
+type Tab = 'edit-profile' | 'account' | 'interface' | 'privacy-policy' | 'help-support';
+
 type Props = {
-    activeTab: string;
-    setActiveTab: React.Dispatch<React.SetStateAction<string>>;
+    activeTab: Tab;
+    setActiveTab: (tab: Tab) => void;
 }
 
-function SettingsSidebar({ activeTab,setActiveTab }: Props) {
+function SettingsSidebar({ activeTab, setActiveTab }: Props) {
     return (
         <React.Fragment>
             <aside className="flex md:flex-col justify-around md:justify-start w-full md:w-1/4 mb-4 md:mb-0">

@@ -1,6 +1,6 @@
 import AnimatedSection from '@/components/ui/container/AnimatedSection'
 import { useTheme } from '@/context/ThemeContext';
-import { Bell, Eye, Shield, SlidersHorizontal } from 'lucide-react'
+import { Bell, Eye, SlidersHorizontal } from 'lucide-react'
 import React from 'react'
 
 function InterfaceSection() {
@@ -54,22 +54,6 @@ function InterfaceSection() {
                     <div className="flex items-center justify-between">
                         <span>High Contrast</span>
                         <input type="checkbox" className="toggle toggle-primary" />
-                    </div>
-                </AnimatedSection>
-
-                {/* Privacy & Security Section */}
-                <AnimatedSection title="Privacy & Security" icon={Shield}>
-                    <div className="flex items-center justify-between">
-                        <span>Private Account</span>
-                        <input type="checkbox" className="toggle toggle-primary" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <span>Two-Factor Authentication</span>
-                        <input type="checkbox" className="toggle toggle-primary" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <span>Allow Search by Email</span>
-                        <input type="checkbox" className="toggle toggle-primary" defaultChecked />
                     </div>
                 </AnimatedSection>
 

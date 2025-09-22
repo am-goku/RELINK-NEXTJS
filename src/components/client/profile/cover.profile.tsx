@@ -5,7 +5,7 @@ import { Camera } from "lucide-react"
 import React, { useEffect, useRef, useState } from "react";
 
 
-const ProfileCover = ({ user, isOwner }: { user: SanitizedUser, isOwner: boolean}) => {
+const ProfileCover = ({ user, isOwner }: { user: SanitizedUser, isOwner: boolean }) => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -45,11 +45,18 @@ const ProfileCover = ({ user, isOwner }: { user: SanitizedUser, isOwner: boolean
         <React.Fragment>
             <div className="relative w-full h-60 bg-gray-300">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                    src={newCover || user?.cover}
-                    alt="Cover"
-                    className="w-full h-full object-cover"
-                />
+                {newCover || user?.cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                        src={newCover || user?.cover}
+                        alt="Cover"
+                        className="w-full h-full object-cover"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-600 dark:text-gray-400 bg-gray-200 dark:bg-neutral-800">
+                        No Cover Photo
+                    </div>
+                )}
                 {
                     isOwner && (
                         <>

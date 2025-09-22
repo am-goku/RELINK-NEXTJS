@@ -1,20 +1,64 @@
+import { ConfirmToggler } from '@/components/template/toggler';
 import AnimatedSection from '@/components/ui/container/AnimatedSection';
-import { Lock, Mail, MessageCircle, UserX } from 'lucide-react';
-import { Session } from 'next-auth';
-import React, { useState } from 'react';
+import apiInstance from '@/lib/axios';
+import { useUserStore } from '@/stores/userStore';
+import { Lock, Mail, MessageCircle, Shield, UserX } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
 
-type Props = {
-    session: Session;
-}
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function AccountSection({ session }: Props) {
+function AccountSection() {
+
+    const accountType = useUserStore(s => s.user?.accountType);
+    const messageFrom = useUserStore(s => s.user?.messageFrom);
 
     const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+    // 2FA
+    const [twoFA, setTwoFA] = useState(false);
+
+    // Search by Email
+    const [searchByEmail, setSearchByEmail] = useState(false);
+
     // Util states
     const [loading, setLoading] = useState<boolean>(false);
+
+    const switchAccountType = useCallback(async () => {
+        try {
+            await apiInstance.patch("/api/users/update/account/type");
+            useUserStore.getState().updateUser("accountType", accountType === "public" ? "private" : "public");
+        } catch (error) {
+            console.log(error);
+        }
+    }, [accountType]) // Funtion-Use: Update account type to Private or Public
+
+    const switchMessageFrom = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        try {
+            const value = e.target.value as 'everyone' | 'followers' | 'none';
+            // TODO: add API call here
+            useUserStore.getState().updateUser("messageFrom", value);
+        } catch (error) {
+            console.log(error);
+        }
+    } // Funtion-Use: Update message between everyone or followers or none
+
+    const switchTwoFA = useCallback(async () => {
+        try {
+            // TODO: add API call here
+            setTwoFA(!twoFA);
+        } catch (error) {
+            console.log(error);
+        }
+    }, [twoFA])
+
+    const switchSearchByEmail = useCallback(async () => {
+        try {
+            // TODO: add API call here
+            setSearchByEmail(!searchByEmail);
+        } catch (error) {
+            console.log(error);
+        }
+    }, [searchByEmail])
 
     const handleDeactivate = async () => {
         setLoading(true);
@@ -28,7 +72,7 @@ function AccountSection({ session }: Props) {
             setLoading(false);
             setShowDeactivateConfirm(false);
         }
-    };
+    }; // TODO: add deactivate account API call
 
     const handleDelete = async () => {
         setLoading(true);
@@ -42,18 +86,55 @@ function AccountSection({ session }: Props) {
             setLoading(false);
             setShowDeleteConfirm(false);
         }
-    };
+    }; // TODO: add delete account API call
 
     return (
         <React.Fragment>
             <div className="space-y-6 px-2 md:px-0">
+                {/* Privacy & Security Section */}
+                <AnimatedSection title="Privacy & Security" icon={Shield}>
+                    <div className="flex items-center justify-between">
+                        <span>Private Account</span>
+                        {/* <input type="checkbox" className="toggle toggle-primary" /> */}
+                        <ConfirmToggler
+                            title={`Switch to ${accountType === 'public' ? 'Public' : 'Private'} Account`}
+                            value={accountType === 'private'}
+                            onConfirm={switchAccountType}
+                            confirmText="Switch"
+                            messageBuilder={() => `Are you sure you want to switch to ${accountType === 'public' ? 'Public' : 'Private'} account?`}
+                        />
+                    </div> {/** Account Type Toggler */}
+
+                    <div className="flex items-center justify-between">
+                        <span>Two-Factor Authentication</span>
+                        <ConfirmToggler
+                            title={`${twoFA ? 'Disable' : 'Enable'} Two-Factor Authentication`}
+                            value={twoFA}
+                            onConfirm={switchTwoFA}
+                            confirmText={`${twoFA ? 'Disable' : 'Enable'}`}
+                            messageBuilder={() => `Are you sure you want to ${twoFA ? 'disable' : 'enable'} Two-Factor Authentication?`}
+                        />
+                    </div> {/** 2FA Toggler */}
+
+                    <div className="flex items-center justify-between">
+                        <span>Allow Search by Email</span>
+                        <ConfirmToggler
+                            title={`${searchByEmail ? 'Disable' : 'Enable'} Search by Email`}
+                            value={searchByEmail}
+                            onConfirm={switchSearchByEmail}
+                            confirmText={`${searchByEmail ? 'Disable' : 'Enable'}`}
+                            messageBuilder={() => `Are you sure you want to ${searchByEmail ? 'disable' : 'enable'} Search by Email?`}
+                        />
+                    </div> {/** Allow Search by Email Toggler */}
+                </AnimatedSection>
+
                 {/* Who Can Message Section */}
                 <AnimatedSection title="Who Can Message You" icon={MessageCircle}>
-                    <div>
-                        <label className="text-sm font-medium block mb-1">Message Permissions</label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-md dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
-                            <option value={'everyone'}>Everyone</option>
+                    <div className="flex items-center justify-between">
+                        <span>Message Permissions</span>
+                        <select value={messageFrom} onChange={switchMessageFrom} className="ml-auto border border-gray-300 px-3 py-1 rounded-md focus:outline-none dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
                             <option value={'followers'}>Followers Only</option>
+                            <option value={'everyone'}>Everyone</option>
                             <option value={'none'}>No One</option>
                         </select>
                     </div>
