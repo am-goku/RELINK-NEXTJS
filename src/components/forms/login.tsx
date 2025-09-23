@@ -13,9 +13,13 @@ type Props = {
     setSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
     setGlobalError: React.Dispatch<React.SetStateAction<string | null>>;
     setGlobalSuccess: React.Dispatch<React.SetStateAction<string | null>>;
+    setOtpEmail: React.Dispatch<React.SetStateAction<string>>;
+    setOtpUsername: React.Dispatch<React.SetStateAction<string>>;
+    setMod: React.Dispatch<React.SetStateAction<"login" | "signup" | "otp">>;
+    setFromSignup: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-function LoginForm({ submitting, setGlobalError, setGlobalSuccess, setSubmitting }: Props) {
+function LoginForm({ submitting, setGlobalError, setGlobalSuccess, setSubmitting, setOtpEmail, setOtpUsername, setMod, setFromSignup }: Props) {
 
     const router = useRouter();
 
@@ -53,7 +57,23 @@ function LoginForm({ submitting, setGlobalError, setGlobalSuccess, setSubmitting
             router.push("/dashboard");
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
-            setGlobalError(err?.message || "Login failed. Please try again.");
+            if (err instanceof Error) {
+                let parsed;
+                try {
+                    parsed = JSON.parse(err.message);
+                } catch {
+                    parsed = { message: err.message };
+                }
+
+                if (parsed.cause?.verified === false) {
+                    setOtpEmail(parsed.cause.email);
+                    setOtpUsername(parsed.cause.username);
+                    setFromSignup(false);
+                    setMod("otp");
+                }
+
+                setGlobalError(parsed.message);
+            }
         } finally {
             setSubmitting(false);
         }

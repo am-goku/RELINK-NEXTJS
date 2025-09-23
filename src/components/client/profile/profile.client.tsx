@@ -8,9 +8,7 @@ import { Session } from "next-auth";
 import { hasConnection } from "@/utils/connections/user-connection";
 import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
 import { IPublicPost } from "@/utils/sanitizer/post";
-import SkeletonPostCard from "@/components/ui/skeleton/SkeletonPostCard";
 import { getPostsByUsername } from "@/services/api/post-apis";
-import PostCard from "@/components/ui/cards/postCard";
 import ProfileCover from "./cover.profile";
 import ProfilePic from "./image.Profile";
 import CreatePostModal from "@/components/modal/createPost";
@@ -18,6 +16,7 @@ import { followUser, unfollowUser } from "@/services/api/user-apis";
 import { ActionButton } from "@/components/template/action-button";
 import ConnectionsTab from "./tabs.profile";
 import { AboutCard } from "./about.profile";
+import PostList from "./posts.profile";
 
 type Props = {
     session: Session | null;
@@ -158,20 +157,7 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
                 className="max-w-2xl mx-auto px-4 mt-6"
             >
                 {activeTab === "posts" && (
-                    <div className="space-y-4">
-                        {loadingPosts ? (
-                            Array.from({ length: 3 }).map((_, i) => <SkeletonPostCard key={i} />)
-                        ) : (
-                            posts.map((post, index) => (
-                                <React.Fragment key={post._id}>
-                                    <PostCard onLike={() => { }} post={post} />
-                                    {index !== posts.length - 1 && (
-                                        <div className="border-t border-gray-200 dark:border-gray-700 my-4 transition-colors" />
-                                    )}
-                                </React.Fragment>
-                            ))
-                        )}
-                    </div>
+                    <PostList loadingPosts={loadingPosts} posts={posts} />
                 )}
 
                 {activeTab === "about" && (

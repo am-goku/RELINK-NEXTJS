@@ -5,18 +5,21 @@ import { emailRegex, passwordRegex, usernameRegex } from '@/utils/validators';
 import { AlertCircle, CheckCircle2, Eye, EyeOff, Loader2, Lock, Mail, User } from 'lucide-react';
 import FieldLabel from '../ui/label/ConnectLablel';
 import { TextInput } from '../ui/fields/connectFields';
-import { register_user } from '@/services/api/auth-apis';
 import { checkUsernameAvailability } from '@/services/api/user-apis';
+import apiInstance from '@/lib/axios';
 
 type Props = {
     submitting: boolean;
     setSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
     setGlobalError: React.Dispatch<React.SetStateAction<string | null>>;
     setGlobalSuccess: React.Dispatch<React.SetStateAction<string | null>>;
-    setMode: React.Dispatch<React.SetStateAction<"login" | "signup">>;
+    setMode: React.Dispatch<React.SetStateAction<"login" | "signup" | "otp">>;
+
+    setOtpEmail: React.Dispatch<React.SetStateAction<string>>;
+    setOtpUsername: React.Dispatch<React.SetStateAction<string>>;
 }
 
-function SignupForm({ setGlobalError, setGlobalSuccess, setSubmitting, submitting, setMode }: Props) {
+function SignupForm({ setGlobalError, setGlobalSuccess, setSubmitting, submitting, setMode, setOtpEmail, setOtpUsername }: Props) {
 
     // signup state
     const [suEmail, setSuEmail] = useState("");
@@ -81,13 +84,15 @@ function SignupForm({ setGlobalError, setGlobalSuccess, setSubmitting, submittin
 
         try {
             setSubmitting(true);
-            await register_user({
+            await apiInstance.post("/api/auth/register", {
                 email: suEmail.toLowerCase(),
                 password: suPassword,
                 username: suUsername,
             });
-            setGlobalSuccess("Account created. You can log in now.");
-            setMode("login");
+            setOtpEmail(suEmail);
+            setOtpUsername(suUsername);
+            setGlobalSuccess("Account created. Please Verify your email.");
+            setMode("otp");
             setSuEmail("");
             setSuUsername("");
             setSuPassword("");

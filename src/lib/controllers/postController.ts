@@ -99,7 +99,7 @@ export async function getPostsByUsername(username: string, page = 1, c_user_id: 
     const skip = (page - 1) * limit;
 
     const posts = await Post.find({
-        user: user._id,
+        author: user._id,
         is_archived: false,
         is_blocked: false,
     }).sort({ created_at: -1 })

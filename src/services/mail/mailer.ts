@@ -4,6 +4,7 @@ import { getOtpTemplate } from "./otpTemplate";
 
 type IOtpFor = 'password' | 'email' | 'login' | 'verification';
 
+
 export async function sendEmail(email: string, username: string, token: string, otpFor: IOtpFor = 'verification') {
   try {
     const info = await transporter.sendMail({

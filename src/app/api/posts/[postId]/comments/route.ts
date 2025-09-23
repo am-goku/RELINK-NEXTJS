@@ -18,12 +18,12 @@ export async function POST(req: NextRequest, context: { params: Promise<{ postId
         }
 
         // Create comment in collection Comment
-        const commentData = await createComment(postId, content, authUser.id);
+        const comment = await createComment(postId, content, authUser.id);
 
         // Add count of comments in key comment_count of collection Post
         await Post.updateOne({ _id: new Types.ObjectId(postId) }, { $inc: { comment_count: 1 } });
 
-        return NextResponse.json({ message: "Comments created successfully", comment: commentData }, { status: 200 });
+        return NextResponse.json(comment, { status: 200 });
 
     } catch (error) {
         return handleApiError(error);

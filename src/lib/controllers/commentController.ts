@@ -11,9 +11,9 @@ export async function createComment(postId: string, text: string, userId: string
     await connectDB();
 
     const newComment = new Comment({
-        post: postId,
+        post: new Types.ObjectId(postId),
         content: text,
-        author: userId
+        author: new Types.ObjectId(userId)
     });
 
     const comment = await newComment.save();
@@ -37,7 +37,7 @@ export async function getComments(postId: string, page: number = 1) {
 export async function getCommentById(commentId: string) {
     await connectDB();
 
-    const comment = await Comment.findById(commentId)
+    const comment = await Comment.findById(new Types.ObjectId(commentId))
         .populate("author", "username image")
         .populate("replies.author", "username image");
 
@@ -48,9 +48,9 @@ export async function deleteComment(commentId: string, postId: string, userId: s
     await connectDB();
 
     const result = await Comment.deleteOne({
-        _id: commentId,
-        post: postId,
-        author: userId
+        _id: new Types.ObjectId(commentId),
+        post: new Types.ObjectId(postId),
+        author: new Types.ObjectId(userId)
     });
 
     if (!result.acknowledged || result.deletedCount === 0) {
@@ -71,10 +71,10 @@ export async function createReply({ commentId, author, content }: {
         author
     };
 
-    await Comment.findByIdAndUpdate(commentId, { $push: { replies: reply } });
+    await Comment.findByIdAndUpdate(new Types.ObjectId(commentId), { $push: { replies: reply } });
 
     // Fetch only the last reply (the one we just added)
-    const updatedComment = await Comment.findById(commentId)
+    const updatedComment = await Comment.findById(new Types.ObjectId(commentId))
         .select({ replies: { $slice: -1 } }) // get only last element in array
         .populate("replies.author", "username image name");
 
@@ -89,7 +89,7 @@ export async function createReply({ commentId, author, content }: {
 export async function getReplies(commentId: string) {
     await connectDB();
 
-    const comment = await Comment.findById(commentId)
+    const comment = await Comment.findById(new Types.ObjectId(commentId))
       .select("replies") // only fetch replies field
       .populate("replies.author", "username image"); // optional populate
 

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ postId
             content
         });
 
-        return NextResponse.json({ message: "Reply created successfully", reply }, { status: 200 });
+        return NextResponse.json(reply,  { status: 200 });
 
     } catch (error) {
         return handleApiError(error)
@@ -33,9 +33,9 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ postId
 
         const { commentId } = await context.params;
 
-        const replies = await getReplies(commentId);
+        const replies = await getReplies(commentId) || [];
 
-        return NextResponse.json({ message: "Replies fetched successfully", replies }, { status: 200 });
+        return NextResponse.json(replies, { status: 200 });
 
     } catch (error) {
         return handleApiError(error)

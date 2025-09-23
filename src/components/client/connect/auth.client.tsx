@@ -10,16 +10,24 @@ import {
 import LoginForm from "@/components/forms/login";
 import SignupForm from "@/components/forms/signup";
 import Footer from "@/components/nav/footer";
+import SignupOtpForm from "@/components/forms/signup-otp";
 
 
 export default function AuthPage() {
     // mode
-    const [mode, setMode] = useState<"login" | "signup">("login");
+    const [mode, setMode] = useState<"login" | "signup" | "otp">("login");
 
     // shared ui
     const [submitting, setSubmitting] = useState(false);
     const [globalError, setGlobalError] = useState<string | null>(null);
     const [globalSuccess, setGlobalSuccess] = useState<string | null>(null);
+
+    // Signup States
+    const [otpEmail, setOtpEmail] = useState("");
+    const [otpUsername, setOtpUsername] = useState("");
+
+    // Otp Form States
+    const [fromSignup, setFromSignup] = useState(true);
 
     useEffect(() => {
         setGlobalError(null);
@@ -133,15 +141,28 @@ export default function AuthPage() {
                                         submitting={submitting}
                                         setGlobalError={setGlobalError}
                                         setGlobalSuccess={setGlobalSuccess}
-                                        setSubmitting={setSubmitting} />
-                                ) : (
+                                        setSubmitting={setSubmitting}
+                                        setMod={setMode}
+                                        setOtpEmail={setOtpEmail}
+                                        setFromSignup={setFromSignup}
+                                        setOtpUsername={setOtpUsername} />
+                                ) : mode === "signup" ? (
                                     <SignupForm
                                         setMode={setMode}
                                         setGlobalError={setGlobalError}
                                         submitting={submitting}
                                         setSubmitting={setSubmitting}
-                                        setGlobalSuccess={setGlobalSuccess} />
-                                )}
+                                        setGlobalSuccess={setGlobalSuccess}
+                                        setOtpEmail={setOtpEmail}
+                                        setOtpUsername={setOtpUsername} />
+                                ) : mode === "otp" ? (
+                                    <SignupOtpForm
+                                        fromSignup={fromSignup}
+                                        setFromSignup={setFromSignup}
+                                        otpEmail={otpEmail}
+                                        otpUsername={otpUsername}
+                                        setGlobalError={setGlobalError} />
+                                ) : null}
                             </AnimatePresence>
                         </div>
 

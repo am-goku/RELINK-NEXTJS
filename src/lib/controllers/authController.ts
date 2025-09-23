@@ -6,6 +6,7 @@ import { sanitizeUser } from "@/utils/sanitizer/user";
 import { sendEmail } from "@/services/mail/mailer";
 import { AppError, SignupErrorCode } from "../errors/error.types";
 import { hashPassword } from "../hash";
+import { UnverifiedUser } from "@/models/UnverifiedUsers";
 
 type IOtpFor = 'password' | 'email' | 'login' | 'verification';
 
@@ -43,6 +44,17 @@ export async function createUser(data: {
         throw err;
     }
 
+    if(!emailExist) {
+        const emailExist = await UnverifiedUser.findOne({ email });
+        if (emailExist) {
+            const err: AppError = Object.assign(new Error("Email already exists but not verified"), {
+                code: "EMAIL_TAKEN" as SignupErrorCode,
+                status: 400,
+            });
+            throw err;
+        }
+    }
+
     const usernameExist = await User.findOne({ username });
     if (usernameExist) {
         const err: AppError = Object.assign(new Error("Username already exists"), {
@@ -50,6 +62,17 @@ export async function createUser(data: {
             status: 400,
         });
         throw err;
+    }
+
+    if(!usernameExist) {
+        const usernameExist = await UnverifiedUser.findOne({ username });
+        if (usernameExist) {
+            const err: AppError = Object.assign(new Error("Username already exists but not verified"), {
+                code: "USERNAME_TAKEN" as SignupErrorCode,
+                status: 400,
+            });
+            throw err;
+        }
     }
 
     const hashedPassword = await hashPassword(password);

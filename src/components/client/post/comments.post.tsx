@@ -1,10 +1,11 @@
 import apiInstance from '@/lib/axios';
 import { SanitizedComment } from '@/utils/sanitizer/comment';
 import { IPublicPost } from '@/utils/sanitizer/post';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Star, User2 } from 'lucide-react';
 import { Session } from 'next-auth';
 import React, { useCallback, useEffect, useState } from 'react'
 import CommentRelies from './replies.post';
+import { getErrorMessage } from '@/lib/errors/errorResponse';
 
 type Props = {
     session: Session;
@@ -33,21 +34,25 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
     }, [getComments]); // Fetch comments when the component mounts
 
     async function postComment() {
-        if (!post) return;
-        if (!commentText.trim()) return setError("Comment cannot be empty.");
-        setBusy(true);
-        await new Promise((r) => setTimeout(r, 500));
-        const newComment: SanitizedComment = {
-            _id: `c-${Date.now()}`,
-            post: post._id,
-            author: { _id: "You", name: "You", username: "You" },
-            content: commentText.trim(),
-            created_at: new Date(),
-            replies: [],
-        };
-        setComments((c) => [...c, newComment]);
-        setCommentText("");
-        setBusy(false);
+        try {
+            if (!post) return; // Post not found
+
+            if (!commentText.trim()) {
+                setError("Comment cannot be empty.");
+                return;
+            } // Comment cannot be empty
+
+            setBusy(true); // Set busy state
+
+            const newComment = (await apiInstance.post(`/api/posts/${post._id}/comments`, { content: commentText })).data;
+
+            setComments((c) => [newComment, ...c]); // Add new comment to the list
+            setCommentText(""); // Clear the comment text
+        } catch (error) {
+            setError(getErrorMessage(error)) // Handle error
+        } finally {
+            setBusy(false); // Set busy state
+        }
     }
 
 
@@ -74,7 +79,10 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
                             <div className="flex-1">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <div className="font-medium">{c.author.username}</div>
+                                        <div className="font-medium flex">{c.author.username}
+                                            {post.author._id === c.author._id && <span className="text-xs opacity-50 flex items-center"> &nbsp; <Star className='h-3 w-3' fill='red' /> Author</span>}
+                                            {c.author._id === session?.user.id && <span className="text-xs opacity-50 flex items-center"> &nbsp; <User2 className='h-3 w-3' fill='gray' /> You</span>}
+                                        </div>
                                         <div className="text-xs opacity-70">{new Date(c.created_at || '').toLocaleString(navigator.language)}</div>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -91,6 +99,8 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
                                     c_id={c._id}
                                     replyingTo={replyingTo}
                                     setReplyingTo={setReplyingTo}
+                                    c_author={c.author}
+                                    p_author={post.author}
                                     replyText={replyText}
                                     setReplyText={setReplyText}
                                     setBusy={setBusy}
