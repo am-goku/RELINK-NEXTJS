@@ -9,7 +9,7 @@ function InterfaceSection() {
 
     return (
         <React.Fragment>
-            <div className="rounded-2xl p-6 space-y-4">
+            <div className="space-y-6 px-2 md:px-0">
                 {/* Notification Section */}
                 <AnimatedSection title="Notifications" icon={Bell}>
                     <div className="flex items-center justify-between">

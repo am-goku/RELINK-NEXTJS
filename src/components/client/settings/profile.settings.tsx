@@ -114,7 +114,7 @@ function ProfileSection() {
 
     return (
         <React.Fragment>
-            <div className="rounded-2xl p-6">
+            <div className="space-y-6 px-2 md:px-0">
                 <AnimatedSection title="Basic Info" icon={User}>
                     <div className="space-y-3">
                         <div id="full_name">

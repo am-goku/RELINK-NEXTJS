@@ -4,7 +4,7 @@ import React from 'react'
 function PrivacyPolicy() {
     return (
         <React.Fragment>
-            <div className="rounded-2xl p-6 space-y-4">
+            <div className="space-y-6 px-2 md:px-0">
                 <h2 className="text-xl font-semibold mb-2">Privacy Policy</h2>
                 <p className="mb-8 text-sm text-[#636e72] dark:text-gray-300">
                     This Privacy Policy describes how we collect, use, and protect your information when you use our social media platform. By using our services, you agree to the terms outlined here.

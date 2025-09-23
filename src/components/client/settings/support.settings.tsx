@@ -4,7 +4,7 @@ import React from 'react'
 function HelpSupport() {
     return (
         <React.Fragment>
-            <div className="rounded-2xl p-6 space-y-4">
+            <div className="space-y-6 px-2 md:px-0">
                 <h2 className="text-xl font-semibold mb-2">Help & Support</h2>
                 <p className="mb-8 text-sm text-[#636e72] dark:text-gray-300">
                     Welcome to our Help & Support page. Here you&apos;ll find answers to common questions,
