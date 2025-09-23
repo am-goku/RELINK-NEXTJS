@@ -34,7 +34,7 @@ function ExploreModal({ imagePosts, modalIndex, setModalIndex, setModalOpen }: P
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img src={imagePosts[modalIndex].image} alt="reel" className="w-full h-full object-contain" />
                                 <div className="absolute bottom-6 left-6 text-white max-w-[60%]">
-                                    <div className="font-bold">{imagePosts[modalIndex].user.username}</div>
+                                    <div className="font-bold">{imagePosts[modalIndex].author.username}</div>
                                     {imagePosts[modalIndex].content && <div className="mt-2 text-sm opacity-90">{imagePosts[modalIndex].content}</div>}
                                 </div>
                             </motion.div>

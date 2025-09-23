@@ -17,8 +17,8 @@ function PostTab({ resultPosts }: Props) {
                         <img src={p.image} alt="" className="w-36 h-24 object-cover rounded-md" />
                         <div className="flex-1">
                             <div className="flex items-center gap-3">
-                                <div className="font-semibold">{p.user.name}</div>
-                                <div className="text-xs opacity-70">@{p.user.username}</div>
+                                <div className="font-semibold">{p.author.name}</div>
+                                <div className="text-xs opacity-70">@{p.author.username}</div>
                             </div>
                             <p className="mt-2 text-sm line-clamp-3">{p.content}</p>
                             <div className="mt-3 flex items-center gap-3 text-xs opacity-70">

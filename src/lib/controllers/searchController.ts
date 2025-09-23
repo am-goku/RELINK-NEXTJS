@@ -42,7 +42,7 @@ export async function searchPosts(
     const posts = await Post.find(filter)
         .skip((page - 1) * limit)
         .limit(limit)
-        .populate("user", "name avatar")
+        .populate("author", "name username image")
         .lean<PopulatedPost[]>();
 
     return {

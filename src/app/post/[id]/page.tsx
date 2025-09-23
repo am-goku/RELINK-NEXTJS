@@ -28,7 +28,7 @@ async function Page({ params }: PostPageProps) {
 
     if (!data || !data.post) throw new Error();
 
-    const isOwner = session.user.id === data.post.user._id.toString();
+    const isOwner = session.user.id === data.post.author._id.toString();
 
     return <PostClient
       session={session}

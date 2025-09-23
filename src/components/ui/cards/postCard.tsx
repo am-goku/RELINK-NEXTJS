@@ -19,11 +19,11 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
-              <Avatar user={{ ...post.user, _id: new Types.ObjectId(post.user._id) }} size={10} />
+              <Avatar user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} size={10} />
             </div>
-            <div onClick={() => {router.push(`/${post.user.username}`)}}>
-              <p className="text-sm font-semibold cursor-pointer">{post.user.name}</p>
-              <p className="text-xs opacity-70">@{post.user.username} • just now</p>
+            <div onClick={() => {router.push(`/${post.author.username}`)}}>
+              <p className="text-sm font-semibold cursor-pointer">{post.author.name}</p>
+              <p className="text-xs opacity-70">@{post.author.username} • just now</p>
             </div>
           </div>
           <button onClick={() => setPostOptions(true)} className="rounded-md p-2 hover:bg-black/5 dark:hover:bg-white/5">
@@ -86,7 +86,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
         <PostOptionsModal
           key={post._id}
           open={postOptions}
-          author_id={post.user._id}
+          author_id={post.author._id}
           onClose={() => setPostOptions(false)}
           onGoToPost={() => router.push(`/post/${post._id}`)}
         />

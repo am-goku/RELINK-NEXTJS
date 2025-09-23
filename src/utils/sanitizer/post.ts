@@ -17,7 +17,7 @@ export interface IPublicPost {
     likes_count: number;
     share_count: number;
 
-    user: {
+    author: {
         _id: string;
         name: string;
         username: string;
@@ -28,8 +28,8 @@ export interface IPublicPost {
 
 type PopulatedUser = Pick<IUserDocument, "_id" | "name" | "username" | "image">;
 
-export type PopulatedPost = Omit<IPostDocument, "user"> & {
-    user: PopulatedUser;
+export type PopulatedPost = Omit<IPostDocument, "author"> & {
+    author: PopulatedUser;
 };
 
 export function sanitizePost(post: PopulatedPost): IPublicPost {
@@ -52,11 +52,11 @@ export function sanitizePost(post: PopulatedPost): IPublicPost {
 
 
         created_at: post.created_at ?? new Date(),
-        user: {
-            _id: post.user._id.toString(),
-            name: post.user.name ?? "",
-            username: post.user.username,
-            image: post.user.image ?? "",
+        author: {
+            _id: post.author._id.toString(),
+            name: post.author.name ?? "",
+            username: post.author.username,
+            image: post.author.image ?? "",
         },
     };
 }

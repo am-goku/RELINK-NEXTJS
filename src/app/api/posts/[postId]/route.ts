@@ -50,7 +50,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ postI
         const updatedPost = await Post.findOneAndUpdate(
             {
                 _id: postId,
-                user: authUser.id, // 👈 Ensure only owner can update
+                author: authUser.id, // 👈 Ensure only owner can update
                 is_blocked: { $ne: true },
             },
             { $set: updateData },

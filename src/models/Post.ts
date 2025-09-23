@@ -8,7 +8,7 @@ export interface IPostBase {
     imageRatio?: "landscape" | "portrait" | "square";
     comments: Types.ObjectId[];
     hashtags: string[];
-    user: Types.ObjectId;
+    author: Types.ObjectId;
     
     // Interactions
     likes: Types.ObjectId[];
@@ -73,7 +73,7 @@ const PostSchema = new Schema<IPostDocument>(
             trim: true,
             default: []
         }],
-        user: {
+        author: {
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true

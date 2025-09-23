@@ -50,14 +50,14 @@ export async function createPost(formData: FormData, user_id: string) {
     const post = new Post({
         content,
         image: image_url,
-        user: new Types.ObjectId(user_id),
+        author: new Types.ObjectId(user_id),
         hashtags,
     });
 
     await post.save();
 
     // populate directly on the instance
-    await post.populate("user", "name username image");
+    await post.populate("author", "name username image");
 
     // Sanitizing post into a safe public format
     return sanitizePost(post);
@@ -77,7 +77,7 @@ export async function getPosts(page = 1) {
         .sort({ created_at: -1 })
         .skip(skip)
         .limit(limit)
-        .populate('user', 'name username image');
+        .populate('author', 'name username image');
 
     return posts.map(post => sanitizePost(post));
 }
@@ -105,7 +105,7 @@ export async function getPostsByUsername(username: string, page = 1, c_user_id: 
     }).sort({ created_at: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("user", "name username image");
+        .populate("author", "name username image");
 
     return posts.map(post => sanitizePost(post));
 }
@@ -118,13 +118,13 @@ export async function getPostsByUserId(userId: string, page = 1) {
     const skip = (page - 1) * limit;
 
     const posts = await Post.find({
-        user: userId,
+        author: userId,
         is_archived: false,
         is_blocked: false,
     }).sort({ created_at: -1 })
         .skip(skip)
         .limit(limit)
-        .populate("user", "name username image");
+        .populate("author", "name username image");
 
     return posts.map(post => sanitizePost(post));
 }
@@ -156,7 +156,7 @@ export async function getPostById(id: string): Promise<IPublicPost> {
         _id: new Types.ObjectId(id),
         is_blocked: { $ne: true },
         is_archived: { $ne: true },
-    }).populate('user');
+    }).populate('author');
 
     if (!post) {
         throw new NotFoundError('Post not found');
@@ -173,8 +173,8 @@ export async function getSuggesions() {
     const posts = await Post.aggregate([
         { $match: { image: { $exists: true, $ne: "" }, is_blocked: { $ne: true }, is_archived: { $ne: true } } },
         { $sample: { size: 9 } },
-        { $lookup: { from: "users", localField: "user", foreignField: "_id", as: "user" } },
-        { $unwind: "$user" }
+        { $lookup: { from: "users", localField: "author", foreignField: "_id", as: "author" } },
+        { $unwind: "$author" }
     ]);
 
     return posts.map(sanitizePost) || [];
