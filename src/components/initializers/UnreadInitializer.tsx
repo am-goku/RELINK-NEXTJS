@@ -15,7 +15,7 @@ export function UnreadInitializer() {
     useEffect(() => {
         if (status === "authenticated") {
             async function loadUnread() {
-                const res = await apiInstance.get("/api/conversations/unread");
+                const res = await apiInstance.get("/api/chat/conversation/unread");
                 if (!res.data) return;
                 const data: { conversation_id: string; unreadCount: number }[] = await res.data;
                 data.forEach(({ conversation_id, unreadCount }) => {

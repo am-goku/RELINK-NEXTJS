@@ -1,6 +1,6 @@
 import Post from "@/models/Post";
 import { BadRequestError, ForbiddenError, NetworkError, NotFoundError } from "../errors/ApiErrors";
-import { getUserByUsername } from "./userController";
+import { getUserById, getUserByUsername } from "./userController";
 import { connectDB } from "../db/mongoose";
 import cloudinary from "../cloudinary/cloudinary";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
@@ -111,8 +111,17 @@ export async function getPostsByUsername(username: string, page = 1, c_user_id: 
 }
 
 
-export async function getPostsByUserId(userId: string, page = 1) {
+export async function getPostsByUserId(userId: string, page = 1, c_user_id: string) {
     await connectDB()
+
+    const user = await getUserById(userId);
+    if (!user) throw new NotFoundError('User not found');
+
+    const isFollowing = user.followers.some(
+        (follower) => follower._id.toString() === c_user_id
+    );
+
+    if (user.accountType === "private" && !isFollowing) throw new ForbiddenError('You are not following this user');
 
     const limit = 15;
     const skip = (page - 1) * limit;
@@ -127,7 +136,7 @@ export async function getPostsByUserId(userId: string, page = 1) {
         .populate("author", "name username image");
 
     return posts.map(post => sanitizePost(post));
-}
+} // Fetch all posts by a user with the User ID (limited to 15 per page)
 
 
 export async function searchPosts(tag: string | null, page: number = 1) {

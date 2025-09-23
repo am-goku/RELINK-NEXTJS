@@ -17,9 +17,9 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ userna
             isOwner = true;
         }
 
-        return NextResponse.json({ message: 'User fetch successfull', user, isOwner })
+        return NextResponse.json({ user, isOwner })
 
     } catch (error) {
         return handleApiError(error)
     }
-}
+} // GET User by Username [api: GET /api/users/:username]

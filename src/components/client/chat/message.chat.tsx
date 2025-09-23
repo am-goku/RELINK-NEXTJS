@@ -80,7 +80,7 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
         const unread = async () => {
             if (activeRoom) {
                 clearUnread(activeRoom._id.toString());
-                await apiInstance.patch(`/api/conversations/${activeRoom._id.toString()}/mark-read`);
+                await apiInstance.patch(`/api/chat/conversation/${activeRoom._id.toString()}/mark-read`);
             }
         }
 

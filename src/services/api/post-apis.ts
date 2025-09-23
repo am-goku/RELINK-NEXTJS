@@ -29,8 +29,8 @@ export async function createNewPost({ content, file }: { content?: string; file?
 
 export async function getPostsByUsername({ username }: { username: string }) {
     try {
-        const res = (await apiInstance.get(`/api/users/${username}/posts`)).data;
-        return res.posts
+        const res = (await apiInstance.get(`/api/posts/user?username=${username}`)).data;
+        return res
     } catch (error) {
         throw (getErrorMessage(error) || "Something went wrong. Please try again.");
     }
