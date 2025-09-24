@@ -6,13 +6,16 @@ import cloudinary from "../cloudinary/cloudinary";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { IPublicPost, sanitizePost } from "@/utils/sanitizer/post";
 import { Types } from "mongoose";
+import { extractHashtags } from "@/utils/string-utils";
 
 export async function createPost(formData: FormData, user_id: string) {
     await connectDB();
 
     const content = (formData.get('content') as string || '').trim();
-    const hashtagsRaw = (formData.get('hashtags') as string || '').trim();
     const file = formData.get('file') as File | null;
+
+    const disableComment = formData.get("disableComment") === "true";
+    const disableShare = formData.get("disableShare") === "true";
 
     let image_url: string | null = null;
 
@@ -42,15 +45,16 @@ export async function createPost(formData: FormData, user_id: string) {
         throw new BadRequestError('Either content or image is required.');
     }
 
-    const hashtags = hashtagsRaw
-        ? hashtagsRaw.split(",").map(tag => tag.trim()).filter(Boolean)
-        : [];
+    // Separating Hashtags
+    const hashtags = extractHashtags(content);
 
     const post = new Post({
         content,
         image: image_url,
         author: new Types.ObjectId(user_id),
         hashtags,
+        disableComment,
+        disableShare
     });
 
     await post.save();

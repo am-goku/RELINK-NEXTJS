@@ -7,6 +7,7 @@ import CropModal from '../cropper/cropModal';
 import PrimaryButton from '../template/primary-button';
 import { createNewPost } from '@/services/api/post-apis';
 import { IPublicPost } from '@/utils/sanitizer/post';
+import { Checkbox } from '../template/check-box';
 
 
 interface Props {
@@ -20,14 +21,17 @@ export default function CreatePostModal({ open, onClose, updatePostList }: Props
 
     const [step, setStep] = useState<'choose' | 'content' | 'image' | 'editor'>('choose');
     const [text, setText] = useState('');
-    const [hashtags, setHashtags] = useState('');
-    const [mentions, setMentions] = useState('');
 
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [croppedImage, setCroppedImage] = useState<Blob | null>(null);
     const [showCropper, setShowCropper] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // checkbox states
+    const [disableComment, setDisableComment] = useState(false);
+    const [disableShare, setDisableShare] = useState(false);
+
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -48,7 +52,8 @@ export default function CreatePostModal({ open, onClose, updatePostList }: Props
         const post = await createNewPost({
             content: text.trim() || undefined,
             file: croppedImage,
-            // TODO: Add hashtags and mentions here
+            disableComment,
+            disableShare
         })
 
         updatePostList?.((list) => [post, ...list]);
@@ -59,10 +64,10 @@ export default function CreatePostModal({ open, onClose, updatePostList }: Props
         await handleCreateSubmit();
         setLoading(false);
         setText('');
-        setHashtags('');
-        setMentions('');
         setPreview(null);
         setCroppedImage(null);
+        setDisableComment(false);
+        setDisableShare(false);
         setStep('choose');
         onClose();
     };
@@ -109,6 +114,18 @@ export default function CreatePostModal({ open, onClose, updatePostList }: Props
                                     placeholder="Write your post..."
                                     className="w-full rounded-xl border px-4 py-3 text-sm outline-none min-h-[120px] resize-none bg-transparent"
                                 />
+                                <section className='flex gap-4'>
+                                    <Checkbox checked={disableComment}
+                                        onChange={setDisableComment}
+                                        label="Disable comments"
+                                        id='disable-comment' />
+
+                                    <Checkbox
+                                        checked={disableShare}
+                                        onChange={setDisableShare}
+                                        label="Disable sharing"
+                                        id='disable-share' />
+                                </section>
                                 <div className="flex justify-end">
                                     <PrimaryButton onClick={handleSubmit} loading={loading} disabled={!text || !text.trim()}>Post</PrimaryButton>
                                 </div>
@@ -137,18 +154,17 @@ export default function CreatePostModal({ open, onClose, updatePostList }: Props
                                         placeholder="Write a description..."
                                         className="w-full rounded-xl border px-4 py-3 text-sm outline-none min-h-[100px] resize-none bg-transparent"
                                     />
-                                    <input
-                                        value={hashtags}
-                                        onChange={(e) => setHashtags(e.target.value)}
-                                        placeholder="Add hashtags (comma separated)"
-                                        className="w-full rounded-xl border px-4 py-2 text-sm outline-none"
-                                    />
-                                    <input
-                                        value={mentions}
-                                        onChange={(e) => setMentions(e.target.value)}
-                                        placeholder="Mention users (@username)"
-                                        className="w-full rounded-xl border px-4 py-2 text-sm outline-none"
-                                    />
+                                    <Checkbox checked={disableComment}
+                                        onChange={setDisableComment}
+                                        label="Disable comments"
+                                        id='disable-comment' />
+
+                                    <Checkbox
+                                        checked={disableShare}
+                                        onChange={setDisableShare}
+                                        label="Disable sharing"
+                                        id='disable-share' />
+
                                     <div className="flex justify-end">
                                         {/* <PrimaryCreateButton onClick={handleSubmit} loading={loading}>Post</PrimaryCreateButton> */}
                                         <PrimaryButton onClick={handleSubmit} loading={loading} disabled={!croppedImage}>Post</PrimaryButton>

@@ -3,7 +3,7 @@ import { getErrorMessage } from "@/lib/errors/errorResponse";
 import { IPublicPost } from "@/utils/sanitizer/post";
 
 
-export async function createNewPost({ content, file }: { content?: string; file?: Blob | null }) {
+export async function createNewPost({ content, file, disableComment, disableShare }: { content?: string; file?: Blob | null, disableComment?: boolean, disableShare?: boolean }) {
     try {
         // Throw an error if no content or image is provided
         if ((!content || !content?.trim()) && !file) throw new Error("No content or image provided");
@@ -13,6 +13,11 @@ export async function createNewPost({ content, file }: { content?: string; file?
         // Append the form data to the FormData object
         if (content?.trim()) formData.append('content', content.trim());
         if (file) formData.append('file', file);
+
+        if (disableComment !== undefined)
+            formData.append("disableComment", String(disableComment));
+        if (disableShare !== undefined)
+            formData.append("disableShare", String(disableShare));
 
         const res = (await apiInstance.post('/api/posts', formData, {
             headers: {

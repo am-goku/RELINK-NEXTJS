@@ -17,6 +17,10 @@ export interface IPublicPost {
     likes_count: number;
     share_count: number;
 
+    // Security
+    disableComment: boolean;
+    disableShare: boolean;
+
     author: {
         _id: string;
         name: string;
@@ -50,6 +54,9 @@ export function sanitizePost(post: PopulatedPost): IPublicPost {
         likes_count: post.likes?.length || 0,
         share_count: post.share_count ?? 0,
 
+        // Security
+        disableComment: post.disableComment ?? false,
+        disableShare: post.disableShare ?? false,
 
         created_at: post.created_at ?? new Date(),
         author: {

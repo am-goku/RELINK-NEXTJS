@@ -1,28 +1,61 @@
 import Avatar from '@/components/template/avatar';
+import apiInstance from '@/lib/axios';
+import { getErrorMessage } from '@/lib/errors/errorResponse';
 import { SanitizedUser } from '@/utils/sanitizer/user';
-import React from 'react'
+import { ListX } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type Props = {
-    resultUsers: SanitizedUser[];
+    query: string;
 }
 
-function UserTab({ resultUsers }: Props) {
+function UserTab({ query }: Props) {
+
+    const router = useRouter();
+
+    const busyRef = useRef(false)
+
+    const [users, setUsers] = useState<SanitizedUser[]>([]);
+
+    const fetchUsers = useCallback(async () => {
+        if (busyRef.current) return;
+        try {
+            if (!query) {
+                const res = (await apiInstance.get(`/api/users/sample?size=10`)).data;
+                setUsers(res)
+                return;
+            }
+            busyRef.current = true;
+        } catch (error) {
+            throw (getErrorMessage(error) || "Something went wrong. Please try again.");
+        } finally {
+            setTimeout(() => busyRef.current = false, 500);
+        }
+    }, [query])
+
+    useEffect(() => {
+        fetchUsers();
+    }, [fetchUsers])
+
     return (
         <div className="space-y-3">
-            {resultUsers.length > 0 ? (
-                resultUsers.map((u) => (
+            {users.length > 0 ? (
+                users.map((u) => (
                     <div key={u._id.toString()} className="rounded-xl bg-white/90 dark:bg-neutral-800/80 p-3 shadow flex items-center gap-3">
-                        {/* <img src={u.image} alt="" className="w-12 h-12 rounded-full object-cover" /> */}
                         <Avatar user={u} key={u._id.toString() + "avatar"} size={12} />
                         <div className="flex-1">
                             <div className="font-semibold">{u.name}</div>
                             <div className="text-xs opacity-70">@{u.username}</div>
                         </div>
-                        <button onClick={() => window.location.href = `/${u.username}`} className="px-3 py-1 rounded-md bg-[#2D3436] text-white">View</button>
+                        <button onClick={() => router.push(`/${u.username}`)} className="px-3 py-1 rounded-md bg-[#2D3436] text-white">View</button>
                     </div>
                 ))
             ) : (
-                <div className="text-center text-sm opacity-70">No users found</div>
+                <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
+                    <ListX className="w-12 h-12 mb-4" />
+                    <p>No User found</p>
+                </div>
             )
             }
         </div>

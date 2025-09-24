@@ -1,38 +1,83 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { IPublicPost } from '@/utils/sanitizer/post';
-import React from 'react'
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { ImageIcon, ListX } from 'lucide-react';
+import apiInstance from '@/lib/axios';
 
 type Props = {
-    resultPosts: IPublicPost[];
-    openModalAt?: (index: number) => void;
+    query: string;
+    openModalAt: (index: number) => void;
+    setImagePosts: React.Dispatch<React.SetStateAction<IPublicPost[]>>
 }
 
-function PostTab({ resultPosts }: Props) {
+function PostTab({ query, openModalAt, setImagePosts }: Props) {
+
+    const busyRef = useRef(false);
+
+    const [posts, setPosts] = useState<IPublicPost[]>([]);
+
+
+    const fetchPosts = useCallback(async () => {
+        if (busyRef.current) return;
+        try {
+            busyRef.current = true;
+
+            if (!query) {
+                const { suggesions } = (await apiInstance.get('/api/explore/suggested')).data || [];
+                setPosts(suggesions);
+                setImagePosts(suggesions || []);
+            } else {
+                const posts = (await apiInstance.get(`/api/hashtag/post?tag=${query}`)).data;
+                setPosts(posts);
+                setImagePosts(posts || []);
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setTimeout(() => busyRef.current = false, 500);
+        }
+    }, [query, setImagePosts]);
+
+    useEffect(() => {
+        fetchPosts();
+    }, [fetchPosts]);
 
     return (
-        <div className="space-y-4">
-            {(Array.isArray(resultPosts) && resultPosts.length > 0) ? (
-                resultPosts.map((p) => (
-                    <article key={p._id} className="rounded-xl bg-white/90 dark:bg-neutral-800/80 p-4 shadow flex gap-4">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={p.image} alt="" className="w-36 h-24 object-cover rounded-md" />
-                        <div className="flex-1">
-                            <div className="flex items-center gap-3">
-                                <div className="font-semibold">{p.author.name}</div>
-                                <div className="text-xs opacity-70">@{p.author.username}</div>
+        <section>
+            {posts && posts.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {posts.map((p, i) => (
+                        <motion.button
+                            key={p._id}
+                            whileHover={{ scale: 1.03 }}
+                            onClick={() => openModalAt(i)}
+                            className="relative w-full h-48 overflow-hidden rounded-xl bg-white/80 dark:bg-neutral-800/80 shadow"
+                        >
+                            {p.image && (
+                                <Image
+                                    src={p.image}
+                                    alt={p.content || "image"}
+                                    fill
+                                    sizes="100%"
+                                    property="src"
+                                    loading="lazy"
+                                    className="object-cover"
+                                />
+                            )}
+                            <div className="absolute left-2 bottom-2 bg-black/50 text-white rounded-full px-2 py-1 text-xs flex items-center gap-1">
+                                <ImageIcon className="w-3 h-3" /> {p.author.username}
                             </div>
-                            <p className="mt-2 text-sm line-clamp-3">{p.content}</p>
-                            <div className="mt-3 flex items-center gap-3 text-xs opacity-70">
-                                {/* <button onClick={() => openModalAt(imagePosts.findIndex(ip => ip.id === p.id))} className="px-2 py-1 rounded-md hover:bg-black/5">View</button> */}
-                                <button className="px-2 py-1 rounded-md hover:bg-black/5">Save</button>
-                            </div>
-                        </div>
-                    </article>
-                ))
+                        </motion.button>
+                    ))}
+                </div>
             ) : (
-                <div className="text-center text-sm opacity-70">No posts found</div>
-            )
-            }
-        </div>
+                <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">
+                    <ListX className="w-12 h-12 mb-4" />
+                    <p>No posts found</p>
+                </div>
+            )}
+        </section>
     )
 }
 

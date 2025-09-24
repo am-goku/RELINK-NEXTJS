@@ -16,6 +16,9 @@ export interface IPostBase {
     views: Types.ObjectId[];
     share_count: number;
 
+    //Security
+    disableComment: boolean;
+    disableShare: boolean;
 
     // Admin fields
     is_blocked: boolean;
@@ -77,6 +80,14 @@ const PostSchema = new Schema<IPostDocument>(
             type: Schema.Types.ObjectId,
             ref: "User",
             required: true
+        },
+        disableComment: {
+            type: Boolean,
+            default: false
+        },
+        disableShare: {
+            type: Boolean,
+            default: false
         },
         is_blocked: {
             type: Boolean,
