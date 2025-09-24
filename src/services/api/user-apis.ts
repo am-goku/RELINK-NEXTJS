@@ -275,7 +275,7 @@ export async function fecthMutualConnections(searchKey: string) {
  * @param {string} username - The username to check for availability.
  * @returns {Promise<boolean>} - A promise that resolves to true if the username is available, false otherwise.
  */
-export async function checkUsernameAvailability(username: string) {
+export async function checkUsernameAvailability(username: string): Promise<boolean> {
     const res = await apiInstance.get(`/api/users/validate/username?username=${username}`);
     return res.data.available
 }

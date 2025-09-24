@@ -3,6 +3,7 @@ import { IPublicPost } from '@/utils/sanitizer/post';
 import { Bookmark, Heart, MessageSquare, Share2 } from 'lucide-react'
 import { Types } from 'mongoose';
 import { Session } from 'next-auth';
+import { useRouter } from 'next/navigation';
 import React from 'react'
 
 type Props = {
@@ -17,6 +18,8 @@ type Props = {
 }
 
 function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, setBusy }: Props) {
+
+    const router = useRouter();
 
     async function toggleLike() {
         if (!post) return;
@@ -56,12 +59,12 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
         // alert("Post shared (mock)");
     } // TODO: Need to add share API call
 
+
     return (
         <article className="rounded-2xl bg-white/90 dark:bg-neutral-800/80 p-4 shadow">
             <header className="flex items-center gap-3 mb-3">
-                {/* <img src={post.author.image} alt={post.author.username} className="w-10 h-10 rounded-full object-cover" /> */}
                 <Avatar size={10} user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} />
-                <div>
+                <div onClick={() => router.push(`/${post.author.username}`)} className='cursor-pointer'>
                     <div className="font-semibold">{post.author.name || post.author.username}</div>
                     <div className="text-xs opacity-70">@{post.author.username} • {new Date(post.created_at).toLocaleDateString()}</div>
                 </div>

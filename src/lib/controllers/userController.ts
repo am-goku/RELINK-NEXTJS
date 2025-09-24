@@ -5,6 +5,7 @@ import { FilterQuery } from "mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
 import { hashPassword } from "../hash";
 import { UploadResult, uploadToCloudinary } from "../cloudinary/cloudinaryUpload";
+import { UnverifiedUser } from "@/models/UnverifiedUsers";
 
 
 
@@ -196,6 +197,10 @@ export async function updateCoverPic(file: File, userId: string) {
 }
 
 export async function validateUsername(username: string) {
+    await connectDB();
+    
     const userCount = await User.countDocuments({ username });
-    return userCount === 0;
+    const unverifiedCount = await UnverifiedUser.countDocuments({ username });
+    const flag = userCount === 0 || unverifiedCount === 0;
+    return flag;
 }

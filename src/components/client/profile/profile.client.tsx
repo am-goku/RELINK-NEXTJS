@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { MessageSquare, Plus, UserMinus, UserPlus } from "lucide-react";
+import { LockKeyhole, MessageSquare, Plus, UserMinus, UserPlus } from "lucide-react";
 import Header from "@/components/nav/header";
 import { Session } from "next-auth";
 import { hasConnection } from "@/utils/connections/user-connection";
@@ -19,7 +19,7 @@ import { AboutCard } from "./about.profile";
 import PostList from "./posts.profile";
 
 type Props = {
-    session: Session | null;
+    session: Session;
     user: SanitizedUser;
     isOwner: boolean;
 }
@@ -115,7 +115,7 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
                                         )
 
                                     }
-                                    <ActionButton onAction={async () => {}}>
+                                    <ActionButton onAction={async () => { }}>
                                         <MessageSquare size={16} /> Message
                                     </ActionButton>
                                 </div>
@@ -125,53 +125,66 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
                 </div>
             </div>
 
-            {/* Sticky Tabs */}
-            <div className="mt-8 border-b border-gray-300 dark:border-gray-700 sticky top-0 bg-[#F0F2F5] dark:bg-neutral-900 z-10">
-                <div className="max-w-4xl mx-auto flex gap-6 px-4">
-                    {([
-                        { key: "posts", label: "Posts" },
-                        { key: "about", label: "About" },
-                        { key: "followers", label: "Followers" },
-                        { key: "following", label: "Following" },
-                    ] as { key: Tab; label: string }[]).map((tab) => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`pb-2 transition-colors border-b-2 ${activeTab === tab.key
-                                ? "border-blue-600 text-blue-600"
-                                : "border-transparent hover:text-blue-600"
-                                }`}
+            {
+                (user.accountType === "private" && user.followers.includes(session?.user.id)) || user.accountType === "public" ? (
+                    <React.Fragment>
+                        {/* Sticky Tabs */}
+                        <div className="mt-8 border-b border-gray-300 dark:border-gray-700 sticky top-0 bg-[#F0F2F5] dark:bg-neutral-900 z-10">
+                            <div className="max-w-4xl mx-auto flex gap-6 px-4">
+                                {([
+                                    { key: "posts", label: "Posts" },
+                                    { key: "about", label: "About" },
+                                    { key: "followers", label: "Followers" },
+                                    { key: "following", label: "Following" },
+                                ] as { key: Tab; label: string }[]).map((tab) => (
+                                    <button
+                                        key={tab.key}
+                                        onClick={() => setActiveTab(tab.key)}
+                                        className={`pb-2 transition-colors border-b-2 ${activeTab === tab.key
+                                            ? "border-blue-600 text-blue-600"
+                                            : "border-transparent hover:text-blue-600"
+                                            }`}
+                                    >
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Tab Content */}
+                        <motion.div
+                            key={activeTab}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="max-w-2xl mx-auto px-4 mt-6"
                         >
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
-            </div>
+                            {activeTab === "posts" && (
+                                <PostList loadingPosts={loadingPosts} posts={posts} />
+                            )}
 
-            {/* Tab Content */}
-            <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-                className="max-w-2xl mx-auto px-4 mt-6"
-            >
-                {activeTab === "posts" && (
-                    <PostList loadingPosts={loadingPosts} posts={posts} />
-                )}
+                            {activeTab === "about" && (
+                                <AboutCard user={user} />
+                            )}
 
-                {activeTab === "about" && (
-                    <AboutCard user={user} />
-                )}
+                            {activeTab === "followers" && (
+                                <ConnectionsTab user_id={user?._id} type="followers" />
+                            )}
 
-                {activeTab === "followers" && (
-                    <ConnectionsTab user_id={user?._id} type="followers" />
-                )}
-
-                {activeTab === "following" && (
-                    <ConnectionsTab user_id={user?._id} type="following" />
-                )}
-            </motion.div>
+                            {activeTab === "following" && (
+                                <ConnectionsTab user_id={user?._id} type="following" />
+                            )}
+                        </motion.div>
+                    </React.Fragment>
+                ) : (
+                    <div className="mt-8 border-b border-gray-300 dark:border-gray-700 sticky top-0 bg-[#F0F2F5] dark:bg-neutral-900 z-10 flex justify-center py-3">
+                        <p className="text-gray-600 dark:text-gray-300 text-center font-medium items-center flex flex-col gap-3">
+                            <LockKeyhole size={24} />
+                            <span>This profile is private. Only approved connections can view the details.</span>
+                        </p>
+                    </div>
+                )
+            }
 
             {/* Floating Create Post Button */}
             {

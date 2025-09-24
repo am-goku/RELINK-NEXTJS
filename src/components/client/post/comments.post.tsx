@@ -1,11 +1,12 @@
 import apiInstance from '@/lib/axios';
 import { SanitizedComment } from '@/utils/sanitizer/comment';
 import { IPublicPost } from '@/utils/sanitizer/post';
-import { Loader2, Star, User2 } from 'lucide-react';
+import { ArrowDownWideNarrow, ArrowUpWideNarrow, Loader2, Star, User2 } from 'lucide-react';
 import { Session } from 'next-auth';
 import React, { useCallback, useEffect, useState } from 'react'
 import CommentRelies from './replies.post';
 import { getErrorMessage } from '@/lib/errors/errorResponse';
+import { AnimatePresence, motion } from 'framer-motion';
 
 type Props = {
     session: Session;
@@ -61,7 +62,7 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
             <div className="mt-5">
                 <h3 className="text-lg font-semibold mb-2">Comments</h3>
                 <div className="space-y-2">
-                    <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Write a comment..." className="w-full rounded-lg border p-3 text-sm outline-none" rows={3} />
+                    <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Write a comment..." className="w-full rounded-lg border p-3 text-sm outline-none bg-gray-50 dark:bg-neutral-900" rows={3} />
                     <div className="flex items-center justify-end gap-2">
                         <button onClick={() => { setCommentText(""); setError(null); }} className="px-3 py-2 rounded-md">Cancel</button>
                         <button onClick={postComment} disabled={busy} className="px-4 py-2 rounded-md bg-[#2D3436] text-white">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Comment"}</button>
@@ -86,7 +87,8 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
                                         <div className="text-xs opacity-70">{new Date(c.created_at || '').toLocaleString(navigator.language)}</div>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <button onClick={() => setReplyingTo(replyingTo === c._id ? null : c._id)} className="text-sm text-blue-600">Reply</button>
+                                        <button onClick={() => setReplyingTo(replyingTo === c._id ? null : c._id)} className="text-xs text-text-black-50 dark:text-text-white-50 flex items-center">
+                                            {replyingTo === c._id ? <ArrowUpWideNarrow className='h-4 w-4' fill='black' /> : <>Reply<ArrowDownWideNarrow className='h-4 w-4' /></>}</button>
                                         {(isPostOwner || c._id === session.user.id) && <button onClick={() => { }} className="text-sm text-red-500">Delete</button>}
                                     </div>
                                 </div>
@@ -94,18 +96,31 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
                                 <p className="mt-2 text-sm whitespace-pre-wrap">{c.content}</p>
 
                                 {/* replies */}
-                                <CommentRelies
-                                    p_id={post._id}
-                                    c_id={c._id}
-                                    replyingTo={replyingTo}
-                                    setReplyingTo={setReplyingTo}
-                                    c_author={c.author}
-                                    p_author={post.author}
-                                    replyText={replyText}
-                                    setReplyText={setReplyText}
-                                    setBusy={setBusy}
-                                    setError={setError}
-                                />
+                                <AnimatePresence initial={false}>
+                                    {replyingTo === c._id && (
+                                        <motion.div
+                                            key="replies"
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: "auto" }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            transition={{ duration: 0.25, ease: "easeInOut" }}
+                                            className="overflow-hidden"
+                                        >
+                                            <CommentRelies
+                                                p_id={post._id}
+                                                c_id={c._id}
+                                                replyingTo={replyingTo}
+                                                setReplyingTo={setReplyingTo}
+                                                c_author={c.author}
+                                                p_author={post.author}
+                                                replyText={replyText}
+                                                setReplyText={setReplyText}
+                                                setBusy={setBusy}
+                                                setError={setError}
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         </div>
                     </div>

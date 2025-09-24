@@ -1,5 +1,5 @@
 import { userAuth } from "@/lib/auth";
-import { getSuggesions } from "@/lib/controllers/postController";
+import { getSuggestions } from "@/lib/controllers/postController";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextResponse } from "next/server";
 
@@ -7,7 +7,7 @@ export async function GET() {
     try {
         await userAuth();
 
-        const suggesions = await getSuggesions();
+        const suggesions = await getSuggestions();
 
         return NextResponse.json({ message: "Suggesions fetched successfully", suggesions }, { status: 200 });
 

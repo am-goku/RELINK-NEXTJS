@@ -8,14 +8,13 @@ import { IPublicPost, sanitizePost } from "@/utils/sanitizer/post";
 import { Types } from "mongoose";
 
 export async function createPost(formData: FormData, user_id: string) {
-
     await connectDB();
 
     const content = (formData.get('content') as string || '').trim();
     const hashtagsRaw = (formData.get('hashtags') as string || '').trim();
     const file = formData.get('file') as File | null;
 
-    let image_url: string | undefined;
+    let image_url: string | null = null;
 
     // Uploading image to Cloudinary
     if (file) {
@@ -65,23 +64,69 @@ export async function createPost(formData: FormData, user_id: string) {
 
 
 export async function getPosts(page = 1) {
-    await connectDB();
+  await connectDB();
 
-    const limit = 15;
-    const skip = (page - 1) * limit;
+  const limit = 15;
+  const skip = (page - 1) * limit;
 
-    const posts = await Post.find({
-        is_archived: false,
-        is_blocked: false,
-    })
-        .sort({ created_at: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate('author', 'name username image');
+  const posts = await Post.aggregate([
+    // Only include non-archived, non-blocked posts
+    { $match: { is_archived: false, is_blocked: false } },
 
-    return posts.map(post => sanitizePost(post));
-}
+    // Join author info
+    {
+      $lookup: {
+        from: "users", // collection name for authors
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    { $unwind: "$author" },
 
+    // Exclude authors who are private, deleted, or blocked
+    {
+      $match: {
+        "author.accountType": { $ne: "private" },
+        "author.deleted": false,
+        "author.blocked": false,
+      },
+    },
+
+    // Randomize order
+    { $sample: { size: limit * (page) } }, // sample enough for pagination
+
+    // Sort randomly already, but apply skip/limit for pagination
+    { $skip: skip },
+    { $limit: limit },
+
+    // Optional: project only required fields
+    {
+      $project: {
+        _id: 1,
+        image: 1,
+        imageRatio: 1,
+        hashtags: 1,
+        content: 1,
+        comment_count: 1,
+        like_count: 1,
+        share_count: 1,
+        views: 1,
+        likes: 1,
+        saves:1,
+        created_at: 1,
+        author: {
+          _id: 1,
+          name: 1,
+          username: 1,
+          image: 1,
+        },
+      },
+    },
+  ]);
+
+  return posts.map(post => sanitizePost(post));
+} // Fetch posts from DB for dashboard
 
 export async function getPostsByUsername(username: string, page = 1, c_user_id: string) {
     await connectDB()
@@ -176,15 +221,31 @@ export async function getPostById(id: string): Promise<IPublicPost> {
     return sanitizedPost;
 }
 
-export async function getSuggesions() {
-    await connectDB();
+export async function getSuggestions() {
+  await connectDB();
 
-    const posts = await Post.aggregate([
-        { $match: { image: { $exists: true, $ne: "" }, is_blocked: { $ne: true }, is_archived: { $ne: true } } },
-        { $sample: { size: 9 } },
-        { $lookup: { from: "users", localField: "author", foreignField: "_id", as: "author" } },
-        { $unwind: "$author" }
-    ]);
+  const posts = await Post.aggregate([
+    {
+      $match: {
+        is_blocked: { $ne: true },
+        is_archived: { $ne: true },
+        image: {
+          $type: "string",
+          $nin: ["", "null", "undefined"]
+        }
+      }
+    },
+    { $sample: { size: 16 } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author"
+      }
+    },
+    { $unwind: "$author" }
+  ]);
 
-    return posts.map(sanitizePost) || [];
+  return posts.map(sanitizePost) || [];
 }

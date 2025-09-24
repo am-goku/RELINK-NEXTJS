@@ -32,6 +32,10 @@ export default function CommentRelies({ p_id, c_id, replyingTo, setReplyingTo, c
 
     useEffect(() => {
         fetchReplies();
+
+        return () => {
+            setReplies([]);
+        }
     }, [fetchReplies]);
 
 
@@ -59,6 +63,17 @@ export default function CommentRelies({ p_id, c_id, replyingTo, setReplyingTo, c
 
     return (
         <div className="mt-3 space-y-2 pl-4 border-l">
+            {/* reply composer (only for main comment) */}
+            {replyingTo === c_id && (
+                <div className="mt-2">
+                    <textarea value={replyText[c_id] || ""} onChange={(e) => setReplyText((p) => ({ ...p, [c_id]: e.target.value }))} className="w-full rounded-md border p-2 text-sm bg-gray-50 dark:bg-neutral-900" rows={2} placeholder={`Reply to @${c_author.username}`} />
+                    <div className="flex justify-end gap-2 mt-2">
+                        <button onClick={() => setReplyingTo(null)} className="px-3 py-1 rounded-md">Cancel</button>
+                        <button onClick={() => postReply(c_id)} className="px-3 py-1 rounded-md bg-[#2D3436] text-white">Reply</button>
+                    </div>
+                </div>
+            )}
+            <hr />
             {replies.map((r, i) => (
                 <div key={i.toString()} className="bg-gray-50 dark:bg-neutral-900 p-2 rounded-md">
                     <div className="text-sm font-medium flex">{r.author.username}
@@ -69,17 +84,6 @@ export default function CommentRelies({ p_id, c_id, replyingTo, setReplyingTo, c
                     <p className="mt-1 text-sm">{r.content}</p>
                 </div>
             ))}
-
-            {/* reply composer (only for main comment) */}
-            {replyingTo === c_id && (
-                <div className="mt-2">
-                    <textarea value={replyText[c_id] || ""} onChange={(e) => setReplyText((p) => ({ ...p, [c_id]: e.target.value }))} className="w-full rounded-md border p-2 text-sm" rows={2} placeholder={`Reply to @${c_author.username}`} />
-                    <div className="flex justify-end gap-2 mt-2">
-                        <button onClick={() => setReplyingTo(null)} className="px-3 py-1 rounded-md">Cancel</button>
-                        <button onClick={() => postReply(c_id)} className="px-3 py-1 rounded-md bg-[#2D3436] text-white">Reply</button>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
