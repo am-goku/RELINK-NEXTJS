@@ -85,6 +85,12 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
         }
     }, [user._id])
 
+    // UI Confition
+    const canViewProfile =
+        isOwner ||
+        user.accountType === "public" ||
+        (user.accountType === "private" && user.followers.includes(session?.user?.id));
+
     return (
         <div className="min-h-screen bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 relative">
             {/* Header Section */}
@@ -126,7 +132,7 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
             </div>
 
             {
-                (user.accountType === "private" && user.followers.includes(session?.user.id)) || user.accountType === "public" ? (
+                canViewProfile ? (
                     <React.Fragment>
                         {/* Sticky Tabs */}
                         <div className="mt-8 border-b border-gray-300 dark:border-gray-700 sticky top-0 bg-[#F0F2F5] dark:bg-neutral-900 z-10">

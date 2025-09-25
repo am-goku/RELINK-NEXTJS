@@ -3,6 +3,7 @@
 import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSession } from 'next-auth/react';
+import { useUserStore } from '@/stores/userStore';
 
 interface Props {
     open: boolean;
@@ -44,6 +45,8 @@ export default function PostOptionsModal({
 
     const { data: session } = useSession();
 
+    const following = useUserStore(s => s.user?.following) || [];
+
     return (
         <AnimatePresence>
             {open && (
@@ -71,7 +74,14 @@ export default function PostOptionsModal({
                                 )
                             }
 
-                            <OptionButton label="Unfollow User" onClick={onUnfollow ?? (() => { })} danger />
+                            {
+                                following.includes(author_id) ? (
+                                    <OptionButton label="Unfollow User" onClick={onUnfollow ?? (() => { })} danger />
+                                ) : (
+                                    <OptionButton label="Follow User" onClick={onUnfollow ?? (() => { })} />
+                                )
+                            }
+
                             <OptionButton label="View Post" onClick={onGoToPost ?? (() => { })} />
                             <OptionButton label="Share" onClick={onShare ?? (() => { })} />
                             <OptionButton label="Copy Link" onClick={onCopyLink ?? (() => { })} />

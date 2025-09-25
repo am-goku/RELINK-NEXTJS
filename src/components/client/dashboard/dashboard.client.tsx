@@ -11,10 +11,6 @@ import SuggesionsDashboard from "./suggesions.client";
 import Footer from "@/components/nav/footer";
 import CreatePostModal from "@/components/modal/createPost";
 
-// Theme helper classes used across components:
-// text: {text-[#2D3436] dark:text-gray-200}
-// bg: {bg-light-bg/90 dark:bg-dark-bg/90 bg-[#F0F2F5] dark:bg-neutral-900}
-
 
 export default function DashboardPage() {
   const [posts, setPosts] = useState<IPublicPost[]>([]);

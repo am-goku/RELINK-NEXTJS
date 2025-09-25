@@ -9,61 +9,61 @@ import { Types } from "mongoose";
 import { extractHashtags } from "@/utils/string-utils";
 
 export async function createPost(formData: FormData, user_id: string) {
-    await connectDB();
+  await connectDB();
 
-    const content = (formData.get('content') as string || '').trim();
-    const file = formData.get('file') as File | null;
+  const content = (formData.get('content') as string || '').trim();
+  const file = formData.get('file') as File | null;
 
-    const disableComment = formData.get("disableComment") === "true";
-    const disableShare = formData.get("disableShare") === "true";
+  const disableComment = formData.get("disableComment") === "true";
+  const disableShare = formData.get("disableShare") === "true";
 
-    let image_url: string | null = null;
+  let image_url: string | null = null;
 
-    // Uploading image to Cloudinary
-    if (file) {
-        try {
-            const buffer = Buffer.from(await file.arrayBuffer());
+  // Uploading image to Cloudinary
+  if (file) {
+    try {
+      const buffer = Buffer.from(await file.arrayBuffer());
 
-            const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    { folder: 'posts' },
-                    (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
-                        if (error || !result) return reject(error);
-                        resolve(result);
-                    }
-                );
-                stream.end(buffer);
-            });
-            image_url = uploadResult.secure_url;
-        } catch (err) {
-            console.log(err)
-            throw new NetworkError("Failed to upload image to Cloudinary");
-        }
+      const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'posts' },
+          (error: UploadApiErrorResponse | undefined, result: UploadApiResponse | undefined) => {
+            if (error || !result) return reject(error);
+            resolve(result);
+          }
+        );
+        stream.end(buffer);
+      });
+      image_url = uploadResult.secure_url;
+    } catch (err) {
+      console.log(err)
+      throw new NetworkError("Failed to upload image to Cloudinary");
     }
+  }
 
-    if (!content && !image_url) {
-        throw new BadRequestError('Either content or image is required.');
-    }
+  if (!content && !image_url) {
+    throw new BadRequestError('Either content or image is required.');
+  }
 
-    // Separating Hashtags
-    const hashtags = extractHashtags(content);
+  // Separating Hashtags
+  const hashtags = extractHashtags(content);
 
-    const post = new Post({
-        content,
-        image: image_url,
-        author: new Types.ObjectId(user_id),
-        hashtags,
-        disableComment,
-        disableShare
-    });
+  const post = new Post({
+    content,
+    image: image_url,
+    author: new Types.ObjectId(user_id),
+    hashtags,
+    disableComment,
+    disableShare
+  });
 
-    await post.save();
+  await post.save();
 
-    // populate directly on the instance
-    await post.populate("author", "name username image");
+  // populate directly on the instance
+  await post.populate("author", "name username image");
 
-    // Sanitizing post into a safe public format
-    return sanitizePost(post);
+  // Sanitizing post into a safe public format
+  return sanitizePost(post);
 }
 
 
@@ -112,12 +112,12 @@ export async function getPosts(page = 1) {
         imageRatio: 1,
         hashtags: 1,
         content: 1,
-        comment_count: 1,
+        comments: 1,
         like_count: 1,
         share_count: 1,
         views: 1,
         likes: 1,
-        saves:1,
+        saves: 1,
         created_at: 1,
         author: {
           _id: 1,
@@ -132,97 +132,105 @@ export async function getPosts(page = 1) {
   return posts.map(post => sanitizePost(post));
 } // Fetch posts from DB for dashboard
 
-export async function getPostsByUsername(username: string, page = 1, c_user_id: string) {
-    await connectDB()
+export async function getPostsByUsername(username: string, page = 1, c_user_id: string, isOwner: boolean = false) {
+  await connectDB()
 
-    const user = await getUserByUsername(username);
-    if (!user) throw new NotFoundError('User not found');
+  const user = await getUserByUsername(username);
+  if (!user) throw new NotFoundError('User not found');
 
-    const isFollowing = user.followers.some(
-        (follower) => follower._id.toString() === c_user_id
+  let isFollowing = true;
+
+  if (!isOwner) {
+    isFollowing = user.followers.some(
+      (follower) => follower._id.toString() === c_user_id
     );
+  }
 
-    if (user.accountType === "private" && !isFollowing) throw new ForbiddenError('You are not following this user');
+  if (user.accountType === "private" && !isFollowing) throw new ForbiddenError('You are not following this user');
 
-    const limit = 15;
-    const skip = (page - 1) * limit;
+  const limit = 15;
+  const skip = (page - 1) * limit;
 
-    const posts = await Post.find({
-        author: user._id,
-        is_archived: false,
-        is_blocked: false,
-    }).sort({ created_at: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("author", "name username image");
+  const posts = await Post.find({
+    author: user._id,
+    is_archived: false,
+    is_blocked: false,
+  }).sort({ created_at: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate("author", "name username image");
 
-    return posts.map(post => sanitizePost(post));
+  return posts.map(post => sanitizePost(post));
 }
 
 
-export async function getPostsByUserId(userId: string, page = 1, c_user_id: string) {
-    await connectDB()
+export async function getPostsByUserId(userId: string, page = 1, c_user_id: string, isOwner: boolean = false) {
+  await connectDB()
 
-    const user = await getUserById(userId);
-    if (!user) throw new NotFoundError('User not found');
+  const user = await getUserById(userId);
+  if (!user) throw new NotFoundError('User not found');
 
-    const isFollowing = user.followers.some(
-        (follower) => follower._id.toString() === c_user_id
+  let isFollowing = true;
+
+  if (!isOwner) {
+    isFollowing = user.followers.some(
+      (follower) => follower._id.toString() === c_user_id
     );
+  }
 
-    if (user.accountType === "private" && !isFollowing) throw new ForbiddenError('You are not following this user');
+  if (user.accountType === "private" && !isFollowing) throw new ForbiddenError('You are not following this user');
 
-    const limit = 15;
-    const skip = (page - 1) * limit;
+  const limit = 15;
+  const skip = (page - 1) * limit;
 
-    const posts = await Post.find({
-        author: userId,
-        is_archived: false,
-        is_blocked: false,
-    }).sort({ created_at: -1 })
-        .skip(skip)
-        .limit(limit)
-        .populate("author", "name username image");
+  const posts = await Post.find({
+    author: userId,
+    is_archived: false,
+    is_blocked: false,
+  }).sort({ created_at: -1 })
+    .skip(skip)
+    .limit(limit)
+    .populate("author", "name username image");
 
-    return posts.map(post => sanitizePost(post));
+  return posts.map(post => sanitizePost(post));
 } // Fetch all posts by a user with the User ID (limited to 15 per page)
 
 
 export async function searchPosts(tag: string | null, page: number = 1) {
-    await connectDB();
+  await connectDB();
 
-    const trimmedTag = typeof tag === 'string' ? tag.trim() : '';
-    if (!trimmedTag) return [];
+  const trimmedTag = typeof tag === 'string' ? tag.trim() : '';
+  if (!trimmedTag) return [];
 
-    const limit = 15;
-    const skip = (page - 1) * limit;
+  const limit = 15;
+  const skip = (page - 1) * limit;
 
-    const posts = await Post.find({
-        hashtags: { $regex: `^${trimmedTag}`, $options: 'i' } // prefix match
-    })
-        .skip(skip)
-        .limit(limit);
+  const posts = await Post.find({
+    hashtags: { $regex: `^${trimmedTag}`, $options: 'i' } // prefix match
+  })
+    .skip(skip)
+    .limit(limit);
 
-    return posts.map(post => sanitizePost(post));
+  return posts.map(post => sanitizePost(post));
 }
 
 
 export async function getPostById(id: string): Promise<IPublicPost> {
-    await connectDB();
+  await connectDB();
 
-    const post = await Post.findOne({
-        _id: new Types.ObjectId(id),
-        is_blocked: { $ne: true },
-        is_archived: { $ne: true },
-    }).populate('author');
+  const post = await Post.findOne({
+    _id: new Types.ObjectId(id),
+    is_blocked: { $ne: true },
+    is_archived: { $ne: true },
+  }).populate('author');
 
-    if (!post) {
-        throw new NotFoundError('Post not found');
-    }
+  if (!post) {
+    throw new NotFoundError('Post not found');
+  }
 
-    const sanitizedPost = sanitizePost(post);
+  const sanitizedPost = sanitizePost(post);
 
-    return sanitizedPost;
+  return sanitizedPost;
 }
 
 export async function getSuggestions() {

@@ -18,11 +18,13 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'userId or username is required' }, { status: 400 });
         }
 
+        const isOwner = (userId === user.id) || (username === user.username);
+
         if (userId) {
-            const posts = await getPostsByUserId(userId, Number(page), user.id);
+            const posts = await getPostsByUserId(userId, Number(page), user.id, isOwner);
             return NextResponse.json(posts, { status: 200 });
         } else if (username) {
-            const posts = await getPostsByUsername(username, Number(page), user.id);
+            const posts = await getPostsByUsername(username, Number(page), user.id, isOwner);
             return NextResponse.json(posts, { status: 200 });
         }
 
