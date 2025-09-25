@@ -10,7 +10,7 @@ type ProfileFormData = {
     name: string;
     username: string;
     bio: string;
-    gender: string;
+    gender: "male" | "female" | "non-binary" | "other" | "prefer-not-to-say" | "";
 };
 
 function ProfileSection() {
@@ -159,10 +159,11 @@ function ProfileSection() {
                                 <option value="" disabled>
                                     Select your gender
                                 </option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Non-binary</option>
-                                <option>Prefer not to say</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="non-binary">Non-binary</option>
+                                <option value="other">Other</option>
+                                <option value="prefer-not-to-say">Prefer not to say</option>
                             </select>
                         </div>
 

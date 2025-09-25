@@ -89,9 +89,13 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
                         <MessageSquare className="h-4 w-4" /> <span className="text-sm">{post.comments_count}</span>
                     </button>
 
-                    <button onClick={handleShare} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
-                        <Share2 className="h-4 w-4" /> <span className="text-sm">{post.share_count}</span>
-                    </button>
+                    {
+                        !post.disableShare ? (
+                            <button onClick={handleShare} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
+                                <Share2 className="h-4 w-4" /> <span className="text-sm">{post.share_count}</span>
+                            </button>
+                        ) : null
+                    }
                 </div>
 
                 <div className="flex items-center gap-3">

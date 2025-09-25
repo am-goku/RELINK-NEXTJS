@@ -9,7 +9,7 @@ export interface IUser {
 
     name?: string;
     bio?: string;
-    gender?: string;
+    gender?: "male" | "female" | "non-binary" | "other" | "prefer-not-to-say";
     image?: string;
     cover?: string;
     links?: string[];
@@ -48,7 +48,8 @@ const UserSchema = new Schema<IUserDocument>(
             type: String
         },
         gender: {
-            type: String
+            type: String,
+            enum: ["male", "female", "non-binary", "other", "prefer-not-to-say"]
         },
         image: {
             type: String

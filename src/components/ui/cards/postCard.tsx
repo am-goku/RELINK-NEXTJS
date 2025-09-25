@@ -21,7 +21,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
               <Avatar user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} size={10} />
             </div>
-            <div onClick={() => {router.push(`/${post.author.username}`)}}>
+            <div onClick={() => { router.push(`/${post.author.username}`) }}>
               <p className="text-sm font-semibold cursor-pointer">{post.author.name}</p>
               <p className="text-xs opacity-70">@{post.author.username} • just now</p>
             </div>
@@ -64,18 +64,23 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
               <span className="text-xs">{post.likes_count}</span>
             </button>
 
-            <button onClick={() => {router.push(`/post/${post._id}`)}} className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5" aria-label="comment">
+            <button onClick={() => { router.push(`/post/${post._id}`) }} className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5" aria-label="comment">
               <MessageSquare className="h-4 w-4" />
               <span className="text-xs">{post.comments_count}</span>
             </button>
 
-            <button
-              className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5"
-              aria-label="share"
-            >
-              <Share2 className="h-4 w-4" />
-              <span className="text-xs">{post.share_count}</span>
-            </button>
+            {
+              !post.disableShare ? (
+                <button
+                  className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5"
+                  aria-label="share"
+                >
+                  <Share2 className="h-4 w-4" />
+                  <span className="text-xs">{post.share_count}</span>
+                </button>
+              ) : null
+            }
+
           </div>
           <div className="text-xs opacity-60 cursor-pointer">View details</div>
         </div>

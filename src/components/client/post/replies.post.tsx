@@ -12,6 +12,7 @@ type CommentRepliesProps = {
     replyingTo: string | null;
     c_author: SanitizedComment["author"];
     p_author: IPublicPost["author"];
+    disableComment: boolean;
     setReplyingTo: React.Dispatch<React.SetStateAction<string | null>>;
     replyText: { [id: string]: string };
     setReplyText: React.Dispatch<React.SetStateAction<{ [id: string]: string }>>;
@@ -19,7 +20,7 @@ type CommentRepliesProps = {
     setBusy: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export default function CommentRelies({ p_id, c_id, replyingTo, setReplyingTo, c_author, p_author, replyText, setReplyText, setError, setBusy }: CommentRepliesProps) {
+export default function CommentRelies({ p_id, c_id, replyingTo, disableComment, setReplyingTo, c_author, p_author, replyText, setReplyText, setError, setBusy }: CommentRepliesProps) {
 
     const { data: session } = useSession();
 
@@ -64,7 +65,7 @@ export default function CommentRelies({ p_id, c_id, replyingTo, setReplyingTo, c
     return (
         <div className="mt-3 space-y-2 pl-4 border-l">
             {/* reply composer (only for main comment) */}
-            {replyingTo === c_id && (
+            {replyingTo === c_id && !disableComment && (
                 <div className="mt-2">
                     <textarea value={replyText[c_id] || ""} onChange={(e) => setReplyText((p) => ({ ...p, [c_id]: e.target.value }))} className="w-full rounded-md border p-2 text-sm bg-gray-50 dark:bg-neutral-900" rows={2} placeholder={`Reply to @${c_author.username}`} />
                     <div className="flex justify-end gap-2 mt-2">

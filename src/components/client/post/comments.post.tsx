@@ -7,6 +7,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import CommentRelies from './replies.post';
 import { getErrorMessage } from '@/lib/errors/errorResponse';
 import { AnimatePresence, motion } from 'framer-motion';
+import Avatar from '@/components/template/avatar';
+import { SanitizedUser } from '@/utils/sanitizer/user';
 
 type Props = {
     session: Session;
@@ -61,13 +63,17 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
         <React.Fragment>
             <div className="mt-5">
                 <h3 className="text-lg font-semibold mb-2">Comments</h3>
-                <div className="space-y-2">
-                    <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Write a comment..." className="w-full rounded-lg border p-3 text-sm outline-none bg-gray-50 dark:bg-neutral-900" rows={3} />
-                    <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => { setCommentText(""); setError(null); }} className="px-3 py-2 rounded-md">Cancel</button>
-                        <button onClick={postComment} disabled={busy} className="px-4 py-2 rounded-md bg-[#2D3436] text-white">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Comment"}</button>
-                    </div>
-                </div>
+                {
+                    !post.disableComment ? (
+                        <div className="space-y-2">
+                            <textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Write a comment..." className="w-full rounded-lg border p-3 text-sm outline-none bg-gray-50 dark:bg-neutral-900" rows={3} />
+                            <div className="flex items-center justify-end gap-2">
+                                <button onClick={() => { setCommentText(""); setError(null); }} className="px-3 py-2 rounded-md">Cancel</button>
+                                <button onClick={postComment} disabled={busy} className="px-4 py-2 rounded-md bg-[#2D3436] text-white">{busy ? <Loader2 className="h-4 w-4 animate-spin" /> : "Comment"}</button>
+                            </div>
+                        </div>
+                    ) : null
+                }
             </div>
 
             {/* Comments List */}
@@ -75,8 +81,7 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
                 {comments.map((c) => (
                     <div key={c._id} className="bg-white/80 dark:bg-neutral-800/70 p-3 rounded-lg">
                         <div className="flex items-start gap-3">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={c.author.image} alt={c.author.username} className="w-10 h-10 rounded-full object-cover" />
+                            <Avatar user={c.author as unknown as SanitizedUser} size={10} />
                             <div className="flex-1">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -113,6 +118,7 @@ function Comments({ session, post, busy, isPostOwner, setError, setBusy }: Props
                                                 setReplyingTo={setReplyingTo}
                                                 c_author={c.author}
                                                 p_author={post.author}
+                                                disableComment={post.disableComment}
                                                 replyText={replyText}
                                                 setReplyText={setReplyText}
                                                 setBusy={setBusy}
