@@ -5,12 +5,14 @@ import { IPublicPost } from "@/utils/sanitizer/post";
 import { Heart, MessageSquare, MoreHorizontal, Share2 } from "lucide-react";
 import PostOptionsModal from "@/components/modal/postOptions";
 import { useRouter } from "next/navigation";
+import ShareModal from "@/components/modal/SocialShare";
 
 function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) => void }) {
 
   const router = useRouter();
 
   const [postOptions, setPostOptions] = React.useState<boolean>(false);
+  const [shareModalOpen, setShareModalOpen] = React.useState<boolean>(false);
 
   return (
     <React.Fragment>
@@ -72,6 +74,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
             {
               !post.disableShare ? (
                 <button
+                  onClick={() => setShareModalOpen(true)}
                   className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5"
                   aria-label="share"
                 >
@@ -96,6 +99,16 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
           onGoToPost={() => router.push(`/post/${post._id}`)}
         />
       )}
+
+      {
+        (shareModalOpen && !post.disableShare) && (
+          <ShareModal
+            isOpen={shareModalOpen}
+            url={`${process.env.NEXT_PUBLIC_API_BASE_URL}/post/${post._id}`}
+            text={post.content || "Check out this post"}
+            onClose={() => setShareModalOpen(false)} />
+        )
+      }
 
     </React.Fragment>
   );

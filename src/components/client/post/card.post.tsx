@@ -1,3 +1,4 @@
+import ShareModal from '@/components/modal/SocialShare';
 import Avatar from '@/components/template/avatar';
 import { IPublicPost } from '@/utils/sanitizer/post';
 import { Bookmark, Heart, MessageSquare, Share2 } from 'lucide-react'
@@ -20,6 +21,8 @@ type Props = {
 function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, setBusy }: Props) {
 
     const router = useRouter();
+
+    const [shareModalOpen, setShareModalOpen] = React.useState(false);
 
     async function toggleLike() {
         if (!post) return;
@@ -52,59 +55,70 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
     } // TODO: Need to add save\unsave API call
 
     async function handleShare() {
-        if (!post) return;
-        setBusy(true);
-        await new Promise((r) => setTimeout(r, 400));
-        setBusy(false);
-        // alert("Post shared (mock)");
+        setShareModalOpen(true);
     } // TODO: Need to add share API call
 
 
     return (
-        <article className="rounded-2xl bg-white/90 dark:bg-neutral-800/80 p-4 shadow">
-            <header className="flex items-center gap-3 mb-3">
-                <Avatar size={10} user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} />
-                <div onClick={() => router.push(`/${post.author.username}`)} className='cursor-pointer'>
-                    <div className="font-semibold">{post.author.name || post.author.username}</div>
-                    <div className="text-xs opacity-70">@{post.author.username} • {new Date(post.created_at).toLocaleDateString()}</div>
+        <React.Fragment>
+            <article className="rounded-2xl bg-white/90 dark:bg-neutral-800/80 p-4 shadow">
+                <header className="flex items-center gap-3 mb-3">
+                    <Avatar size={10} user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} />
+                    <div onClick={() => router.push(`/${post.author.username}`)} className='cursor-pointer'>
+                        <div className="font-semibold">{post.author.name || post.author.username}</div>
+                        <div className="text-xs opacity-70">@{post.author.username} • {new Date(post.created_at).toLocaleDateString()}</div>
+                    </div>
+                </header>
+
+                <div className="text-sm mb-3 whitespace-pre-wrap">{post.content}</div>
+
+                {post.image && (
+                    <div className="mb-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={post.image} alt="post image" className="w-full rounded-lg object-cover max-h-[60vh]" />
+                    </div>
+                )}
+
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button onClick={toggleLike} disabled={busy} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${liked ? "bg-red-600 text-white" : "hover:bg-black/5 dark:hover:bg-white/5"}`}>
+                            <Heart className="h-4 w-4" /> <span className="text-sm">{post.likes.length + (liked ? 1 : 0)}</span>
+                        </button>
+
+                        <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
+                            <MessageSquare className="h-4 w-4" /> <span className="text-sm">{post.comments_count}</span>
+                        </button>
+
+                        {
+                            !post.disableShare ? (
+                                <button onClick={handleShare} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
+                                    <Share2 className="h-4 w-4" /> <span className="text-sm">{post.share_count}</span>
+                                </button>
+                            ) : null
+                        }
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                        <button onClick={toggleSave} className={`p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 ${saved ? "bg-gray-200 dark:bg-gray-600" : ""}`}>
+                            <Bookmark className="h-4 w-4" />
+                        </button>
+                    </div>
                 </div>
-            </header>
+            </article>
 
-            <div className="text-sm mb-3 whitespace-pre-wrap">{post.content}</div>
 
-            {post.image && (
-                <div className="mb-3">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={post.image} alt="post image" className="w-full rounded-lg object-cover max-h-[60vh]" />
-                </div>
-            )}
+            {
+                (shareModalOpen && !post.disableShare) && (
+                    <ShareModal
+                        isOpen={shareModalOpen}
+                        onClose={() => setShareModalOpen(false)}
+                        url={window.location.href}
+                        text={post.content || "Check out this post"}
+                    />
+                )
+            }
 
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <button onClick={toggleLike} disabled={busy} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${liked ? "bg-red-600 text-white" : "hover:bg-black/5 dark:hover:bg-white/5"}`}>
-                        <Heart className="h-4 w-4" /> <span className="text-sm">{post.likes.length + (liked ? 1 : 0)}</span>
-                    </button>
-
-                    <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
-                        <MessageSquare className="h-4 w-4" /> <span className="text-sm">{post.comments_count}</span>
-                    </button>
-
-                    {
-                        !post.disableShare ? (
-                            <button onClick={handleShare} className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
-                                <Share2 className="h-4 w-4" /> <span className="text-sm">{post.share_count}</span>
-                            </button>
-                        ) : null
-                    }
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <button onClick={toggleSave} className={`p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 ${saved ? "bg-gray-200 dark:bg-gray-600" : ""}`}>
-                        <Bookmark className="h-4 w-4" />
-                    </button>
-                </div>
-            </div>
-        </article>
+        </React.Fragment>
     )
 }
 
