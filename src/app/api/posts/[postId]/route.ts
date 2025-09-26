@@ -2,7 +2,7 @@ import Post from "@/models/Post";
 import { userAuth } from "@/lib/auth";
 import { connectDB } from "@/lib/db/mongoose";
 import { NextRequest, NextResponse } from "next/server";
-import { getPostById } from "@/lib/controllers/postController";
+import { getPostById } from "@/lib/controllers/post";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
 
 

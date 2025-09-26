@@ -141,5 +141,10 @@ UserSchema.methods.compareOTP = async function (enteredOtp: string): Promise<boo
     return bcrypt.compare(enteredOtp, this.otp);
 };
 
+UserSchema.index(
+    { _id: 1, accountType: 1, deleted: 1, blocked: 1 },
+    { name: "users_author_filter_index" }
+);
+
 const User = models.User || model<IUserDocument>("User", UserSchema);
 export default User;

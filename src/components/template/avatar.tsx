@@ -11,6 +11,7 @@ function Avatar({ user, size = 10 }: { user: Partial<SanitizedUser>; size?: numb
                     src={user.image}
                     alt={user.name}
                     className="h-full w-full object-cover"
+                    loading="lazy"
                     style={{ height: `${size * 4}px`, width: `${size * 4}px` }}
                 />
             ) : (

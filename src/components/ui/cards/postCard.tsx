@@ -1,18 +1,37 @@
 import React from "react";
 import Avatar from "../../template/avatar";
-import { Types } from "mongoose";
 import { IPublicPost } from "@/utils/sanitizer/post";
 import { Heart, MessageSquare, MoreHorizontal, Share2 } from "lucide-react";
-import PostOptionsModal from "@/components/modal/postOptions";
 import { useRouter } from "next/navigation";
-import ShareModal from "@/components/modal/SocialShare";
 
-function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) => void }) {
+type Props = {
+  post: IPublicPost;
+  setPostOptionsData: React.Dispatch<React.SetStateAction<{ post_id: string; author_id: string } | null>>;
+  setShareModalData: React.Dispatch<React.SetStateAction<{ post_id: string; text: string } | null>>;
+}
+
+function PostCard({ post, setPostOptionsData, setShareModalData }: Props) {
 
   const router = useRouter();
 
-  const [postOptions, setPostOptions] = React.useState<boolean>(false);
-  const [shareModalOpen, setShareModalOpen] = React.useState<boolean>(false);
+  // const [postOptions, setPostOptions] = React.useState<boolean>(false);
+  // const [shareModalOpen, setShareModalOpen] = React.useState<boolean>(false);
+
+  const setPostOptions = (open: boolean) => {
+    if (open) {
+      setPostOptionsData({ post_id: post._id, author_id: post.author._id });
+    } else {
+      setPostOptionsData(null);
+    }
+  };
+
+  const setShareModalOpen = (open: boolean) => {
+    if (open) {
+      setShareModalData({ post_id: post._id, text: post.content || "" });
+    } else {
+      setShareModalData(null);
+    }
+  };
 
   return (
     <React.Fragment>
@@ -21,7 +40,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 shrink-0 overflow-hidden rounded-full">
-              <Avatar user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} size={10} />
+              <Avatar user={post.author} size={10} />
             </div>
             <div onClick={() => { router.push(`/${post.author.username}`) }}>
               <p className="text-sm font-semibold cursor-pointer">{post.author.name}</p>
@@ -43,6 +62,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
             <img
               src={post.image}
               alt={post.content ? post.content.slice(0, 60) : `image-${post._id}`}
+              loading="lazy"
               className={`w-full object-cover transition-transform hover:scale-105 ${post.imageRatio === "landscape"
                 ? "aspect-[16/9]"
                 : post.imageRatio === "portrait"
@@ -58,7 +78,7 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
         <div className="mt-2 flex items-center justify-between">
           <div className="flex items-center gap-1">
             <button
-              onClick={() => onLike(post._id)}
+              onClick={() => {}}
               className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5"
               aria-label="like"
             >
@@ -88,30 +108,8 @@ function PostCard({ post, onLike }: { post: IPublicPost; onLike: (id: string) =>
           <div className="text-xs opacity-60 cursor-pointer">View details</div>
         </div>
       </article>
-
-      {/* PostOptionsModal */}
-      {postOptions && (
-        <PostOptionsModal
-          key={post._id}
-          open={postOptions}
-          author_id={post.author._id}
-          onClose={() => setPostOptions(false)}
-          onGoToPost={() => router.push(`/post/${post._id}`)}
-        />
-      )}
-
-      {
-        (shareModalOpen && !post.disableShare) && (
-          <ShareModal
-            isOpen={shareModalOpen}
-            url={`${process.env.NEXT_PUBLIC_API_BASE_URL}/post/${post._id}`}
-            text={post.content || "Check out this post"}
-            onClose={() => setShareModalOpen(false)} />
-        )
-      }
-
     </React.Fragment>
   );
 }
 
-export default PostCard;
+export default React.memo(PostCard);

@@ -1,5 +1,5 @@
 import { userAuth } from "@/lib/auth";
-import { getPostsByUserId, getPostsByUsername } from "@/lib/controllers/postController";
+import { getPostsByUserId, getPostsByUsername } from "@/lib/controllers/post";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextRequest, NextResponse } from "next/server";
 

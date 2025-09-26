@@ -41,7 +41,7 @@ export async function getPostsByUsername({ username }: { username: string }) {
     }
 }
 
-export async function fetchDashboardPosts(): Promise<IPublicPost[]> {
-    const res = await apiInstance.get("/api/posts");
-    return res.data.posts || [];
+export async function fetchDashboardPosts(page: number = 1): Promise<IPublicPost[]> {
+    const res = (await apiInstance.get(`/api/posts?page=${page}`)).data;
+    return res;
 }

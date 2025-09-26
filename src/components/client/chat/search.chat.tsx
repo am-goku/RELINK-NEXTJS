@@ -89,7 +89,7 @@ function ChatSearchBar({ rooms, session, setNewChat, setActiveRoom }: Props) {
                             if (!hasParticipantInNonGroup(rooms, u._id.toString())) {
                                 return (
                                     <li onClick={() => manageNewChat(u)} key={u._id.toString()} className="flex items-center gap-3 px-2 py-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-md cursor-pointer">
-                                        <Avatar user={u} key={u._id.toString()} size={9} />
+                                        <Avatar user={{...u, _id: u._id.toString()}} key={u._id.toString()} size={9} />
                                         <div className="flex-1 text-sm">
                                             <div className="font-medium">{u.name || u.username}</div>
                                         </div>

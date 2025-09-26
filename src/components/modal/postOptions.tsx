@@ -45,7 +45,9 @@ export default function PostOptionsModal({
 
     const { data: session } = useSession();
 
-    const following = useUserStore(s => s.user?.following) || [];
+    const following = useUserStore(s => s.user?.following)?.map(f => f) || [];
+
+    console.log(following)
 
     return (
         <AnimatePresence>
@@ -70,15 +72,16 @@ export default function PostOptionsModal({
                                 session?.user.id === author_id ? (
                                     <OptionButton label="Delete Post" onClick={onDelete ?? (() => { })} danger />
                                 ) : (
-                                    <OptionButton label="Report" onClick={onReport ?? (() => { })} danger />
-                                )
-                            }
-
-                            {
-                                following.includes(author_id) ? (
-                                    <OptionButton label="Unfollow User" onClick={onUnfollow ?? (() => { })} danger />
-                                ) : (
-                                    <OptionButton label="Follow User" onClick={onUnfollow ?? (() => { })} />
+                                    <>
+                                        <OptionButton label="Report" onClick={onReport ?? (() => { })} danger />
+                                        {
+                                            following.includes(author_id) ? (
+                                                <OptionButton label="Unfollow User" onClick={onUnfollow ?? (() => { })} danger />
+                                            ) : (
+                                                <OptionButton label="Follow User" onClick={onUnfollow ?? (() => { })} />
+                                            )
+                                        }
+                                    </>
                                 )
                             }
 

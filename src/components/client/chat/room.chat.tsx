@@ -35,7 +35,7 @@ function RoomItem({ room, user, activeRoom, setActiveRoom }: Props) {
                 className={`w-full text-left rounded-xl p-2 flex items-center gap-3 hover:bg-black/5 dark:hover:bg-white/5 ${activeRoom?._id.toString() === room._id.toString() ? "bg-light-bg/90 dark:bg-dark-bg/90" : ""}`}
             >
                 <div className="relative">
-                    {user && <Avatar user={user} key={user?._id.toString()} size={10} />}
+                    {user && <Avatar user={{ ...user, _id: user._id.toString() }} key={user?._id.toString()} size={10} />}
                     {/* TODO: Have to manage online status */}
                     <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${online ? "bg-green-500" : "bg-gray-400"}`} />
                 </div>

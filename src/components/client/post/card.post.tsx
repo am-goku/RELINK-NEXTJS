@@ -2,7 +2,6 @@ import ShareModal from '@/components/modal/SocialShare';
 import Avatar from '@/components/template/avatar';
 import { IPublicPost } from '@/utils/sanitizer/post';
 import { Bookmark, Heart, MessageSquare, Share2 } from 'lucide-react'
-import { Types } from 'mongoose';
 import { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';
 import React from 'react'
@@ -63,7 +62,7 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
         <React.Fragment>
             <article className="rounded-2xl bg-white/90 dark:bg-neutral-800/80 p-4 shadow">
                 <header className="flex items-center gap-3 mb-3">
-                    <Avatar size={10} user={{ ...post.author, _id: new Types.ObjectId(post.author._id) }} />
+                    <Avatar size={10} user={post.author} />
                     <div onClick={() => router.push(`/${post.author.username}`)} className='cursor-pointer'>
                         <div className="font-semibold">{post.author.name || post.author.username}</div>
                         <div className="text-xs opacity-70">@{post.author.username} • {new Date(post.created_at).toLocaleDateString()}</div>

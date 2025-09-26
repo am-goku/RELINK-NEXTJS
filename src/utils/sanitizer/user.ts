@@ -1,31 +1,30 @@
 import { IUser, IUserDocument } from "@/models/User";
 
 type BaseSanitizedUser = {
-  _id: IUser['_id'];
-  username: IUser['username'];
-  role: IUser['role'];
-  name: IUser['name'];
-  bio: IUser['bio'];
-  gender: IUser['gender'];
-  image: IUser['image'];
-  cover: IUser['cover'];
-  links: IUser['links'];
-  accountType: IUser['accountType'];
-  messageFrom: IUser['messageFrom'];
-  onlineStatus: IUser['onlineStatus'];
-  created_at: IUser['created_at'];
-  updated_at: IUser['updated_at'];
-  followers: TConnection[];
-  following: TConnection[];
+  _id: string;
+  username: string;
+  role: "user" | "admin" | "super-admin";
+  name: string;
+  bio: string;
+  gender: "male" | "female" | "non-binary" | "other" | "prefer-not-to-say";
+  image: string;
+  cover: string;
+  links: string[];
+  accountType: "public" | "private";
+  messageFrom: "everyone" | "followers" | "none";
+  onlineStatus: boolean;
+  created_at: Date;  
+  updated_at: Date;
+  followers: string[];
+  following: string[];
   followersCount: number;
   followingCount: number;
 };
 
 type AdminSanitizedUser = BaseSanitizedUser & {
-  email: IUser['email'];
-  blocked: IUser['blocked'];
-  deleted: IUser['deleted'];
-  otp: IUser['otp'];
+  email: string;
+  blocked: boolean;
+  deleted: boolean;
 };
 
 // Conditional type based on role
@@ -35,45 +34,28 @@ export type SanitizedUser<R extends IUser['role'] = 'user'> =
 export type ShortUser = Pick<BaseSanitizedUser, "_id" | "username"> &
   Partial<Pick<BaseSanitizedUser, "name" | "image">>;
 
-type TConnection = string | ShortUser;
-
 export function sanitizeUser(
   user: IUserDocument | IUser,
   role: IUser["role"] = "user"
-) {
-  // normalize followers/following
-  const normalizeConnections = (
-    connections: TConnection[] = []
-  ) => {
-    return connections.map((conn) =>
-      typeof conn === "string"
-        ? { _id: conn, username: "", name: "", image: "" } // fallback for non-populated
-        : {
-          _id: conn._id,
-          username: conn.username,
-          name: conn.name,
-          image: conn.image || "",
-        }
-    );
-  };
+): SanitizedUser<typeof role> {
 
   const baseUser = {
-    _id: user._id,
+    _id: user._id.toString(),
     username: user.username,
-    role: user.role,
-    name: user.name,
-    bio: user.bio,
-    gender: user.gender,
-    image: user.image,
-    cover: user.cover,
-    links: user.links,
-    accountType: user.accountType,
-    messageFrom: user.messageFrom,
-    onlineStatus: user.onlineStatus,
-    created_at: user.created_at,
-    updated_at: user.updated_at,
-    followers: normalizeConnections(user.followers as TConnection[]),
-    following: normalizeConnections(user.following as TConnection[]),
+    role: user.role || "user",
+    name: user.name || "",
+    bio: user.bio || "",
+    gender: user.gender || "prefer-not-to-say",
+    image: user.image || "",
+    cover: user.cover || "",
+    links: user.links || [],
+    accountType: user.accountType || "public",
+    messageFrom: user.messageFrom || "everyone",
+    onlineStatus: user.onlineStatus || true,
+    created_at: user.created_at || new Date(),
+    updated_at: user.updated_at || new Date(),
+    followers: user.followers.map(f => f.toString()) || [],
+    following: user.following.map(f => f.toString()) || [],
     followersCount: user.followers?.length || 0,
     followingCount: user.following?.length || 0,
   };
@@ -82,9 +64,8 @@ export function sanitizeUser(
     return {
       ...baseUser,
       email: user.email,
-      blocked: user.blocked,
-      deleted: user.deleted,
-      otp: user.otp,
+      blocked: user.blocked || false,
+      deleted: user.deleted || false,
     };
   }
 

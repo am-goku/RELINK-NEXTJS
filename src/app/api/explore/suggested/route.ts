@@ -1,5 +1,5 @@
 import { userAuth } from "@/lib/auth";
-import { getSuggestions } from "@/lib/controllers/postController";
+import { getSuggestions } from "@/lib/controllers/post";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextResponse } from "next/server";
 

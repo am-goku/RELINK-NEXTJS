@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { userAuth } from '@/lib/auth';
 import { handleApiError } from '@/lib/errors/errorResponse';
-import { createPost, getPosts } from '@/lib/controllers/postController';
+import { createPost, getPosts } from '@/lib/controllers/post';
 
 export const config = {
     api: {
@@ -29,16 +29,20 @@ export async function POST(req: NextRequest) {
 }
 
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
+        const { searchParams } = new URL(req.url);
+
+        const page = searchParams.get("page") || 1;
+
         const user = await userAuth();
         if (!user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const posts = await getPosts();
+        const data = await getPosts(Number(page));
 
-        return NextResponse.json({ message: 'Posts fetched successfully', posts }, { status: 200 });
+        return NextResponse.json(data, { status: 200 });
     } catch (error) {
         return handleApiError(error);
     }

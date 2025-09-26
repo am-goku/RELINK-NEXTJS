@@ -3,12 +3,11 @@
 import Avatar from "@/components/template/avatar";
 import { getUserConnectionList } from "@/services/api/user-apis";
 import { ShortUser } from "@/utils/sanitizer/user";
-import { Types } from "mongoose";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type ConnectionsTabProps = {
-    user_id: Types.ObjectId;
+    user_id: string;
     type: "followers" | "following";
 };
 

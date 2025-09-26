@@ -9,7 +9,7 @@ export interface IPostBase {
     comments: Types.ObjectId[];
     hashtags: string[];
     author: Types.ObjectId;
-    
+
     // Interactions
     likes: Types.ObjectId[];
     saves: Types.ObjectId[];
@@ -117,6 +117,11 @@ PostSchema.pre("validate", function (next) {
     }
     next();
 });
+
+PostSchema.index(
+    { is_archived: 1, is_blocked: 1, created_at: -1 },
+    { name: "post_dashboard_index" }
+);
 
 // Post Model
 const Post = mongoose.models.Post || mongoose.model<IPostDocument>("Post", PostSchema);

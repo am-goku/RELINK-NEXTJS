@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import { LockKeyhole, MessageSquare, Plus, UserMinus, UserPlus } from "lucide-react";
 import Header from "@/components/nav/header";
 import { Session } from "next-auth";
-import { hasConnection } from "@/utils/connections/user-connection";
-import { SanitizedUser, ShortUser } from "@/utils/sanitizer/user";
+import { SanitizedUser } from "@/utils/sanitizer/user";
 import { IPublicPost } from "@/utils/sanitizer/post";
 import { getPostsByUsername } from "@/services/api/post-apis";
 import ProfileCover from "./cover.profile";
@@ -54,7 +53,7 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
     // Connection management
     useEffect(() => {
         if (user && session) {
-            const following = hasConnection(user.followers as ShortUser[], session.user.id);
+            const following = user.following.includes(session.user.id);
             setIsFollowing(following);
         }
         return () => {
@@ -73,14 +72,14 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
     // Connection management: follow
     const doFollow = useCallback(async () => {
         if (user._id) {
-            await followUser({ id: user._id });
+            await followUser(user._id);
             setIsFollowing(true);
         }
     }, [user._id])
     // Connection management: unfollow
     const doUnfollow = useCallback(async () => {
         if (user._id) {
-            await unfollowUser({ id: user._id });
+            await unfollowUser(user._id);
             setIsFollowing(false);
         }
     }, [user._id])

@@ -1,7 +1,6 @@
 import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
 import { SanitizedUser } from "@/utils/sanitizer/user";
-import { Types } from "mongoose";
 import React, { Dispatch, SetStateAction } from "react";
 
 type ProfileFormData = {
@@ -103,9 +102,7 @@ export async function updateUserProfile({ updateUser, formData, originalData, se
 }
 
 
-export async function followUser({ id }: {
-    id: Types.ObjectId,
-}) {
+export async function followUser(id: string) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/follow`)).data;
         return res
@@ -115,9 +112,7 @@ export async function followUser({ id }: {
 }
 
 
-export async function unfollowUser({ id }: {
-    id: Types.ObjectId
-}) {
+export async function unfollowUser(id: string) {
     try {
         const res = (await apiInstance.patch(`/api/users/connection/${id}/unfollow`)).data;
         return res;
@@ -162,7 +157,7 @@ export async function getUserProfileData({ username, setProfileData, setIsOwner,
  * @prop {React.Dispatch<React.SetStateAction<string | null>>} setError - The function to update the error state.
  */
 export async function getUserConnectionList({ id, type }: {
-    id: Types.ObjectId,
+    id: string,
     type: "followers" | "following",
 }) {
     try {
