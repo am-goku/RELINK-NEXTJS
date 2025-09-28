@@ -16,28 +16,31 @@ import { ActionButton } from "@/components/template/action-button";
 import ConnectionsTab from "./tabs.profile";
 import { AboutCard } from "./about.profile";
 import PostList from "./posts.profile";
+import { useUserStore } from "@/stores/userStore";
 
 type Props = {
     session: Session;
-    user: SanitizedUser;
+    initialUser: SanitizedUser;
     isOwner: boolean;
 }
 
 type Tab = 'posts' | 'about' | 'followers' | 'following';
 
-export default function ProfilePage({ session, user, isOwner }: Props) {
+export default function ProfilePage({ session, initialUser, isOwner }: Props) {
+
+    // Profile user state
+    const [user, setUser] = useState<SanitizedUser>(initialUser);
+    const [posts, setPosts] = useState<IPublicPost[]>([])
+
+    // Global states
+    const isFollowing = useUserStore(state => state.user?.following.includes(user._id));
+
+    // UI states
     const [activeTab, setActiveTab] = useState<Tab>("posts");
-
-    // const [user, setUser] = useState<SanitizedUser | null>(null);
     const [error, setError] = useState<string>('');
-    const [posts, setPosts] = useState<IPublicPost[] | []>([])
     const [loadingPosts, setLoadingPosts] = useState(true);
-
-    //Create post states
+    const [loadingConnection, setLoadingConnection] = useState<boolean>(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
-
-    // connection states
-    const [isFollowing, setIsFollowing] = useState<boolean>(true);
 
     // Fetching User Posts
     useEffect(() => {
@@ -50,17 +53,6 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
         if (user?.username) fetch_posts();
     }, [user?.username])
 
-    // Connection management
-    useEffect(() => {
-        if (user && session) {
-            const following = user.following.includes(session.user.id);
-            setIsFollowing(following);
-        }
-        return () => {
-            setIsFollowing(false);
-        }
-    }, [user, session]);
-
     // Error handling
     useEffect(() => {
         if (error) console.log(error)
@@ -72,23 +64,30 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
     // Connection management: follow
     const doFollow = useCallback(async () => {
         if (user._id) {
+            setLoadingConnection(true);
             await followUser(user._id);
-            setIsFollowing(true);
+            useUserStore.getState().updateUser("following", [...(useUserStore.getState().user?.following || []), user._id]);
+            setUser(prev => ({ ...prev, followers: [session.user.id, ...prev.followers] }));
+            setLoadingConnection(false);
         }
-    }, [user._id])
+    }, [session.user.id, user._id])
+
     // Connection management: unfollow
     const doUnfollow = useCallback(async () => {
         if (user._id) {
+            setLoadingConnection(true);
             await unfollowUser(user._id);
-            setIsFollowing(false);
+            useUserStore.getState().updateUser("following", (useUserStore.getState().user?.following || []).filter(id => id !== user._id));
+            setUser(prev => ({ ...prev, followers: prev.followers.filter(id => id !== session.user.id) }));
+            setLoadingConnection(false);
         }
-    }, [user._id])
+    }, [session.user.id, user._id])
 
     // UI Confition
     const canViewProfile =
         isOwner ||
         user.accountType === "public" ||
-        (user.accountType === "private" && user.followers.includes(session?.user?.id));
+        (user.accountType === "private" && isFollowing);
 
     return (
         <div className="min-h-screen bg-[#F0F2F5] dark:bg-neutral-900 text-[#2D3436] dark:text-gray-200 relative">
@@ -110,11 +109,11 @@ export default function ProfilePage({ session, user, isOwner }: Props) {
                                 <div className="flex gap-2 mt-2">
                                     {
                                         isFollowing ? (
-                                            <ActionButton onAction={doUnfollow}>
+                                            <ActionButton loading={loadingConnection} onAction={doUnfollow}>
                                                 <UserMinus size={16} /> Remove
                                             </ActionButton>
                                         ) : (
-                                            <ActionButton onAction={doFollow}>
+                                            <ActionButton loading={loadingConnection} onAction={doFollow}>
                                                 <UserPlus size={16} /> Follow
                                             </ActionButton>
                                         )

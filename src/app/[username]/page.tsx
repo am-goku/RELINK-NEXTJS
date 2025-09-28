@@ -18,7 +18,7 @@ async function Page({ params }: { params: Promise<{ username: string }> }) {
 
     const isOwner = session.user.id === user._id.toString();
 
-    return <ProfilePage session={session} user={user} isOwner={isOwner} />
+    return <ProfilePage session={session} initialUser={user} isOwner={isOwner} />
 
 }
 
