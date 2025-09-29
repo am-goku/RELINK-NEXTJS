@@ -16,10 +16,6 @@ type Props = {
 
 function PostClient({post, isOwner, session}: Props) {
 
-    // Post States
-    const [likes, setLikes] = useState<IPublicPost["likes"]>(post.likes || []);
-    const [saves, setSaves] = useState<IPublicPost["saves"]>(post.saves || []);
-
     const [error, setError] = useState<string | null>(null);
 
     //UI States
@@ -43,13 +39,7 @@ function PostClient({post, isOwner, session}: Props) {
                 {/* Post Card */}
                 <PostPageCard
                     session={session}
-                    busy={busy}
                     post={post}
-                    liked={likes.includes(session.user.id)}
-                    saved={saves.includes(session.user.id)}
-                    setLikes={setLikes}
-                    setSaves={setSaves}
-                    setBusy={setBusy}
                 />
 
                 {/* Comment Composer */}

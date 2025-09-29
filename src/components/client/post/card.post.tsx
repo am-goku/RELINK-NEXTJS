@@ -1,57 +1,24 @@
 import ShareModal from '@/components/modal/SocialShare';
 import Avatar from '@/components/template/avatar';
+import LikeButton from '@/components/template/heart';
+import SaveButton from '@/components/template/save';
+import { DateHelper } from '@/helpers/date-helper';
 import { IPublicPost } from '@/utils/sanitizer/post';
-import { Bookmark, Heart, MessageSquare, Share2 } from 'lucide-react'
+import { MessageSquare, Share2 } from 'lucide-react'
 import { Session } from 'next-auth';
 import { useRouter } from 'next/navigation';
 import React from 'react'
 
 type Props = {
-    session: Session;
+    session?: Session;
     post: IPublicPost;
-    busy: boolean;
-    liked: boolean;
-    saved: boolean;
-    setLikes: React.Dispatch<React.SetStateAction<IPublicPost['likes']>>;
-    setSaves: React.Dispatch<React.SetStateAction<IPublicPost['saves']>>;
-    setBusy: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, setBusy }: Props) {
+function PostPageCard({ session, post }: Props) {
 
     const router = useRouter();
 
     const [shareModalOpen, setShareModalOpen] = React.useState(false);
-
-    async function toggleLike() {
-        if (!post) return;
-        setBusy(true);
-        await new Promise((r) => setTimeout(r, 400));
-        setLikes((s) => {
-            const userId = session.user.id;
-            if (liked) {
-                return s.filter(id => id !== userId);
-            } else {
-                return [...s, userId];
-            }
-        });
-        setBusy(false);
-    } // TODO: Need to add like\unlike API call
-
-    async function toggleSave() {
-        if (!post) return;
-        setBusy(true);
-        await new Promise((r) => setTimeout(r, 300));
-        setSaves((s) => {
-            const userId = session.user.id;
-            if (saved) {
-                return s.filter(id => id !== userId);
-            } else {
-                return [...s, userId];
-            }
-        })
-        setBusy(false);
-    } // TODO: Need to add save\unsave API call
 
     async function handleShare() {
         setShareModalOpen(true);
@@ -65,7 +32,7 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
                     <Avatar size={10} user={post.author} />
                     <div onClick={() => router.push(`/${post.author.username}`)} className='cursor-pointer'>
                         <div className="font-semibold">{post.author.name || post.author.username}</div>
-                        <div className="text-xs opacity-70">@{post.author.username} • {new Date(post.created_at).toLocaleDateString()}</div>
+                        <div className="text-xs opacity-70">@{post.author.username} • {DateHelper.formatDateLong(post.created_at)}</div>
                     </div>
                 </header>
 
@@ -80,9 +47,12 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
 
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <button onClick={toggleLike} disabled={busy} className={`flex items-center gap-2 rounded-lg px-3 py-2 ${liked ? "bg-red-600 text-white" : "hover:bg-black/5 dark:hover:bg-white/5"}`}>
-                            <Heart className="h-4 w-4" /> <span className="text-sm">{post.likes.length + (liked ? 1 : 0)}</span>
-                        </button>
+
+                        <LikeButton
+                            post_id={post._id}
+                            initialLiked={post.likes.includes(session?.user?.id || "")}
+                            initialCount={post.likes.length}
+                        />
 
                         <button className="flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-black/5 dark:hover:bg-white/5">
                             <MessageSquare className="h-4 w-4" /> <span className="text-sm">{post.comments_count}</span>
@@ -98,9 +68,10 @@ function PostPageCard({ session, busy, post, liked, saved, setLikes, setSaves, s
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <button onClick={toggleSave} className={`p-2 rounded-md hover:bg-black/5 dark:hover:bg-white/5 ${saved ? "bg-gray-200 dark:bg-gray-600" : ""}`}>
-                            <Bookmark className="h-4 w-4" />
-                        </button>
+                        <SaveButton
+                            initialSaved={post.saves.includes(session?.user?.id || "")}
+                            post_id={post._id}
+                        />
                     </div>
                 </div>
             </article>

@@ -1,8 +1,12 @@
 import React from "react";
 import Avatar from "../../template/avatar";
 import { IPublicPost } from "@/utils/sanitizer/post";
-import { Heart, MessageSquare, MoreHorizontal, Share2 } from "lucide-react";
+import { MessageSquare, MoreHorizontal, Share2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import LikeButton from "@/components/template/heart";
+import { useSession } from "next-auth/react";
+import { DateHelper } from "@/helpers/date-helper";
+import SaveButton from "@/components/template/save";
 
 type Props = {
   post: IPublicPost;
@@ -14,8 +18,9 @@ function PostCard({ post, setPostOptionsData, setShareModalData }: Props) {
 
   const router = useRouter();
 
-  // const [postOptions, setPostOptions] = React.useState<boolean>(false);
-  // const [shareModalOpen, setShareModalOpen] = React.useState<boolean>(false);
+  const { data: session } = useSession();
+
+  const liked = post.likes.includes(session?.user?.id || "") || false;
 
   const setPostOptions = (open: boolean) => {
     if (open) {
@@ -44,7 +49,7 @@ function PostCard({ post, setPostOptionsData, setShareModalData }: Props) {
             </div>
             <div onClick={() => { router.push(`/${post.author.username}`) }}>
               <p className="text-sm font-semibold cursor-pointer">{post.author.name}</p>
-              <p className="text-xs opacity-70">@{post.author.username} • just now</p>
+              <p className="text-xs opacity-70">@{post.author.username} • {DateHelper.formatDateLong(post.created_at)}</p>
             </div>
           </div>
           <button onClick={() => setPostOptions(true)} className="rounded-md p-2 hover:bg-black/5 dark:hover:bg-white/5">
@@ -77,14 +82,8 @@ function PostCard({ post, setPostOptionsData, setShareModalData }: Props) {
         {/* actions */}
         <div className="mt-2 flex items-center justify-between">
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => {}}
-              className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5"
-              aria-label="like"
-            >
-              <Heart className="h-4 w-4" />
-              <span className="text-xs">{post.likes_count}</span>
-            </button>
+
+            <LikeButton post_id={post._id} initialLiked={liked} initialCount={post.likes_count} key={post._id + "-like"} />
 
             <button onClick={() => { router.push(`/post/${post._id}`) }} className="flex items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-black/5 dark:hover:bg-white/5" aria-label="comment">
               <MessageSquare className="h-4 w-4" />
@@ -105,7 +104,10 @@ function PostCard({ post, setPostOptionsData, setShareModalData }: Props) {
             }
 
           </div>
-          <div className="text-xs opacity-60 cursor-pointer">View details</div>
+          <SaveButton
+            initialSaved={post.saves.includes(session?.user?.id || "")}
+            post_id={post._id}
+          />
         </div>
       </article>
     </React.Fragment>

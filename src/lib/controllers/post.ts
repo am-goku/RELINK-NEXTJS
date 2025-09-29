@@ -265,3 +265,51 @@ export async function getSuggestions() {
 
   return posts.map(sanitizePost) || [];
 } // Get suggestions
+
+export async function handlePostLike(postId: string, userId: string) {
+  await connectDB();
+
+  const post = await Post.findById(postId);
+  if (!post) throw new NotFoundError('Post not found');
+
+  const hasLiked = post.likes.some((id: Types.ObjectId) => id.equals(userId));
+
+  const updated = await Post.findByIdAndUpdate(
+    postId,
+    hasLiked
+      ? { $pull: { likes: userId } }
+      : { $addToSet: { likes: userId } },
+    { new: true } // return updated doc
+  );
+
+  return {
+    postId: updated!._id.toString(),
+    userId,
+    liked: !hasLiked,
+    likesCount: updated!.likes.length
+  };
+} // Like or unlike a post
+
+export async function handlePostSave(postId: string, userId: string) {
+  await connectDB();
+
+  const post = await Post.findById(postId);
+  if (!post) throw new NotFoundError("Post not found");
+
+  const hasSaved = post.saves.some((id: Types.ObjectId) => id.equals(userId));
+
+  if (hasSaved) {
+    post.saves.pull(userId); // let Mongoose cast
+  } else {
+    post.saves.push(userId);
+  }
+
+  await post.save();
+
+  return {
+    postId: post._id.toString(),
+    userId,
+    saved: !hasSaved,
+    savesCount: post.saves.length,
+  };
+} // Save or unsave a post
