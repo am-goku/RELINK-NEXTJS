@@ -9,7 +9,7 @@ import Footer from "@/components/nav/footer";
 import CreatePostModal from "@/components/modal/createPost";
 import apiInstance from "@/lib/axios";
 import { getErrorMessage } from "@/lib/errors/errorResponse";
-import PostList from "./list.dashboard";
+import PostList from "@/components/list/PostList";
 
 type Props = {
   initialPosts: IPublicPost[];

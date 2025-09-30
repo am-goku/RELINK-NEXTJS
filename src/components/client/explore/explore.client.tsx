@@ -21,6 +21,7 @@ export default function ExplorePage() {
     const tabFromQuery = (searchParams.get("tab") as Tab) || "posts";
     const query = searchParams.get("q") || "";
     const activeTab = tabFromQuery;
+    const hashtag = searchParams.get("tag") || "";
 
     const setActiveTab = (tab: Tab) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -28,8 +29,21 @@ export default function ExplorePage() {
         router.replace(`/explore?${params.toString()}`, { scroll: false });
     };
 
+    const setHashtag = (tag: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        setActiveTab("posts");
+        params.set("tag", tag);
+        router.replace(`/explore?${params.toString()}`, { scroll: false });
+    }
+
     const setQuery = (q: string) => {
         const params = new URLSearchParams(searchParams.toString());
+        const isHash = q.startsWith("#");
+        if(hashtag) params.delete("tag");
+        if (isHash) {
+            setActiveTab("tags");
+            q = q.slice(1); // remove #
+        }
         params.set("q", q);
         router.replace(`/explore?${params.toString()}`, { scroll: false });
     };
@@ -66,6 +80,7 @@ export default function ExplorePage() {
 
                     <div className="relative flex-1 max-w-xl">
                         <ExploreSearchBar
+                            query={query}
                             setQuery={setQuery}
                         />
                     </div>
@@ -90,7 +105,7 @@ export default function ExplorePage() {
 
                         <div>
                             {activeTab === "posts" && (
-                                <PostTab query={query} setImagePosts={setImagePosts} openModalAt={openModalAt} />
+                                <PostTab hashtag={hashtag} query={query} setImagePosts={setImagePosts} openModalAt={openModalAt} />
                             )}
 
                             {activeTab === "users" && (
@@ -98,7 +113,7 @@ export default function ExplorePage() {
                             )}
 
                             {activeTab === "tags" && (
-                                <TagsTab query={query} />
+                                <TagsTab query={query} setHashtag={setHashtag} />
                             )}
                         </div>
                     </section>

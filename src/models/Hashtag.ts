@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
+import { PopulatedPost } from "@/utils/sanitizer/post";
 
 // Instance interface (a single hashtag document)
 export interface IHashtag extends Document {
@@ -9,6 +10,10 @@ export interface IHashtag extends Document {
     posts: Types.ObjectId[];
     created_at: Date;
     updated_at: Date;
+}
+
+export interface PopulatedHashtag extends Omit<IHashtag, "posts"> {
+    posts: PopulatedPost[];
 }
 
 // Static methods interface

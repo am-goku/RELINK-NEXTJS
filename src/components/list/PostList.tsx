@@ -1,11 +1,11 @@
-import PostCard from '@/components/ui/cards/postCard';
-import { IPublicPost } from '@/utils/sanitizer/post';
-import { AnimatePresence, motion } from 'framer-motion';
+import PostOptionsModal from "@/components/modal/postOptions";
+import ShareModal from "@/components/modal/SocialShare";
+import { IPublicPost } from "@/utils/sanitizer/post";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import React from 'react';
-import PostOptionsModal from '@/components/modal/postOptions';
-import { useRouter } from 'next/navigation';
-import ShareModal from '@/components/modal/SocialShare';
+import { AnimatePresence, motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import React from "react";
+import PostCard from "../ui/cards/postCard";
 
 type Props = {
     hasMore: boolean;

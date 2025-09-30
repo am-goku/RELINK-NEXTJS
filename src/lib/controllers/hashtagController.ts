@@ -1,4 +1,5 @@
-import { Hashtag } from "@/models/Hashtag";
+import { Hashtag, PopulatedHashtag } from "@/models/Hashtag";
+import { sanitizePost } from "@/utils/sanitizer/post";
 import { Types } from "mongoose";
 
 export async function trackPostHashtags(postId: Types.ObjectId, hashtags: string[]) {
@@ -14,9 +15,15 @@ export async function getTrendingHashtags(size: number = 10) {
 
 export async function findAHashtag(tag: string) {
     const hashtag = await Hashtag.findOne({ tag })
-        .populate("posts", "content author image created_at")
+        .populate({
+            path: "posts",
+            match: { image: { $ne: null } }, // <--- only posts with image
+            select: "content author image created_at",
+            populate: { path: "author", select: "name username image" },
+        })
+        .lean<PopulatedHashtag>()
         .exec();
-    return hashtag;
+    return { ...hashtag, posts: hashtag?.posts.map(sanitizePost) };
 }
 
 export async function searchHashtags(query: string, limit: number = 10) {

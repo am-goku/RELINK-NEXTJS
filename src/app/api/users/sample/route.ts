@@ -18,6 +18,8 @@ export async function GET(req: NextRequest) {
         const users = await User.aggregate([
             {
                 $match: {
+                    _id: { $ne: new Types.ObjectId(user.id) },
+                    role: 'user',
                     blocked: { $ne: true },
                     deleted: { $ne: true },
                     followers: { $ne: new Types.ObjectId(user.id) },

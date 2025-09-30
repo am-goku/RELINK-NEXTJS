@@ -6,14 +6,15 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 type Props = {
     query: string;
+    setHashtag: (tag: string) => void;
 }
 
-function TagsTab({ query }: Props) {
+function TagsTab({ query, setHashtag }: Props) {
 
     const busyRef = useRef(false);
 
     const [tags, setTags] = useState<SanitizedHashtag[]>([]);
-
+    
     const fetchTags = useCallback(async () => {
         if (busyRef.current) return; // debounce
 
@@ -37,15 +38,16 @@ function TagsTab({ query }: Props) {
     }, [query])
 
     useEffect(() => {
+        console.log("Rendering TagsTab with query:", query);
         fetchTags();
-    }, [fetchTags])
+    }, [fetchTags, query])
 
     return (
         <div className="space-y-4">
             {
                 tags.length > 0 ? (
                     tags.map((t) => (
-                        <button key={t._id.toString()} onClick={() => { }} className="px-3 py-1 rounded-full bg-white/90 dark:bg-neutral-800/80 shadow-sm">#{t.tag}</button>
+                        <button key={t._id.toString()} onClick={() => setHashtag(t.tag)} className="px-3 py-1 rounded-full bg-white/90 dark:bg-neutral-800/80 shadow-sm">#{t.tag}</button>
                     ))
                 ) : (
                     <div className="flex flex-col items-center justify-center py-16 text-gray-500 dark:text-gray-400">

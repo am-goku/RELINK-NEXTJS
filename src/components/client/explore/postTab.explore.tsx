@@ -7,37 +7,45 @@ import apiInstance from '@/lib/axios';
 
 type Props = {
     query: string;
+    hashtag: string;
     openModalAt: (index: number) => void;
     setImagePosts: React.Dispatch<React.SetStateAction<IPublicPost[]>>
 }
 
-function PostTab({ query, openModalAt, setImagePosts }: Props) {
+function PostTab({ query, hashtag, openModalAt, setImagePosts }: Props) {
 
     const busyRef = useRef(false);
 
     const [posts, setPosts] = useState<IPublicPost[]>([]);
-
 
     const fetchPosts = useCallback(async () => {
         if (busyRef.current) return;
         try {
             busyRef.current = true;
 
+            if (hashtag) {
+                const data = (await apiInstance.get(`/api/hashtag/post?tag=${hashtag}`)).data;
+                setPosts(data.posts);
+                setImagePosts(data.posts || []);
+                return;
+            }
+
             if (!query) {
                 const { suggesions } = (await apiInstance.get('/api/explore/suggested')).data || [];
                 setPosts(suggesions);
                 setImagePosts(suggesions || []);
             } else {
-                const posts = (await apiInstance.get(`/api/hashtag/post?tag=${query}`)).data;
-                setPosts(posts);
-                setImagePosts(posts || []);
+                const data = (await apiInstance.get(`/api/hashtag/post?tag=${query}`)).data;
+                setPosts(data.posts);
+                setImagePosts(data.posts || []);
             }
+
         } catch (error) {
             console.log(error);
         } finally {
-            setTimeout(() => busyRef.current = false, 500);
+            busyRef.current = false;
         }
-    }, [query, setImagePosts]);
+    }, [hashtag, query, setImagePosts]);
 
     useEffect(() => {
         fetchPosts();

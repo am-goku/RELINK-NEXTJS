@@ -1,7 +1,7 @@
 import User, { IUser, IUserDocument } from "@/models/User";
 import { connectDB } from "../db/mongoose";
 import { BadRequestError, NotFoundError, UnauthorizedError } from "../errors/ApiErrors";
-import { FilterQuery } from "mongoose";
+import { FilterQuery, Types } from "mongoose";
 import { sanitizeUser } from "@/utils/sanitizer/user";
 import { hashPassword } from "../hash";
 import { UploadResult, uploadToCloudinary } from "../cloudinary/cloudinaryUpload";
@@ -125,7 +125,7 @@ export async function updatePassword(password: string, userId: string) {
 
 
 
-export async function searchUser(searchKey: string | null, page: number = 1, prev: 'true' | 'false' = 'false') {
+export async function searchUser(user_id: string, searchKey: string | null, page: number = 1, prev: 'true' | 'false' = 'false') {
     await connectDB();
 
     if (!searchKey || !searchKey.trim()) return [];
@@ -134,6 +134,10 @@ export async function searchUser(searchKey: string | null, page: number = 1, pre
     const skip = (page - 1) * limit;
 
     const users = await User.find({
+        _id: { $ne: new Types.ObjectId(user_id) },
+        blocked: { $ne: true },
+        deleted: { $ne: true },
+        role: 'user',
         $or: [
             { username: { $regex: `^${searchKey.trim()}`, $options: 'i' } }, // prefix match
             { name: { $regex: searchKey.trim(), $options: 'i' } }            // optional full name match

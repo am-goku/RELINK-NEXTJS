@@ -21,18 +21,20 @@ function UserTab({ query }: Props) {
     const fetchUsers = useCallback(async () => {
         if (busyRef.current) return;
         try {
-            if (!query) {
-                const res = (await apiInstance.get(`/api/users/sample?size=10`)).data;
-                setUsers(res)
-                return;
-            }
             busyRef.current = true;
+            let res = [];
+            if (query) {
+                res = (await apiInstance.get(`/api/users/search?searchKey=${query}`)).data;
+            } else {
+                res = (await apiInstance.get('/api/users/sample?size=10')).data;
+            }
+            setUsers(res);
         } catch (error) {
-            throw (getErrorMessage(error) || "Something went wrong. Please try again.");
+            console.error(getErrorMessage(error) || "Something went wrong. Please try again.");
         } finally {
-            setTimeout(() => busyRef.current = false, 500);
+            busyRef.current = false; // reset immediately, unless you want debounce
         }
-    }, [query])
+    }, [query]);
 
     useEffect(() => {
         fetchUsers();
