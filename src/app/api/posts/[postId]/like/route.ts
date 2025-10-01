@@ -3,11 +3,11 @@ import { handlePostLike } from "@/lib/controllers/post";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PATCH(_req: NextRequest, { params }: { params: { postId: string } }) {
+export async function PATCH(_req: NextRequest, context: { params: Promise<{ postId: string }> }) {
     try {
         const user = await userAuth();
 
-        const { postId } = params;
+        const { postId } = await context.params;
 
         const data = await handlePostLike(postId, user.id);
 

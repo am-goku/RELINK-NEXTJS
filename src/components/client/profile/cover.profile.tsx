@@ -44,7 +44,6 @@ const ProfileCover = ({ user, isOwner }: { user: SanitizedUser, isOwner: boolean
     return (
         <React.Fragment>
             <div className="relative w-full h-60 bg-gray-300">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 {newCover || user?.cover ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img

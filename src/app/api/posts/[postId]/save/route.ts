@@ -3,11 +3,11 @@ import { handlePostSave } from "@/lib/controllers/post";
 import { handleApiError } from "@/lib/errors/errorResponse";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PATCH(_req: NextRequest, { params }: { params: { postId: string } }) {
+export async function PATCH(_req: NextRequest, context: { params: Promise<{ postId: string }> }) {
     try {
         const user = await userAuth();
 
-        const postId = params.postId;
+        const { postId } = await context.params;
         if (!postId) {
             throw new Error("Post ID is required");
         }
