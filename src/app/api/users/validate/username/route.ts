@@ -16,6 +16,8 @@ export async function GET(req: NextRequest) {
 
         const available = await validateUsername(username);
 
+        console.log(available);
+
         return NextResponse.json({ available })
 
     } catch (error) {

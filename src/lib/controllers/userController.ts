@@ -200,11 +200,11 @@ export async function updateCoverPic(file: File, userId: string) {
     return cloudResponse.url;
 }
 
-export async function validateUsername(username: string) {
+export async function validateUsername(username: string): Promise<boolean> {
     await connectDB();
     
     const userCount = await User.countDocuments({ username });
     const unverifiedCount = await UnverifiedUser.countDocuments({ username });
-    const flag = userCount === 0 || unverifiedCount === 0;
+    const flag = (userCount === 0 && unverifiedCount === 0);
     return flag;
 }
