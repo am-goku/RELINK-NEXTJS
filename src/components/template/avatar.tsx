@@ -3,7 +3,7 @@ import { User } from "lucide-react";
 
 function Avatar({ user, size = 10 }: { user: Partial<SanitizedUser>; size?: number }) {
     return (
-        <div className={`h-${size} w-${size} overflow-hidden rounded-full bg-gray-200`}>
+        <div key={`${user._id?.toString()}-avatar`} className={`h-${size} w-${size} overflow-hidden rounded-full bg-gray-200`}>
             {user.image ? (
                 // note: tailwind dynamic class with template string for height/width won't work without plugin; we apply inline style
                 // eslint-disable-next-line @next/next/no-img-element

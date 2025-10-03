@@ -31,8 +31,6 @@ export async function GET(req: NextRequest) {
 
         const data = users.map(u => sanitizeUser(u));
 
-        console.log(data);
-
         return NextResponse.json(data, { status: 200 });
 
     } catch (error) {

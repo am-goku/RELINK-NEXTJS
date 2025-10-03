@@ -3,6 +3,7 @@ import { Session } from 'next-auth';
 import React, { useEffect } from 'react'
 import ChatSearchBar from './search.chat';
 import RoomItem from './room.chat';
+import SuggestionChat from './suggestion.chat';
 
 type Props = {
     session: Session;
@@ -16,7 +17,6 @@ function ChatSidebar({ session, sidebarOpen, minScreen, setNewChat }: Props) {
     const rooms = useChatStore(state => state.chatRooms);
     const activeRoom = useChatStore(state => state.selectedRoom);
     const setActiveRoom = useChatStore(state => state.setSelectedRoom);
-
     
     useEffect(() => {
         return () => setActiveRoom(null)
@@ -46,6 +46,8 @@ function ChatSidebar({ session, sidebarOpen, minScreen, setNewChat }: Props) {
                                 />
                             );
                         })}
+                        <p className='text-sm font-semibold'>Suggestions</p>
+                        <SuggestionChat rooms={rooms} session={session} setActiveRoom={setActiveRoom} setNewChat={setNewChat} />
                     </ul>
                 </nav>
             </aside>

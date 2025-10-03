@@ -25,7 +25,6 @@ type Props = {
 
 function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen, setNewChat }: Props) {
 
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const bottomRef = useRef<HTMLDivElement>(null);
 
     // Chat room states
@@ -59,21 +58,30 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
         return () => {
             socket.off("receive-message");
         }
-    }, [activeRoom, reorderRooms, updateLastMessage]) // listen for new messages
+    }, [activeRoom?._id, reorderRooms, updateLastMessage]) // listen for new messages
 
     // Fetch messages
     useEffect(() => {
         const getMessages = async () => {
-            if (activeRoom && !newChat) {
-                setLoading(true);
-                const messages = (await apiInstance.get(`/api/chat/conversation/${activeRoom._id.toString()}/message`)).data.messages || [];
-                setMessages(messages);
+            try {
+                if (activeRoom) {
+                    setLoading(true);
+                    const res = await apiInstance.get(`/api/chat/conversation/${activeRoom._id.toString()}/message`);
+                    setMessages(res.data.messages || []);
+                }
+            } catch {
+                setMessages([]);
+            } finally {
+                setLoading(false);
             }
-            setLoading(false);
         };
 
         getMessages();
-    }, [activeRoom, newChat]);
+
+        return () => {
+            setMessages([]);
+        }
+    }, [activeRoom, setNewChat]);
 
     // Mark messages as unread
     useEffect(() => {
@@ -94,14 +102,17 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
 
     // Handle typing
     useEffect(() => {
-        socket.on("typing", ({roomId}) => {
-            if(activeRoom?._id.toString() === roomId) {
+        const handler = ({ roomId }: { roomId: string }) => {
+            if (activeRoom?._id.toString() === roomId) {
                 setTyping(true);
-                setTimeout(() => {
-                    setTyping(false);
-                }, 3000);
+                setTimeout(() => setTyping(false), 3000);
             }
-        });
+        };
+
+        socket.on("typing", handler);
+        return () => {
+            socket.off("typing", handler);
+        };
     }, [activeRoom?._id])
 
     return (
@@ -138,7 +149,6 @@ function MessageArea({ session, minScreen, sidebarOpen, newChat, setSidebarOpen,
                                                     );
                                                 })}
                                                 {typing && <TypingLoader />}
-                                                <div ref={messagesEndRef} />
                                             </motion.div>
                                         </AnimatePresence>
                                     )
