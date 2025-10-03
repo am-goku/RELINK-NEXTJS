@@ -22,6 +22,6 @@ jobs:
           script: |
             cd ${{ secrets.EC2_PROJECT_DIR }}
             git pull ${{ secrets.GIT_REPO_URL }} main
-            NODE_OPTIONS="--max-old-space-size=4096" ${{ secrets.NODE_PATH }} install --production
-            NODE_OPTIONS="--max-old-space-size=4096" ${{ secrets.NODE_PATH }} run build
-            ${{ secrets.PM2_PATH }} restart ${{ secrets.PM2_SERVICE }}
+            NODE_OPTIONS="--max-old-space-size=4096" npm install --production
+            NODE_OPTIONS="--max-old-space-size=4096" npm run build
+            pm2 restart ${{ secrets.PM2_SERVICE }}
