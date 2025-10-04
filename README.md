@@ -1,24 +1,23 @@
 # RELINK
 
-A modern web application built with **Next.js** and **TypeScript**, featuring Tailwind CSS and other tooling.
-
-*(This project was bootstrapped with create-next-app.)*
+A modern social web application built with Next.js and TypeScript.
 
 ---
 
 ## Table of Contents
 
+* [About](#about)
 * [Features](#features)
 * [Tech Stack](#tech-stack)
 * [Getting Started](#getting-started)
 
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
-  * [Running the App](#running-the-app)
-  * [Building for Production](#building-for-production)
+  * [Environment](#environment)
+  * [Development](#development)
+  * [Build & Production](#build--production)
   * [Linting & Formatting](#linting--formatting)
 * [Project Structure](#project-structure)
-* [Configuration & Environment](#configuration--environment)
 * [Deployment](#deployment)
 * [Contributing](#contributing)
 * [License](#license)
@@ -26,29 +25,30 @@ A modern web application built with **Next.js** and **TypeScript**, featuring Ta
 
 ---
 
+## About
+
+RELINK is a social application built with Next.js and TypeScript. It uses Tailwind CSS for styling and MongoDB (via Mongoose) for data persistence.
+
+---
+
 ## Features
 
-* Server-side rendering and static generation via Next.js
-* TypeScript for strong type safety
-* Tailwind CSS for fast, responsive styling
-* Linting and formatting tools (ESLint, Prettier)
-* Configurable for easy deployment
-* Modular architecture for scalability
-
-*(You can add more features, like authentication, API routes, etc.)*
+* Server-side rendering and static generation with Next.js
+* TypeScript for type safety
+* Tailwind CSS for utility-first styling
+* MongoDB database using Mongoose
+* Modular, scalable folder structure
 
 ---
 
 ## Tech Stack
 
-| Layer        | Tool / Framework |
-| ------------ | ---------------- |
-| Framework    | Next.js          |
-| Language     | TypeScript       |
-| Styling      | Tailwind CSS     |
-| Linting      | ESLint           |
-| Formatting   | Prettier         |
-| Build System | Next.js built-in |
+* Next.js
+* TypeScript
+* React
+* Tailwind CSS
+* MongoDB with Mongoose
+* ESLint & Prettier
 
 ---
 
@@ -56,8 +56,9 @@ A modern web application built with **Next.js** and **TypeScript**, featuring Ta
 
 ### Prerequisites
 
-* Node.js (v16 or newer recommended)
-* npm, yarn, or pnpm package manager
+* Node.js v16 or newer
+* npm, yarn, or pnpm
+* MongoDB instance (local or hosted)
 
 ### Installation
 
@@ -65,26 +66,50 @@ A modern web application built with **Next.js** and **TypeScript**, featuring Ta
 git clone https://github.com/am-goku/RELINK-NEXTJS.git
 cd RELINK-NEXTJS
 npm install
-# or yarn install / pnpm install
 ```
 
-### Running the App (Development)
+### Environment
+
+Create a `.env.local` file in the project root and add environment variables required by the project. Example:
+
+```env
+# Authentication
+NEXTAUTH_SECRET=sample_secret_key
+NEXTAUTH_URL=http://localhost:3000
+
+# API
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
+NEXT_PUBLIC_SOCKET_URL=ws://localhost:3001
+
+# MongoDB
+MONGODB_URI=mongodb+srv://sample_user:sample_password@cluster0.mongodb.net/relink
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=sample_cloud_name
+CLOUDINARY_API_SECRET=sample_api_secret
+CLOUDINARY_API_KEY=sample_api_key
+
+# SMTP
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=sample_user@example.com
+SMTP_PASS=sample_password
+```
+
+### Development
 
 ```bash
 npm run dev
-# or yarn dev / pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to view it.
+Open [http://localhost:3000](http://localhost:3000)
 
-### Building for Production
+### Build & Production
 
 ```bash
 npm run build
 npm start
 ```
-
-This builds the project and serves it in production mode.
 
 ### Linting & Formatting
 
@@ -93,79 +118,61 @@ npm run lint
 npm run format
 ```
 
-Ensure your code is clean and formatted before committing.
-
 ---
 
 ## Project Structure
 
 ```
 .
-├── .github/             # GitHub workflows (CI/CD)
-├── public/              # Static assets
-├── src/                 # Application source code
-│   ├── pages/           # Page components / routes
-│   ├── components/      # Reusable UI components
-│   ├── styles/          # Global and component styles
-│   └── ...              # Utilities, hooks, etc.
-├── next.config.ts       # Next.js configuration
-├── tailwind.config.js   # Tailwind configuration
-├── tsconfig.json        # TypeScript configuration
-├── eslint.config.mjs    # ESLint configuration
-└── package.json         # Dependencies and scripts
+├── .github/
+├── public/
+├── src/
+│   ├── app/ or pages/
+│   ├── components/
+│   ├── lib/
+│   ├── hooks/
+│   ├── models/         # Mongoose models
+│   ├── styles/
+│   └── utils/
+├── next.config.js
+├── tailwind.config.js
+├── tsconfig.json
+├── package.json
+└── .env.local (gitignored)
 ```
-
----
-
-## Configuration & Environment
-
-Environment variables are defined in a `.env.local` file (excluded from Git). Example:
-
-```ini
-NEXT_PUBLIC_API_URL=https://api.example.com
-DATABASE_URL=postgres://user:pass@localhost:5432/db
-```
-
-Access them in code using `process.env.VAR_NAME`.
 
 ---
 
 ## Deployment
 
-Deploy **RELINK** easily on:
+Recommended platforms:
 
-* **Vercel** — Recommended (first-party Next.js support)
-* **Netlify**
-* **Custom Node.js servers** (e.g., EC2, DigitalOcean)
+* Vercel (recommended for Next.js)
+* Netlify (when using static exports)
+* Any Node.js host (Docker, DigitalOcean, AWS, etc.)
 
-Follow the [Next.js deployment docs](https://nextjs.org/docs/deployment) for details.
+Before deploying, ensure environment variables (MONGODB_URI, NEXTAUTH_SECRET, etc.) are configured in the host.
 
 ---
 
 ## Contributing
 
-Contributions are welcome!
-
-1. Fork the repo
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit your changes: `git commit -m 'Add new feature'`
-4. Push to your branch: `git push origin feature/new-feature`
-5. Open a Pull Request
-
-Please ensure your code passes linting and builds successfully before submitting.
+1. Fork the repository
+2. Create a branch: `git checkout -b feature/your-feature`
+3. Commit your changes: `git commit -m "Add feature"
+4. Push: `git push origin feature/your-feature`
+5. Open a pull request
 
 ---
 
 ## License
 
-This project is shared publicly for demonstration purposes only.  
-All rights reserved © Gokul Krishna.
+This project is shared publicly for demonstration purposes only. All rights reserved © Gokul Krishna.
 
 ---
 
 ## Contact
 
-**Author:** [Gokul Krishna](https://github.com/am-goku)
-**Repository:** [https://github.com/am-goku/RELINK-NEXTJS](https://github.com/am-goku/RELINK-NEXTJS)
+Gokul Krishna — [https://github.com/am-goku](https://github.com/am-goku)
 
----
+Repository: [https://github.com/am-goku/RELINK-NEXTJS](https://github.com/am-goku/RELINK-NEXTJS)
