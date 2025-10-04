@@ -158,7 +158,8 @@ Please ensure your code passes linting and builds successfully before submitting
 
 ## License
 
-*(Add your license here — e.g., MIT, Apache 2.0, etc.)*
+This project is shared publicly for demonstration purposes only.  
+All rights reserved © Gokul Krishna.
 
 ---
 
